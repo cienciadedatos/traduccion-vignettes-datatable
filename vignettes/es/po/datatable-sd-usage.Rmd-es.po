@@ -1,12 +1,13 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
+"Project-Id-Version: 0.0.1\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-10-04 11:41-0300\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
+"PO-Revision-Date: 2024-10-04 16:53-0300\n"
+"Last-Translator: Nombre Apellido <direccion@ejemplo.com>\n"
+"Language-Team: es\n"
+"Language: es\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -17,23 +18,23 @@ msgid ""
 "This vignette will explain the most common ways to use the `.SD` variable in "
 "your `data.table` analyses. It is an adaptation of [this answer]{1} given on "
 "StackOverflow."
-msgstr ""
+msgstr "Esta viñeta explica las formas más comunes de usar la variable `.SD` en los análisis de `data.table`. Es una adaptación de [esta respuesta]{1} proporcionada en StackOverflow."
 
 #: es%5Cdatatable-sd-usage.Rmd.tmp%2Bheading
 msgid "What is `.SD`?"
-msgstr ""
+msgstr "¿Qué es «.SD»?"
 
 #: es%5Cdatatable-sd-usage.Rmd.tmp%2Bp
 msgid ""
 "In the broadest sense, `.SD` is just shorthand for capturing a variable that "
 "comes up frequently in the context of data analysis. It can be understood to "
-"stand for *S*ubset, *S*elfsame, or *S*elf-reference of the *D*ata. That is, `"
-".SD` is in its most basic guise a _reflexive reference_ to the `data.table` "
+"stand for *S*ubset, *S*elfsame, or *S*elf-reference of the *D*ata. That is, "
+"`.SD` is in its most basic guise a _reflexive reference_ to the `data.table` "
 "itself -- as we'll see in examples below, this is particularly helpful for "
 "chaining together \"queries\" (extractions/subsets/etc using `[`). In "
 "particular, this also means that `.SD` is _itself a `data.table`_ (with the "
 "caveat that it does not allow assignment with `:=`)."
-msgstr ""
+msgstr "En el sentido más amplio, `.SD` es simplemente una abreviatura para capturar una variable que aparece con frecuencia en el contexto del análisis de datos. Puede entenderse como *S*ubset, *S*elfsame, o *S*elf-reference of the *D*ata. Es decir, `.SD` es en su forma más básica una _referencia reflexiva_ a la `data.table` en sí misma -- como veremos en los ejemplos a continuación, esto es particularmente útil para encadenar \"consultas\" (extracciones/subconjuntos/etc. usando `[`). En particular, esto también significa que `.SD` es _en sí mismo una `data.table`_ (con la salvedad de que no permite la asignación con `:=`)."
 
 #: es%5Cdatatable-sd-usage.Rmd.tmp%2Bp
 msgid ""
@@ -44,11 +45,11 @@ msgid ""
 "is slightly different, conceptually (though at core it's the same, since, "
 "after all, a non-grouped operation is an edge case of grouping with just one "
 "group)."
-msgstr ""
+msgstr "El uso más simple de `.SD` es para la creación de subconjuntos de columnas (es decir, cuando se especifica `.SDcols`); como esta versión es mucho más sencilla de entender, la abordaremos primero a continuación. La interpretación de `.SD` en su segundo uso, los escenarios de agrupación (es decir, cuando se especifica `by = ` o `keyby = `), es ligeramente diferente, conceptualmente (aunque en esencia es la misma, ya que, después de todo, una operación no agrupada es un caso extremo de agrupación con un solo grupo)."
 
 #: es%5Cdatatable-sd-usage.Rmd.tmp%2Bheading
 msgid "Loading and Previewing Lahman Data"
-msgstr ""
+msgstr "Carga y vista previa de datos de Lahman"
 
 #: es%5Cdatatable-sd-usage.Rmd.tmp%2Bp
 msgid ""
@@ -57,7 +58,7 @@ msgid ""
 "usage, we'd simply load these data sets from the `Lahman` R package; in this "
 "vignette, we've pre-downloaded them directly from the package's GitHub page "
 "instead."
-msgstr ""
+msgstr "Para que esto parezca más real, en lugar de inventar datos, carguemos algunos conjuntos de datos sobre béisbol desde la [base de datos Lahman]{1}. En el uso típico de R, simplemente cargaríamos estos conjuntos de datos desde el paquete R `Lahman`; en este ejemplo, los hemos descargado previamente directamente desde la página de GitHub del paquete."
 
 #: es%5Cdatatable-sd-usage.Rmd.tmp%2Bp
 msgid ""
@@ -66,90 +67,90 @@ msgid ""
 "`Pitching` records statistics for a given pitcher in a given year. Please do "
 "check out the [documentation]{1} and explore the data yourself a bit before "
 "proceeding to familiarize yourself with their structure."
-msgstr ""
+msgstr "Los lectores familiarizados con la jerga del béisbol encontrarán familiar el contenido de las tablas: \"Equipos\" registra algunas estadísticas de un equipo determinado en un año determinado, mientras que \"Lanzamientos\" registra las estadísticas de un lanzador determinado en un año determinado. Consulte la [documentación]{1} y explore los datos un poco antes de familiarizarse con su estructura."
 
 #: es%5Cdatatable-sd-usage.Rmd.tmp%2Bheading
 msgid "`.SD` on Ungrouped Data"
-msgstr ""
+msgstr "`.SD` en datos no agrupados"
 
 #: es%5Cdatatable-sd-usage.Rmd.tmp%2Bp
 msgid ""
 "To illustrate what I mean about the reflexive nature of `.SD`, consider its "
 "most banal usage:"
-msgstr ""
+msgstr "Para ilustrar lo que quiero decir sobre la naturaleza reflexiva de «.SD», consideremos su uso más banal:"
 
 #: es%5Cdatatable-sd-usage.Rmd.tmp%2Bp
 msgid ""
 "That is, `Pitching[ , .SD]` has simply returned the whole table, i.e., this "
 "was an overly verbose way of writing `Pitching` or `Pitching[]`:"
-msgstr ""
+msgstr "Es decir, `Pitching[ , .SD]` simplemente ha devuelto la tabla completa, es decir, esta era una forma demasiado verbosa de escribir `Pitching` o `Pitching[]`:"
 
 #: es%5Cdatatable-sd-usage.Rmd.tmp%2Bp
 msgid ""
 "In terms of subsetting, `.SD` is still a subset of the data, it's just a "
 "trivial one (the set itself)."
-msgstr ""
+msgstr "En términos de subconjuntos, `.SD` sigue siendo un subconjunto de los datos, sólo que es trivial (el conjunto en sí)."
 
 #: es%5Cdatatable-sd-usage.Rmd.tmp%2Bheading
 msgid "Column Subsetting: `.SDcols`"
-msgstr ""
+msgstr "Subconjunto de columna: `.SDcols`"
 
 #: es%5Cdatatable-sd-usage.Rmd.tmp%2Bp
 msgid ""
 "The first way to impact what `.SD` is is to limit the _columns_ contained in "
 "`.SD` using the `.SDcols` argument to `[`:"
-msgstr ""
+msgstr "La primera forma de influir en lo que es `.SD` es limitar las _columnas_ contenidas en `.SD` usando el argumento `.SDcols` a `[`:"
 
 #: es%5Cdatatable-sd-usage.Rmd.tmp%2Bp
 msgid ""
 "This is just for illustration and was pretty boring. In addition to "
 "accepting a character vector, `.SDcols` also accepts:"
-msgstr ""
+msgstr "Esto es solo para ilustrar y fue bastante aburrido. Además de aceptar un vector de caracteres, `.SDcols` también acepta:"
 
 #: es%5Cdatatable-sd-usage.Rmd.tmp%2Bp
 msgid ""
 "=====1. any function such as `is.character` to filter _columns_===== =====2. "
 "the function^{*} `patterns()` to filter _column names_ by regular "
 "expression===== =====3. integer and logical vectors====="
-msgstr ""
+msgstr "=====1. cualquier función como `is.character` para filtrar _columnas_===== =====2. la función^{*} `patterns()` para filtrar _nombres de columnas_ mediante expresiones regulares===== =====3. vectores enteros y lógicos====="
 
 #: es%5Cdatatable-sd-usage.Rmd.tmp%2Bp
 msgid "*see `?patterns` for more details"
-msgstr ""
+msgstr "*ver `?patrones` para más detalles"
 
 #: es%5Cdatatable-sd-usage.Rmd.tmp%2Bp
 msgid ""
 "This simple usage lends itself to a wide variety of highly beneficial / "
 "ubiquitous data manipulation operations:"
-msgstr ""
+msgstr "Este uso simple se presta a una amplia variedad de operaciones de manipulación de datos altamente beneficiosas y omnipresentes:"
 
 #: es%5Cdatatable-sd-usage.Rmd.tmp%2Bheading
 msgid "Column Type Conversion"
-msgstr ""
+msgstr "Conversión de tipo de columna"
 
 #: es%5Cdatatable-sd-usage.Rmd.tmp%2Bp
 msgid ""
 "Column type conversion is a fact of life for data munging. Though [`fwrite` "
-"recently gained the ability to declare the class of each column up front]{1}"
-", not all data sets come from `fread` (e.g. in this vignette) and "
+"recently gained the ability to declare the class of each column up front]"
+"{1}, not all data sets come from `fread` (e.g. in this vignette) and "
 "conversions back and forth among `character`/`factor`/`numeric` types are "
 "common. We can use `.SD` and `.SDcols` to batch-convert groups of columns to "
 "a common type."
-msgstr ""
+msgstr "La conversión de tipos de columnas es una realidad en la manipulación de datos. Aunque [`fwrite` recientemente obtuvo la capacidad de declarar la clase de cada columna por adelantado]{1}, no todos los conjuntos de datos provienen de `fread` (por ejemplo, en esta viñeta) y las conversiones entre tipos `character`/`factor`/`numeric` son comunes. Podemos usar `.SD` y `.SDcols` para convertir por lotes grupos de columnas a un tipo común."
 
 #: es%5Cdatatable-sd-usage.Rmd.tmp%2Bp
 msgid ""
-"We notice that the following columns are stored as `character` in the `Teams`"
-" data set, but might more logically be stored as `factor`s:"
-msgstr ""
+"We notice that the following columns are stored as `character` in the "
+"`Teams` data set, but might more logically be stored as `factor`s:"
+msgstr "Observamos que las siguientes columnas se almacenan como \"carácter\" en el conjunto de datos \"Equipos\", pero sería más lógico almacenarlas como \"factor\":"
 
 #: es%5Cdatatable-sd-usage.Rmd.tmp%2Bp
 msgid "The syntax to now convert these columns to `factor` is simple:"
-msgstr ""
+msgstr "La sintaxis para convertir ahora estas columnas a \"factor\" es sencilla:"
 
 #: es%5Cdatatable-sd-usage.Rmd.tmp%2Bp
 msgid "Note:"
-msgstr ""
+msgstr "Nota:"
 
 #: es%5Cdatatable-sd-usage.Rmd.tmp%2Bp
 msgid ""
@@ -157,10 +158,10 @@ msgid ""
 "place without making a copy. See [reference semantics]{1} for more. ===== "
 "=====2. The LHS, `names(.SD)`, indicates which columns we are updating - in "
 "this case we update the entire `.SD`.===== =====3. The RHS, `lapply()`, "
-"loops through each column of the `.SD` and converts the column to a "
-"factor.===== =====4. We use the `.SDcols` to only select columns that have "
-"pattern of `teamID`.====="
-msgstr ""
+"loops through each column of the `.SD` and converts the column to a factor."
+"===== =====4. We use the `.SDcols` to only select columns that have pattern "
+"of `teamID`.====="
+msgstr "=====1. `:=` es un operador de asignación para actualizar la `data.table` en su lugar sin hacer una copia. Consulte [semántica de referencia]{1} para obtener más información. ===== =====2. El LHS, `names(.SD)`, indica qué columnas estamos actualizando; en este caso, actualizamos todo el `.SD`.===== =====3. El RHS, `lapply()`, recorre cada columna del `.SD` y convierte la columna en un factor.===== =====4. Usamos `.SDcols` para seleccionar solo columnas que tengan el patrón `teamID`.====="
 
 #: es%5Cdatatable-sd-usage.Rmd.tmp%2Bp
 msgid ""
@@ -170,32 +171,32 @@ msgid ""
 "`integer` vector of column _positions_ or a `logical` vector dictating "
 "include/exclude for each column. Finally, the use of a function to filter "
 "columns is very helpful."
-msgstr ""
+msgstr "Nuevamente, el argumento `.SDcols` es bastante flexible; anteriormente, proporcionamos `patrones` pero también podríamos haber proporcionado `fkt` o cualquier vector `carácter` de nombres de columnas. En otras situaciones, es más conveniente proporcionar un vector `entero` de posiciones de columnas o un vector `lógico` que indique la inclusión/exclusión de cada columna. Finalmente, el uso de una función para filtrar columnas es muy útil."
 
 #: es%5Cdatatable-sd-usage.Rmd.tmp%2Bp
 msgid ""
 "For example, we could do the following to convert all `factor` columns to "
 "`character`:"
-msgstr ""
+msgstr "Por ejemplo, podríamos hacer lo siguiente para convertir todas las columnas de tipo «factor» a «carácter»:"
 
 #: es%5Cdatatable-sd-usage.Rmd.tmp%2Bp
 msgid ""
 "Lastly, we can do pattern-based matching of columns in `.SDcols` to select "
 "all columns which contain `team` back to `factor`:"
-msgstr ""
+msgstr "Por último, podemos hacer una coincidencia basada en patrones de columnas en `.SDcols` para seleccionar todas las columnas que contienen `team` hasta `factor`:"
 
 #: es%5Cdatatable-sd-usage.Rmd.tmp%2Bp
 msgid ""
-"** A proviso to the above: _explicitly_ using column numbers (like `DT[ , (1)"
-" := rnorm(.N)]`) is bad practice and can lead to silently corrupted code "
+"** A proviso to the above: _explicitly_ using column numbers (like `DT[ , "
+"(1) := rnorm(.N)]`) is bad practice and can lead to silently corrupted code "
 "over time if column positions change. Even implicitly using numbers can be "
 "dangerous if we don't keep smart/strict control over the ordering of when we "
 "create the numbered index and when we use it."
-msgstr ""
+msgstr "** Una salvedad a lo anterior: usar números de columna _explícitamente_ (como `DT[ , (1) := rnorm(.N)]`) es una mala práctica y puede provocar que el código se corrompa de forma silenciosa con el tiempo si cambian las posiciones de las columnas. Incluso el uso implícito de números puede ser peligroso si no mantenemos un control inteligente/estricto sobre el orden en que creamos el índice numerado y cuándo lo usamos."
 
 #: es%5Cdatatable-sd-usage.Rmd.tmp%2Bheading
 msgid "Controlling a Model's Right-Hand Side"
-msgstr ""
+msgstr "Controlar el lado derecho de un modelo"
 
 #: es%5Cdatatable-sd-usage.Rmd.tmp%2Bp
 msgid ""
@@ -205,24 +206,24 @@ msgid ""
 "`Pitching` table. How does the (linear) relationship between `W` (wins) and "
 "`ERA` vary depending on which other covariates are included in the "
 "specification?"
-msgstr ""
+msgstr "La variación de la especificación del modelo es una característica fundamental del análisis estadístico sólido. Intentemos predecir la efectividad (promedio de carreras limpias, una medida del rendimiento) de un lanzador utilizando el pequeño conjunto de covariables disponibles en la tabla \"Lanzamiento\". ¿Cómo varía la relación (lineal) entre \"W\" (victorias) y \"ERA\" según qué otras covariables se incluyan en la especificación?"
 
 #: es%5Cdatatable-sd-usage.Rmd.tmp%2Bp
 msgid ""
 "Here's a short script leveraging the power of `.SD` which explores this "
 "question:"
-msgstr ""
+msgstr "A continuación se muestra un breve script que aprovecha el poder de `.SD` y que explora esta pregunta:"
 
 #: es%5Cdatatable-sd-usage.Rmd.tmp%2Bp
 msgid ""
 "The coefficient always has the expected sign (better pitchers tend to have "
 "more wins and fewer runs allowed), but the magnitude can vary substantially "
 "depending on what else we control for."
-msgstr ""
+msgstr "El coeficiente siempre tiene el signo esperado (los mejores lanzadores tienden a tener más victorias y menos carreras permitidas), pero la magnitud puede variar sustancialmente dependiendo de qué más controlemos."
 
 #: es%5Cdatatable-sd-usage.Rmd.tmp%2Bheading
 msgid "Conditional Joins"
-msgstr ""
+msgstr "Uniones condicionales"
 
 #: es%5Cdatatable-sd-usage.Rmd.tmp%2Bp
 msgid ""
@@ -230,42 +231,42 @@ msgid ""
 "syntax `x[i]` flexibly handles three common approaches to subsetting -- when "
 "`i` is a `logical` vector, `x[i]` will return those rows of `x` "
 "corresponding to where `i` is `TRUE`; when `i` is _another `data.table`_ (or "
-"a `list`), a (right) `join` is performed (in the plain form, using the `key`"
-"s of `x` and `i`, otherwise, when `on = ` is specified, using matches of "
-"those columns); and when `i` is a character, it is interpreted as shorthand "
-"for `x[list(i)]`, i.e., as a join."
-msgstr ""
+"a `list`), a (right) `join` is performed (in the plain form, using the "
+"`key`s of `x` and `i`, otherwise, when `on = ` is specified, using matches "
+"of those columns); and when `i` is a character, it is interpreted as "
+"shorthand for `x[list(i)]`, i.e., as a join."
+msgstr "La sintaxis de `data.table` es hermosa por su simplicidad y robustez. La sintaxis `x[i]` maneja de manera flexible tres enfoques comunes para la creación de subconjuntos: cuando `i` es un vector `lógico`, `x[i]` devolverá aquellas filas de `x` correspondientes a donde `i` es `VERDADERO`; cuando `i` es _otra `data.table`_ (o una `lista`), se realiza una `unión` (derecha) (en la forma simple, utilizando las `key`s de `x` e `i`, de lo contrario, cuando se especifica `on = `, utilizando las coincidencias de esas columnas); y cuando `i` es un carácter, se interpreta como una abreviatura de `x[list(i)]`, es decir, como una unión."
 
 #: es%5Cdatatable-sd-usage.Rmd.tmp%2Bp
 msgid ""
 "This is great in general, but falls short when we wish to perform a "
 "_conditional join_, wherein the exact nature of the relationship among "
 "tables depends on some characteristics of the rows in one or more columns."
-msgstr ""
+msgstr "Esto es excelente en general, pero se queda corto cuando deseamos realizar una _unión condicional_, en donde la naturaleza exacta de la relación entre tablas depende de algunas características de las filas en una o más columnas."
 
 #: es%5Cdatatable-sd-usage.Rmd.tmp%2Bp
 msgid ""
 "This example is admittedly a tad contrived, but illustrates the idea; see "
 "here ([1]{1}, [2]{2}) for more."
-msgstr ""
+msgstr "Este ejemplo es ciertamente un poco artificial, pero ilustra la idea; véase aquí ([1]{1}, [2]{2}) para más información."
 
 #: es%5Cdatatable-sd-usage.Rmd.tmp%2Bp
 msgid ""
 "The goal is to add a column `team_performance` to the `Pitching` table that "
 "records the team's performance (rank) of the best pitcher on each team (as "
 "measured by the lowest ERA, among pitchers with at least 6 recorded games)."
-msgstr ""
+msgstr "El objetivo es agregar una columna `team_performance` a la tabla `Pitching` que registre el desempeño (rango) del mejor lanzador de cada equipo (medido por la ERA más baja, entre los lanzadores con al menos 6 juegos registrados)."
 
 #: es%5Cdatatable-sd-usage.Rmd.tmp%2Bp
 msgid ""
 "Note that the `x[y]` syntax returns `nrow(y)` values (i.e., it's a right "
 "join), which is why `.SD` is on the right in `Teams[.SD]` (since the RHS of "
 "`:=` in this case requires `nrow(Pitching[rank_in_team == 1])` values)."
-msgstr ""
+msgstr "Tenga en cuenta que la sintaxis `x[y]` devuelve valores `nrow(y)` (es decir, es una unión derecha), por lo que `.SD` está a la derecha en `Teams[.SD]` (ya que el RHS de `:=` en este caso requiere valores `nrow(Pitching[rank_in_team == 1])`)."
 
 #: es%5Cdatatable-sd-usage.Rmd.tmp%2Bheading
 msgid "Grouped `.SD` operations"
-msgstr ""
+msgstr "Operaciones agrupadas `.SD`"
 
 #: es%5Cdatatable-sd-usage.Rmd.tmp%2Bp
 msgid ""
@@ -274,11 +275,11 @@ msgid ""
 "when `data.table` processes `j` is to think of your `data.table` as being "
 "split into many component sub-`data.table`s, each of which corresponds to a "
 "single value of your `by` variable(s):"
-msgstr ""
+msgstr "A menudo, nos gustaría realizar alguna operación en nuestros datos _a nivel de grupo_. Cuando especificamos `by =` (o `keyby = `), el modelo mental de lo que sucede cuando `data.table` procesa `j` es pensar en su `data.table` como si estuviera dividida en muchos sub-`data.table` componentes, cada uno de los cuales corresponde a un único valor de su(s) variable(s) `by`:"
 
 #: es%5Cdatatable-sd-usage.Rmd.tmp%2Bp
 msgid "![Grouping, Illustrated]{1}"
-msgstr ""
+msgstr "![Agrupamiento, ilustrado]{1}"
 
 #: es%5Cdatatable-sd-usage.Rmd.tmp%2Bp
 msgid ""
@@ -287,42 +288,42 @@ msgid ""
 "scope of `.SD` is a single sub-`data.table`). This allows us to concisely "
 "express an operation that we'd like to perform on _each sub-`data.table`_ "
 "before the re-assembled result is returned to us."
-msgstr ""
+msgstr "En el caso de la agrupación, `.SD` es de naturaleza múltiple: se refiere a _cada_ una de estas sub-`data.table`s, _una a la vez_ (de manera un poco más precisa, el alcance de `.SD` es una única sub-`data.table`). Esto nos permite expresar de manera concisa una operación que nos gustaría realizar en _cada sub-`data.table`_ antes de que se nos devuelva el resultado reensamblado."
 
 #: es%5Cdatatable-sd-usage.Rmd.tmp%2Bp
 msgid ""
 "This is useful in a variety of settings, the most common of which are "
 "presented here:"
-msgstr ""
+msgstr "Esto es útil en una variedad de configuraciones, las más comunes de las cuales se presentan aquí:"
 
 #: es%5Cdatatable-sd-usage.Rmd.tmp%2Bheading
 msgid "Group Subsetting"
-msgstr ""
+msgstr "Subconjunto de grupo"
 
 #: es%5Cdatatable-sd-usage.Rmd.tmp%2Bp
 msgid ""
 "Let's get the most recent season of data for each team in the Lahman data. "
 "This can be done quite simply with:"
-msgstr ""
+msgstr "Obtengamos la temporada más reciente de datos de cada equipo en los datos de Lahman. Esto se puede hacer de forma muy sencilla con:"
 
 #: es%5Cdatatable-sd-usage.Rmd.tmp%2Bp
 msgid ""
 "Recall that `.SD` is itself a `data.table`, and that `.N` refers to the "
-"total number of rows in a group (it's equal to `nrow(.SD)` within each group)"
-", so `.SD[.N]` returns the _entirety of `.SD`_ for the final row associated "
-"with each `teamID`."
-msgstr ""
+"total number of rows in a group (it's equal to `nrow(.SD)` within each "
+"group), so `.SD[.N]` returns the _entirety of `.SD`_ for the final row "
+"associated with each `teamID`."
+msgstr "Recuerde que `.SD` es en sí mismo una `data.table`, y que `.N` se refiere al número total de filas en un grupo (es igual a `nrow(.SD)` dentro de cada grupo), por lo que `.SD[.N]` devuelve la _totalidad de `.SD`_ para la fila final asociada con cada `teamID`."
 
 #: es%5Cdatatable-sd-usage.Rmd.tmp%2Bp
 msgid ""
 "Another common version of this is to use `.SD[1L]` instead to get the "
 "_first_ observation for each group, or `.SD[sample(.N, 1L)]` to return a "
 "_random_ row for each group."
-msgstr ""
+msgstr "Otra versión común de esto es utilizar `.SD[1L]` para obtener la _primera_ observación para cada grupo, o `.SD[sample(.N, 1L)]` para devolver una fila _aleatoria_ para cada grupo."
 
 #: es%5Cdatatable-sd-usage.Rmd.tmp%2Bheading
 msgid "Group Optima"
-msgstr ""
+msgstr "Grupo Optima"
 
 #: es%5Cdatatable-sd-usage.Rmd.tmp%2Bp
 msgid ""
@@ -330,14 +331,14 @@ msgid ""
 "their total number of runs scored (`R`; we could easily adjust this to refer "
 "to other metrics, of course). Instead of taking a _fixed_ element from each "
 "sub-`data.table`, we now define the desired index _dynamically_ as follows:"
-msgstr ""
+msgstr "Supongamos que queremos obtener el _mejor_ año de cada equipo, medido por la cantidad total de carreras anotadas (`R`; podríamos ajustar esto fácilmente para hacer referencia a otras métricas, por supuesto). En lugar de tomar un elemento _fijo_ de cada sub-`data.table`, ahora definimos el índice deseado _dinámicamente_ de la siguiente manera:"
 
 #: es%5Cdatatable-sd-usage.Rmd.tmp%2Bp
 msgid ""
 "Note that this approach can of course be combined with `.SDcols` to return "
 "only portions of the `data.table` for each `.SD` (with the caveat that `."
 "SDcols` should be fixed across the various subsets)"
-msgstr ""
+msgstr "Tenga en cuenta que este enfoque, por supuesto, se puede combinar con `.SDcols` para devolver solo partes de `data.table` para cada `.SD` (con la salvedad de que `.SDcols` debe fijarse en los distintos subconjuntos)."
 
 #: es%5Cdatatable-sd-usage.Rmd.tmp%2Bp
 msgid ""
@@ -346,11 +347,11 @@ msgid ""
 "operations like `sum` or `mean` -- see `?GForce` for more details and keep "
 "an eye on/voice support for feature improvement requests for updates on this "
 "front: [1]{3}, [2]{4}, [3]{5}, [4]{6}, [5]{7}, [6]{8}"
-msgstr ""
+msgstr "_NB_: `.SD[1L]` está optimizado actualmente por [_`GForce`_]{1} ([ver también]{2}), elementos internos de `data.table` que aceleran enormemente las operaciones agrupadas más comunes como `sum` o `mean` - vea `?GForce` para más detalles y esté atento/exprese al soporte para solicitudes de mejoras de características para actualizaciones en este frente: [1]{3}, [2]{4}, [3]{5}, [4]{6}, [5]{7}, [6]{8}"
 
 #: es%5Cdatatable-sd-usage.Rmd.tmp%2Bheading
 msgid "Grouped Regression"
-msgstr ""
+msgstr "Regresión agrupada"
 
 #: es%5Cdatatable-sd-usage.Rmd.tmp%2Bp
 msgid ""
@@ -361,17 +362,16 @@ msgid ""
 "standard errors from this approach are generally incorrect -- the "
 "specification `ERA ~ W*teamID` will be better -- this approach is easier to "
 "read and the _coefficients_ are OK):"
-msgstr ""
+msgstr "Volviendo a la pregunta anterior sobre la relación entre `ERA` y `W`, supongamos que esperamos que esta relación varíe según el equipo (es decir, hay una pendiente diferente para cada equipo). Podemos volver a ejecutar fácilmente esta regresión para explorar la heterogeneidad en esta relación de la siguiente manera (observando que los errores estándar de este enfoque son generalmente incorrectos - la especificación `ERA ~ W*teamID` será mejor - este enfoque es más fácil de leer y los _coeficientes_ son correctos):"
 
 #: es%5Cdatatable-sd-usage.Rmd.tmp%2Bp
 msgid ""
 "While there is indeed a fair amount of heterogeneity, there's a distinct "
 "concentration around the observed overall value."
-msgstr ""
+msgstr "Si bien es cierto que existe una buena cantidad de heterogeneidad, hay una clara concentración en torno al valor general observado."
 
 #: es%5Cdatatable-sd-usage.Rmd.tmp%2Bp
 msgid ""
 "The above is just a short introduction of the power of `.SD` in facilitating "
 "beautiful, efficient code in `data.table`!"
-msgstr ""
-
+msgstr "Lo anterior es solo una breve introducción del poder de `.SD` para facilitar un código hermoso y eficiente en `data.table`."

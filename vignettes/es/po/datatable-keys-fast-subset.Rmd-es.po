@@ -1,12 +1,13 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
+"Project-Id-Version: 0.0.1\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-10-04 11:40-0300\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
+"PO-Revision-Date: 2024-10-04 16:53-0300\n"
+"Last-Translator: Nombre Apellido <direccion@ejemplo.com>\n"
+"Language-Team: es\n"
+"Language: es\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -17,60 +18,60 @@ msgid ""
 "This vignette is aimed at those who are already familiar with *data.table* "
 "syntax, its general form, how to subset rows in `i`, select and compute on "
 "columns, add/modify/delete columns *by reference* in `j` and group by using "
-"`by`. If you're not familiar with these concepts, please read the *"
-"\"Introduction to data.table\"* and *\"Reference semantics\"* vignettes "
+"`by`. If you're not familiar with these concepts, please read the "
+"*\"Introduction to data.table\"* and *\"Reference semantics\"* vignettes "
 "first."
-msgstr ""
+msgstr "Esta viñeta está dirigida a aquellos que ya están familiarizados con la sintaxis de *data.table*, su forma general, cómo crear subconjuntos de filas en `i`, seleccionar y calcular columnas, agregar/modificar/eliminar columnas *por referencia* en `j` y agrupar utilizando `by`. Si no está familiarizado con estos conceptos, lea primero las viñetas *\"Introducción a data.table\"* y *\"Semántica de referencia\"*."
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bheading
 msgid "Data {#data}"
-msgstr ""
+msgstr "Datos {#data}"
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bp
 msgid ""
-"We will use the same `flights` data as in the *\"Introduction to data.table\""
-"* vignette."
-msgstr ""
+"We will use the same `flights` data as in the *\"Introduction to data."
+"table\"* vignette."
+msgstr "Utilizaremos los mismos datos de \"vuelos\" que en la viñeta *\"Introducción a data.table\"*."
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bheading
 msgid "Introduction"
-msgstr ""
+msgstr "Introducción"
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bp
 msgid "In this vignette, we will"
-msgstr ""
+msgstr "En esta viñeta, vamos a"
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bp
 msgid ""
 "=====* first introduce the concept of `key` in *data.table*, and set and use "
 "keys to perform *fast binary search* based subsets in `i`,====="
-msgstr ""
+msgstr "=====* primero introduzca el concepto de `clave` en *data.table*, y establezca y use claves para realizar *búsquedas binarias rápidas* basadas en subconjuntos en `i`,====="
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bp
 msgid ""
 "=====* see that we can combine key based subsets along with `j` and `by` in "
 "the exact same way as before,====="
-msgstr ""
+msgstr "=====* observa que podemos combinar subconjuntos basados en clave junto con `j` y `by` exactamente de la misma manera que antes,====="
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bp
 msgid ""
 "=====* look at other additional useful arguments - `mult` and `nomatch`,====="
-msgstr ""
+msgstr "=====* mira otros argumentos útiles adicionales: `mult` y `nomatch`,====="
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bp
 msgid ""
 "=====* and finally conclude by looking at the advantage of setting keys - "
 "perform *fast binary search based subsets* and compare with the traditional "
 "vector scan approach.====="
-msgstr ""
+msgstr "=====* y finalmente concluimos mirando la ventaja de configurar claves: realizar *búsquedas binarias rápidas basadas en subconjuntos* y compararlas con el enfoque de escaneo vectorial tradicional.====="
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bheading
 msgid "1. Keys"
-msgstr ""
+msgstr "1. Llaves"
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bheading
 msgid "a) What is a *key*?"
-msgstr ""
+msgstr "a) ¿Qué es una *clave*?"
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bp
 msgid ""
@@ -78,108 +79,108 @@ msgid ""
 "in `i` using logical expressions, row numbers and using `order()`. In this "
 "section, we will look at another way of subsetting incredibly fast - using "
 "*keys*."
-msgstr ""
+msgstr "En la viñeta *\"Introducción a data.table\"*, vimos cómo crear subconjuntos de filas en `i` utilizando expresiones lógicas, números de fila y el uso de `order()`. En esta sección, veremos otra forma de crear subconjuntos increíblemente rápido: utilizando *claves*."
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bp
 msgid ""
 "But first, let's start by looking at *data.frames*. All *data.frames* have a "
 "row names attribute. Consider the *data.frame* `DF` below."
-msgstr ""
+msgstr "Pero primero, comencemos por analizar los *data.frames*. Todos los *data.frames* tienen un atributo de nombre de fila. Considere el *data.frame* `DF` a continuación."
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bp
 msgid "We can *subset* a particular row using its row name as shown below:"
-msgstr ""
+msgstr "Podemos crear un *subconjunto* de una fila particular usando su nombre de fila como se muestra a continuación:"
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bp
 msgid ""
 "i.e., row names are more or less *an index* to rows of a *data.frame*. "
 "However,"
-msgstr ""
+msgstr "Es decir, los nombres de fila son más o menos *un índice* de las filas de un *data.frame*. Sin embargo,"
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bp
 msgid "=====1. Each row is limited to *exactly one* row name.====="
-msgstr ""
+msgstr "=====1. Cada fila está limitada a *exactamente un* nombre de fila.====="
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bp
 msgid "=====2. And row names should be *unique*.====="
-msgstr ""
+msgstr "=====2. Y los nombres de las filas deben ser *únicos*.====="
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bp
 msgid "Now let's convert it to a *data.table*."
-msgstr ""
+msgstr "Ahora vamos a convertirlo en una *tabla de datos*."
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bp
 msgid "=====* Note that row names have been reset.====="
-msgstr ""
+msgstr "=====* Tenga en cuenta que los nombres de las filas se han restablecido.====="
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bp
 msgid ""
 "=====* *data.tables* never uses row names. Since *data.tables* **inherit** "
 "from *data.frames*, it still has the row names attribute. But it never uses "
 "them. We'll see in a moment as to why.====="
-msgstr ""
+msgstr "=====* *data.tables* nunca utiliza nombres de fila. Dado que *data.tables* **hereda** de *data.frames*, aún tiene el atributo de nombres de fila, pero nunca los utiliza. En un momento veremos por qué.====="
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bp
 msgid ""
-"Instead, in *data.tables* we set and use `keys`. Think of a `key` as **"
-"supercharged rownames**."
-msgstr ""
+"Instead, in *data.tables* we set and use `keys`. Think of a `key` as "
+"**supercharged rownames**."
+msgstr "En cambio, en *data.tables*, establecemos y usamos `keys`. Piense en una `key` como si fuera un conjunto de **nombres de fila supercargados**."
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bheading
 msgid "Keys and their properties {#key-properties}"
-msgstr ""
+msgstr "Claves y sus propiedades {#key-properties}"
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bp
 msgid ""
-"=====1. We can set keys on *multiple columns* and the column can be of *"
-"different types* -- *integer*, *numeric*, *character*, *factor*, *integer64* "
-"etc. *list* and *complex* types are not supported yet.====="
-msgstr ""
+"=====1. We can set keys on *multiple columns* and the column can be of "
+"*different types* -- *integer*, *numeric*, *character*, *factor*, "
+"*integer64* etc. *list* and *complex* types are not supported yet.====="
+msgstr "=====1. Podemos establecer claves en *varias columnas* y la columna puede ser de *diferentes tipos*: *entero*, *numérico*, *carácter*, *factor*, *entero64*, etc. Los tipos *lista* y *complejos* aún no son compatibles.====="
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bp
 msgid ""
 "=====2. Uniqueness is not enforced, i.e., duplicate key values are allowed. "
 "Since rows are sorted by key, any duplicates in the key columns will appear "
 "consecutively.====="
-msgstr ""
+msgstr "=====2. No se exige unicidad, es decir, se permiten valores de clave duplicados. Dado que las filas se ordenan por clave, los duplicados en las columnas de clave aparecerán de forma consecutiva.====="
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bp
 msgid "=====3. Setting a `key` does *two* things:====="
-msgstr ""
+msgstr "=====3. Establecer una `clave` hace *dos* cosas:====="
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bp
 msgid "For the rest of the vignette, we will work with `flights` data set."
-msgstr ""
+msgstr "Para el resto de la viñeta, trabajaremos con el conjunto de datos \"vuelos\"."
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bheading
 msgid "b) Set, get and use keys on a *data.table*"
-msgstr ""
+msgstr "b) Establecer, obtener y utilizar claves en una *data.table*"
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bheading
 msgid ""
 "-- How can we set the column `origin` as key in the *data.table* `flights`?"
-msgstr ""
+msgstr "-- ¿Cómo podemos establecer la columna `origen` como clave en la *tabla de datos* `vuelos`?"
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bp
 msgid ""
-"=====* You can use the function `setkey()` and provide the column names ("
-"without quoting them). This is helpful during interactive use.====="
-msgstr ""
+"=====* You can use the function `setkey()` and provide the column names "
+"(without quoting them). This is helpful during interactive use.====="
+msgstr "=====* Puede utilizar la función `setkey()` y proporcionar los nombres de las columnas (sin comillas). Esto resulta útil durante el uso interactivo.====="
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bp
 msgid ""
 "=====* Alternatively you can pass a character vector of column names to the "
 "function `setkeyv()`. This is particularly useful while designing functions "
 "to pass columns to set key on as function arguments.====="
-msgstr ""
+msgstr "=====* Alternativamente, puede pasar un vector de caracteres de nombres de columnas a la función `setkeyv()`. Esto es particularmente útil al diseñar funciones para pasar columnas a las que se les asignará una clave como argumentos de función.====="
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bp
 msgid ""
 "=====* Note that we did not have to assign the result back to a variable. "
-"This is because like the `:=` function we saw in the *\"Reference semantics\""
-"* vignette, `setkey()` and `setkeyv()` modify the input *data.table* *by "
-"reference*. They return the result invisibly.====="
-msgstr ""
+"This is because like the `:=` function we saw in the *\"Reference "
+"semantics\"* vignette, `setkey()` and `setkeyv()` modify the input *data."
+"table* *by reference*. They return the result invisibly.====="
+msgstr "=====* Tenga en cuenta que no tuvimos que asignar el resultado a una variable. Esto se debe a que, al igual que la función `:=` que vimos en la viñeta *\"Semántica de referencia\"*, `setkey()` y `setkeyv()` modifican la entrada *data.table* *por referencia*. Devuelven el resultado de forma invisible.====="
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bp
 msgid ""
@@ -187,296 +188,296 @@ msgid ""
 "provided - `origin`. Since we reorder by reference, we only require "
 "additional memory of one column of length equal to the number of rows in the "
 "*data.table*, and is therefore very memory efficient.====="
-msgstr ""
+msgstr "=====* La *data.table* ahora está reordenada (u ordenada) por la columna que proporcionamos: `origin`. Como reordenamos por referencia, solo necesitamos memoria adicional de una columna de longitud igual a la cantidad de filas en la *data.table* y, por lo tanto, es muy eficiente en el uso de la memoria.====="
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bp
 msgid ""
 "=====* You can also set keys directly when creating *data.tables* using the "
 "`data.table()` function using `key` argument. It takes a character vector of "
 "column names.====="
-msgstr ""
+msgstr "=====* También puede establecer claves directamente al crear *data.tables* utilizando la función `data.table()` con el argumento `key`. Toma un vector de caracteres de nombres de columnas.====="
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bheading
 msgid "set* and `:=`:"
-msgstr ""
+msgstr "establecer* y `:=`:"
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bp
 msgid ""
 "In *data.table*, the `:=` operator and all the `set*` (e.g., `setkey`, "
 "`setorder`, `setnames` etc.) functions are the only ones which modify the "
 "input object *by reference*."
-msgstr ""
+msgstr "En *data.table*, el operador `:=` y todas las funciones `set*` (por ejemplo, `setkey`, `setorder`, `setnames` etc.) son las únicas que modifican el objeto de entrada *por referencia*."
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bp
 msgid ""
 "Once you *key* a *data.table* by certain columns, you can subset by querying "
-"those key columns using the `.()` notation in `i`. Recall that `.()` is an *"
-"alias to* `list()`."
-msgstr ""
+"those key columns using the `.()` notation in `i`. Recall that `.()` is an "
+"*alias to* `list()`."
+msgstr "Una vez que se *identifica* una *tabla de datos* por determinadas columnas, se puede crear un subconjunto consultando esas columnas clave utilizando la notación `.()` en `i`. Recuerde que `.()` es un *alias* de `list()`."
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bheading
 msgid ""
 "-- Use the key column `origin` to subset all rows where the origin airport "
 "matches *\"JFK\"*"
-msgstr ""
+msgstr "-- Utilice la columna clave `origen` para crear un subconjunto de todas las filas donde el aeropuerto de origen coincida con *\"JFK\"*"
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bp
 msgid ""
 "=====* The *key* column has already been set to `origin`. So it is "
 "sufficient to provide the value, here *\"JFK\"*, directly. The `.()` syntax "
 "helps identify that the task requires looking up the value *\"JFK\"* in the "
-"key column of *data.table* (here column `origin` of `flights` *data."
-"table*).====="
-msgstr ""
+"key column of *data.table* (here column `origin` of `flights` *data.table*)."
+"====="
+msgstr "=====* La columna *key* ya se ha establecido en `origin`. Por lo tanto, es suficiente proporcionar el valor, aquí *\"JFK\"*, directamente. La sintaxis `.()` ayuda a identificar que la tarea requiere buscar el valor *\"JFK\"* en la columna de clave de *data.table* (aquí, la columna `origin` de *data.table* `flights`).====="
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bp
 msgid ""
 "=====* The *row indices* corresponding to the value *\"JFK\"* in `origin` is "
 "obtained first. And since there is no expression in `j`, all columns "
 "corresponding to those row indices are returned.====="
-msgstr ""
+msgstr "=====* Primero se obtienen los *índices de fila* correspondientes al valor *\"JFK\"* en `origin`. Y como no hay expresión en `j`, se devuelven todas las columnas correspondientes a esos índices de fila.====="
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bp
 msgid ""
 "=====* On single column key of *character* type, you can drop the `.()` "
 "notation and use the values directly when subsetting, like subset using row "
 "names on *data.frames*.====="
-msgstr ""
+msgstr "=====* En una clave de columna única de tipo *carácter*, puede eliminar la notación `.()` y usar los valores directamente al crear subconjuntos, como un subconjunto que usa nombres de fila en *data.frames*.====="
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bp
 msgid "=====* We can subset any amount of values as required====="
-msgstr ""
+msgstr "=====* Podemos crear subconjuntos de cualquier cantidad de valores según sea necesario====="
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bheading
 msgid "-- How can we get the column(s) a *data.table* is keyed by?"
-msgstr ""
+msgstr "-- ¿Cómo podemos obtener las columnas por las que se codifica una *data.table*?"
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bp
 msgid "Using the function `key()`."
-msgstr ""
+msgstr "Usando la función `key()`."
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bp
 msgid "=====* It returns a character vector of all the key columns.====="
-msgstr ""
+msgstr "=====* Devuelve un vector de caracteres de todas las columnas clave.====="
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bp
 msgid "=====* If no key is set, it returns `NULL`.====="
-msgstr ""
+msgstr "=====* Si no se establece ninguna clave, devuelve `NULL`.====="
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bheading
 msgid "c) Keys and multiple columns"
-msgstr ""
+msgstr "c) Claves y columnas múltiples"
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bp
 msgid ""
 "To refresh, *keys* are like *supercharged* row names. We can set key on "
 "multiple columns and they can be of multiple types."
-msgstr ""
+msgstr "Para refrescar, las *claves* son como nombres de fila *supercargados*. Podemos establecer claves en varias columnas y pueden ser de varios tipos."
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bheading
 msgid "-- How can I set keys on both `origin` *and* `dest` columns?"
-msgstr ""
+msgstr "-- ¿Cómo puedo configurar claves en las columnas `origin` *y* `dest`?"
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bp
 msgid ""
 "=====* It sorts the *data.table* first by the column `origin` and then by "
 "`dest` *by reference*.====="
-msgstr ""
+msgstr "=====* Ordena la *data.table* primero por la columna `origen` y luego por `dest` *por referencia*.====="
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bheading
 msgid ""
 "-- Subset all rows using key columns where first key column `origin` matches "
 "*\"JFK\"* and second key column `dest` matches *\"MIA\"*"
-msgstr ""
+msgstr "-- Subconjunto de todas las filas utilizando columnas clave donde la primera columna clave `origin` coincide con *\"JFK\"* y la segunda columna clave `dest` coincide con *\"MIA\"*"
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bheading
 msgid "How does the subset work here? {#multiple-key-point}"
-msgstr ""
+msgstr "¿Cómo funciona el subconjunto aquí? {#multiple-key-point}"
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bp
 msgid ""
 "=====* It is important to understand how this works internally. *\"JFK\"* is "
 "first matched against the first key column `origin`. And *within those "
 "matching rows*, *\"MIA\"* is matched against the second key column `dest` to "
-"obtain *row indices* where both `origin` and `dest` match the given "
-"values.====="
-msgstr ""
+"obtain *row indices* where both `origin` and `dest` match the given values."
+"====="
+msgstr "=====* Es importante entender cómo funciona esto internamente. *\"JFK\"* primero se compara con la primera columna de clave `origin`. Y *dentro de esas filas coincidentes*, *\"MIA\"* se compara con la segunda columna de clave `dest` para obtener *índices de fila* donde tanto `origin` como `dest` coinciden con los valores dados.====="
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bp
 msgid ""
 "=====* Since no `j` is provided, we simply return *all columns* "
 "corresponding to those row indices.====="
-msgstr ""
+msgstr "=====* Dado que no se proporciona ninguna `j`, simplemente devolvemos *todas las columnas* correspondientes a esos índices de fila.====="
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bheading
 msgid ""
 "-- Subset all rows where just the first key column `origin` matches *\"JFK\"*"
-msgstr ""
+msgstr "-- Subconjunto de todas las filas donde solo la primera columna de clave `origen` coincide con *\"JFK\"*"
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bp
 msgid ""
 "=====* Since we did not provide any values for the second key column `dest`, "
 "it just matches *\"JFK\"* against the first key column `origin` and returns "
 "all the matched rows.====="
-msgstr ""
+msgstr "=====* Dado que no proporcionamos ningún valor para la segunda columna clave `dest`, simplemente compara *\"JFK\"* con la primera columna clave `origin` y devuelve todas las filas coincidentes.====="
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bheading
 msgid ""
 "-- Subset all rows where just the second key column `dest` matches *\"MIA\"*"
-msgstr ""
+msgstr "-- Subconjunto de todas las filas donde solo la segunda columna clave `dest` coincide con *\"MIA\"*"
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bheading
 msgid "What's happening here?"
-msgstr ""
+msgstr "¿Que está pasando aquí?"
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bp
 msgid ""
-"=====* Read [this]{1} again. The value provided for the second key column *"
-"\"MIA\"* has to find the matching values in `dest` key column *on the "
+"=====* Read [this]{1} again. The value provided for the second key column "
+"*\"MIA\"* has to find the matching values in `dest` key column *on the "
 "matching rows provided by the first key column `origin`*. We can not skip "
 "the values of key columns *before*. Therefore, we provide *all* unique "
 "values from key column `origin`.====="
-msgstr ""
+msgstr "=====* Lea [esto]{1} nuevamente. El valor provisto para la segunda columna de clave *\"MIA\"* tiene que encontrar los valores coincidentes en la columna de clave `dest` *en las filas coincidentes provistas por la primera columna de clave `origin`*. No podemos omitir los valores de las columnas de clave *anteriores*. Por lo tanto, proporcionamos *todos* los valores únicos de la columna de clave `origin`.====="
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bp
 msgid ""
 "=====* *\"MIA\"* is automatically recycled to fit the length of "
 "`unique(origin)` which is *3*.====="
-msgstr ""
+msgstr "=====* *\"MIA\"* se recicla automáticamente para ajustarse a la longitud de `unique(origin)` que es *3*.====="
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bheading
 msgid "2. Combining keys with `j` and `by`"
-msgstr ""
+msgstr "2. Combinando teclas con `j` y `by`"
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bp
 msgid ""
-"All we have seen so far is the same concept -- obtaining *row indices* in `i`"
-", but just using a different method -- using `keys`. It shouldn't be "
+"All we have seen so far is the same concept -- obtaining *row indices* in "
+"`i`, but just using a different method -- using `keys`. It shouldn't be "
 "surprising that we can do exactly the same things in `j` and `by` as seen "
 "from the previous vignettes. We will highlight this with a few examples."
-msgstr ""
+msgstr "Hasta ahora, todo lo que hemos visto es el mismo concepto: obtener *índices de fila* en `i`, pero utilizando un método diferente: el uso de `keys`. No debería sorprender que podamos hacer exactamente lo mismo en `j` y `by`, como se vio en los ejemplos anteriores. Lo destacaremos con algunos ejemplos."
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bheading
 msgid "a) Select in `j`"
-msgstr ""
+msgstr "a) Seleccione en `j`"
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bheading
 msgid ""
 "-- Return `arr_delay` column as a *data.table* corresponding to `origin = "
 "\"LGA\"` and `dest = \"TPA\"`."
-msgstr ""
+msgstr "-- Devuelve la columna `arr_delay` como una *data.table* correspondiente a `origin = \"LGA\"` y `dest = \"TPA\"`."
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bp
 msgid ""
 "=====* The *row indices* corresponding to `origin == \"LGA\"` and `dest == "
 "\"TPA\"` are obtained using *key based subset*.====="
-msgstr ""
+msgstr "=====* Los *índices de fila* correspondientes a `origin == \"LGA\"` y `dest == \"TPA\"` se obtienen utilizando un *subconjunto basado en clave*.====="
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bp
 msgid ""
 "=====* Once we have the row indices, we look at `j` which requires only the "
-"`arr_delay` column. So we simply select the column `arr_delay` for those *"
-"row indices* in the exact same way as we have seen in *Introduction to data."
+"`arr_delay` column. So we simply select the column `arr_delay` for those "
+"*row indices* in the exact same way as we have seen in *Introduction to data."
 "table* vignette.====="
-msgstr ""
+msgstr "=====* Una vez que tenemos los índices de fila, observamos `j`, que requiere solo la columna `arr_delay`. Por lo tanto, simplemente seleccionamos la columna `arr_delay` para esos *índices de fila* de la misma manera que hemos visto en la viñeta *Introducción a data.table*.====="
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bp
 msgid ""
-"=====* We could have returned the result by using `with = FALSE` as "
-"well.====="
-msgstr ""
+"=====* We could have returned the result by using `with = FALSE` as well."
+"====="
+msgstr "=====* Podríamos haber devuelto el resultado usando `with = FALSE` también.====="
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bheading
 msgid "b) Chaining"
-msgstr ""
+msgstr "b) Encadenamiento"
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bheading
 msgid ""
 "-- On the result obtained above, use chaining to order the column in "
 "decreasing order."
-msgstr ""
+msgstr "-- Sobre el resultado obtenido anteriormente, utilice el encadenamiento para ordenar la columna en orden decreciente."
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bheading
 msgid "c) Compute or *do* in `j`"
-msgstr ""
+msgstr "c) Calcular o *hacer* en `j`"
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bheading
 msgid ""
-"-- Find the maximum arrival delay corresponding to `origin = \"LGA\"` and `"
-"dest = \"TPA\"`."
-msgstr ""
+"-- Find the maximum arrival delay corresponding to `origin = \"LGA\"` and "
+"`dest = \"TPA\"`."
+msgstr "-- Encuentra el retraso máximo de llegada correspondiente a `origin = \"LGA\"` y `dest = \"TPA\"`."
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bp
 msgid ""
 "=====* We can verify that the result is identical to first value (486) from "
 "the previous example.====="
-msgstr ""
+msgstr "=====*Podemos verificar que el resultado es idéntico al primer valor (486) del ejemplo anterior.====="
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bheading
 msgid "d) *sub-assign* by reference using `:=` in `j`"
-msgstr ""
+msgstr "d) *sub-asignar* por referencia usando `:=` en `j`"
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bp
 msgid ""
 "We have seen this example already in the *Reference semantics* vignette. "
 "Let's take a look at all the `hours` available in the `flights` *data.table*:"
-msgstr ""
+msgstr "Ya hemos visto este ejemplo en la viñeta *Semántica de referencia*. Echemos un vistazo a todas las `horas` disponibles en la *tabla de datos* `vuelos`:"
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bp
 msgid ""
 "We see that there are totally `25` unique values in the data. Both *0* and "
 "*24* hours seem to be present. Let's go ahead and replace *24* with *0*, but "
 "this time using *key*."
-msgstr ""
+msgstr "Vemos que hay un total de `25` valores únicos en los datos. Parece que están presentes tanto *0* como *24* horas. Reemplacemos *24* por *0*, pero esta vez usando *key*."
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bp
 msgid ""
 "=====* We first set `key` to `hour`. This reorders `flights` by the column "
 "`hour` and marks that column as the `key` column.====="
-msgstr ""
+msgstr "=====* Primero establecemos `key` en `hour`. Esto reordena `flights` por la columna `hour` y marca esa columna como la columna `key`.====="
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bp
 msgid ""
 "=====* Now we can subset on `hour` by using the `.()` notation. We subset "
 "for the value *24* and obtain the corresponding *row indices*.====="
-msgstr ""
+msgstr "=====* Ahora podemos crear un subconjunto en `hora` usando la notación `.()`. Creamos un subconjunto para el valor *24* y obtenemos los *índices de fila* correspondientes.====="
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bp
 msgid ""
 "=====* And on those row indices, we replace the `key` column with the value "
 "`0`.====="
-msgstr ""
+msgstr "=====* Y en esos índices de fila, reemplazamos la columna `key` con el valor `0`.====="
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bp
 msgid ""
 "=====* Since we have replaced values on the *key* column, the *data.table* "
 "`flights` isn't sorted by `hour` anymore. Therefore, the key has been "
 "automatically removed by setting to NULL.====="
-msgstr ""
+msgstr "=====* Dado que hemos reemplazado los valores en la columna *key*, la *data.table* `flights` ya no se ordena por `hour`. Por lo tanto, la clave se ha eliminado automáticamente al establecerla en NULL.====="
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bp
 msgid "Now, there shouldn't be any *24* in the `hour` column."
-msgstr ""
+msgstr "Ahora, no debería haber ningún *24* en la columna \"hora\"."
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bheading
 msgid "e) Aggregation using `by`"
-msgstr ""
+msgstr "e) Agregación utilizando `por`"
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bp
 msgid "Let's set the key back to `origin, dest` first."
-msgstr ""
+msgstr "Primero, establezcamos nuevamente la clave en `origen, destino`."
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bheading
 msgid ""
 "-- Get the maximum departure delay for each `month` corresponding to `origin "
 "= \"JFK\"`. Order the result by `month`"
-msgstr ""
+msgstr "-- Obtener el retraso máximo de salida para cada `mes` correspondiente a `origen = \"JFK\"`. Ordenar el resultado por `mes`"
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bp
 msgid ""
 "=====* We subset on the `key` column *origin* to obtain the *row indices* "
 "corresponding to *\"JFK\"*.====="
-msgstr ""
+msgstr "=====* Creamos un subconjunto de la columna `clave` *origen* para obtener los *índices de fila* correspondientes a *\"JFK\"*.====="
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bp
 msgid ""
@@ -484,240 +485,240 @@ msgid ""
 "group by and `dep_delay` to obtain `max()` for each group. *data.table's* "
 "query optimisation therefore subsets just those two columns corresponding to "
 "the *row indices* obtained in `i`, for speed and memory efficiency.====="
-msgstr ""
+msgstr "=====* Una vez que obtenemos los índices de fila, solo necesitamos dos columnas: `month` para agrupar y `dep_delay` para obtener `max()` para cada grupo. Por lo tanto, la optimización de consultas de *data.table* subconjunto solo aquellas dos columnas correspondientes a los *índices de fila* obtenidos en `i`, para mayor velocidad y eficiencia de memoria.====="
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bp
 msgid ""
-"=====* And on that subset, we group by *month* and compute "
-"`max(dep_delay)`.====="
-msgstr ""
+"=====* And on that subset, we group by *month* and compute `max(dep_delay)`."
+"====="
+msgstr "=====* Y en ese subconjunto, agrupamos por *mes* y calculamos `max(dep_delay)`.====="
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bp
 msgid ""
 "=====* We use `keyby` to automatically key that result by *month*. Now we "
 "understand what that means. In addition to ordering, it also sets *month* as "
 "the `key` column.====="
-msgstr ""
+msgstr "=====* Usamos `keyby` para clasificar automáticamente ese resultado por *mes*. Ahora entendemos lo que eso significa. Además de ordenar, también establece *mes* como la columna `key`.====="
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bheading
 msgid "3. Additional arguments - `mult` and `nomatch`"
-msgstr ""
+msgstr "3. Argumentos adicionales: `mult` y `nomatch`"
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bheading
 msgid "a) The *mult* argument"
-msgstr ""
+msgstr "a) El argumento *mult*"
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bp
 msgid ""
 "We can choose, for each query, if *\"all\"* the matching rows should be "
 "returned, or just the *\"first\"* or *\"last\"* using the `mult` argument. "
 "The default value is *\"all\"* - what we've seen so far."
-msgstr ""
+msgstr "Podemos elegir, para cada consulta, si se deben devolver *\"all\"* las filas coincidentes, o solo *\"first\"* o *\"last\"* utilizando el argumento `mult`. El valor predeterminado es *\"all\"*, lo que hemos visto hasta ahora."
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bheading
 msgid ""
-"-- Subset only the first matching row from all rows where `origin` matches *"
-"\"JFK\"* and `dest` matches *\"MIA\"*"
-msgstr ""
+"-- Subset only the first matching row from all rows where `origin` matches "
+"*\"JFK\"* and `dest` matches *\"MIA\"*"
+msgstr "-- Subconjunto solo de la primera fila coincidente de todas las filas donde `origin` coincide con *\"JFK\"* y `dest` coincide con *\"MIA\"*"
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bheading
 msgid ""
-"-- Subset only the last matching row of all the rows where `origin` matches *"
-"\"LGA\", \"JFK\", \"EWR\"* and `dest` matches *\"XNA\"*"
-msgstr ""
+"-- Subset only the last matching row of all the rows where `origin` matches "
+"*\"LGA\", \"JFK\", \"EWR\"* and `dest` matches *\"XNA\"*"
+msgstr "-- Subconjunto solo de la última fila coincidente de todas las filas donde `origin` coincide con *\"LGA\", \"JFK\", \"EWR\"* y `dest` coincide con *\"XNA\"*"
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bp
 msgid ""
 "=====* The query *\"JFK\", \"XNA\"* doesn't match any rows in `flights` and "
 "therefore returns `NA`.====="
-msgstr ""
+msgstr "=====* La consulta *\"JFK\", \"XNA\"* no coincide con ninguna fila en `vuelos` y, por lo tanto, devuelve `NA`.====="
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bp
 msgid ""
 "=====* Once again, the query for second key column `dest`, *\"XNA\"*, is "
 "recycled to fit the length of the query for first key column `origin`, which "
 "is of length 3.====="
-msgstr ""
+msgstr "=====* Una vez más, la consulta para la segunda columna de clave `dest`, *\"XNA\"*, se recicla para ajustarse a la longitud de la consulta para la primera columna de clave `origin`, que tiene una longitud 3.====="
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bheading
 msgid "b) The *nomatch* argument"
-msgstr ""
+msgstr "b) El argumento *nomatch*"
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bp
 msgid ""
 "We can choose if queries that do not match should return `NA` or be skipped "
 "altogether using the `nomatch` argument."
-msgstr ""
+msgstr "Podemos elegir si las consultas que no coinciden deben devolver \"NA\" o ignorarse por completo utilizando el argumento \"nomatch\"."
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bheading
 msgid "-- From the previous example, Subset all rows only if there's a match"
-msgstr ""
+msgstr "-- Del ejemplo anterior, crea un subconjunto de todas las filas solo si hay una coincidencia"
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bp
 msgid ""
 "=====* Default value for `nomatch` is `NA`. Setting `nomatch = NULL` skips "
 "queries with no matches.====="
-msgstr ""
+msgstr "=====* El valor predeterminado para `nomatch` es `NA`. Si se establece `nomatch = NULL`, se omiten las consultas sin coincidencias.====="
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bp
 msgid ""
 "=====* The query “JFK”, “XNA” doesn’t match any rows in flights and "
 "therefore is skipped.====="
-msgstr ""
+msgstr "=====* La consulta “JFK”, “XNA” no coincide con ninguna fila en los vuelos y, por lo tanto, se omite.====="
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bheading
 msgid "4. binary search vs vector scans"
-msgstr ""
+msgstr "4. Búsqueda binaria vs escaneo vectorial"
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bp
 msgid ""
 "We have seen so far how we can set and use keys to subset. But what's the "
 "advantage? For example, instead of doing:"
-msgstr ""
+msgstr "Hemos visto hasta ahora cómo podemos establecer y utilizar claves para crear subconjuntos. Pero, ¿cuál es la ventaja? Por ejemplo, en lugar de hacer:"
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bp
 msgid "we could have done:"
-msgstr ""
+msgstr "Podríamos haber hecho:"
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bp
 msgid ""
-"One advantage very likely is shorter syntax. But even more than that, *"
-"binary search based subsets* are **incredibly fast**."
-msgstr ""
+"One advantage very likely is shorter syntax. But even more than that, "
+"*binary search based subsets* are **incredibly fast**."
+msgstr "Una de las ventajas más probables es que la sintaxis es más corta. Pero, además, los *subconjuntos basados en búsqueda binaria* son **increíblemente rápidos**."
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bp
 msgid ""
 "As the time goes `data.table` gets new optimization and currently the latter "
 "call is automatically optimized to use *binary search*.\n"
 "To use slow *vector scan* key needs to be removed."
-msgstr ""
+msgstr "A medida que pasa el tiempo, `data.table` obtiene una nueva optimización y actualmente la última llamada se optimiza automáticamente para usar *búsqueda binaria*.\nPara usar un *escaneo vectorial* lento, se debe eliminar la clave."
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bheading
 msgid "a) Performance of binary search approach"
-msgstr ""
+msgstr "a) Rendimiento del enfoque de búsqueda binaria"
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bp
 msgid ""
 "To illustrate, let's create a sample *data.table* with 20 million rows and "
 "three columns and key it by columns `x` and `y`."
-msgstr ""
+msgstr "Para ilustrarlo, creemos una tabla de datos de muestra con 20 millones de filas y tres columnas y clasifiquémosla por las columnas «x» e «y»."
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bp
 msgid ""
 "`DT` is ~380MB. It is not really huge, but this will do to illustrate the "
 "point."
-msgstr ""
+msgstr "`DT` ocupa aproximadamente 380 MB. No es realmente una cantidad enorme, pero esto servirá para ilustrar el punto."
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bp
 msgid ""
 "From what we have seen in the Introduction to data.table section, we can "
 "subset those rows where columns `x = \"g\"` and `y = 877` as follows:"
-msgstr ""
+msgstr "De lo que hemos visto en la sección Introducción a data.table, podemos crear subconjuntos de aquellas filas donde las columnas `x = \"g\"` e `y = 877` de la siguiente manera:"
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bp
 msgid "Now let's try to subset by using keys."
-msgstr ""
+msgstr "Ahora vamos a intentar crear subconjuntos mediante el uso de claves."
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bp
 msgid "=====* The speed-up is **~`r round(t1[3]/max(t2[3], .001))`x**!====="
-msgstr ""
+msgstr "=====* La aceleración es **~`r round(t1[3]/max(t2[3], .001))`x**!====="
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bheading
 msgid "b) Why does keying a *data.table* result in blazing fast subsets?"
-msgstr ""
+msgstr "b) ¿Por qué al introducir datos en una *tabla de datos* se obtienen subconjuntos increíblemente rápidos?"
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bp
 msgid ""
 "To understand that, let's first look at what *vector scan approach* (method "
 "1) does."
-msgstr ""
+msgstr "Para entender esto, veamos primero qué hace el *enfoque de escaneo vectorial* (método 1)."
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bheading
 msgid "Vector scan approach"
-msgstr ""
+msgstr "Enfoque de escaneo vectorial"
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bp
 msgid ""
 "=====* The column `x` is searched for the value *\"g\"* row by row, on all "
 "20 million of them. This results in a *logical vector* of size 20 million, "
 "with values `TRUE, FALSE or NA` corresponding to `x`'s value.====="
-msgstr ""
+msgstr "=====* Se busca el valor *\"g\"* en la columna `x` fila por fila, en los 20 millones de filas. Esto da como resultado un *vector lógico* de tamaño 20 millones, con valores `TRUE, FALSE o NA` correspondientes al valor de `x`.====="
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bp
 msgid ""
 "=====* Similarly, the column `y` is searched for `877` on all 20 million "
 "rows one by one, and stored in another logical vector.====="
-msgstr ""
+msgstr "=====* De manera similar, se busca la columna `y` en busca de `877` en las 20 millones de filas una por una, y se almacena en otro vector lógico.====="
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bp
 msgid ""
 "=====* Element wise `&` operations are performed on the intermediate logical "
 "vectors and all the rows where the expression evaluates to `TRUE` are "
 "returned.====="
-msgstr ""
+msgstr "=====* Las operaciones `&` elemento por elemento se realizan en los vectores lógicos intermedios y se devuelven todas las filas donde la expresión se evalúa como `VERDADERO`.====="
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bp
 msgid ""
 "This is what we call a *vector scan approach*. And this is quite "
 "inefficient, especially on larger tables and when one needs repeated "
 "subsetting, because it has to scan through all the rows each time."
-msgstr ""
+msgstr "Esto es lo que llamamos un \"enfoque de escaneo vectorial\", y es bastante ineficiente, especialmente en tablas más grandes y cuando se necesita crear subconjuntos repetidamente, porque se deben escanear todas las filas cada vez."
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bp
 msgid ""
-"Now let us look at binary search approach (method 2). Recall from ["
-"Properties of key]{1} - *setting keys reorders the data.table by key columns*"
-". Since the data is sorted, we don't have to *scan through the entire length "
-"of the column*! We can instead use *binary search* to search a value in `O("
-"log n)` as opposed to `O(n)` in case of *vector scan approach*, where `n` is "
-"the number of rows in the *data.table*."
-msgstr ""
+"Now let us look at binary search approach (method 2). Recall from "
+"[Properties of key]{1} - *setting keys reorders the data.table by key "
+"columns*. Since the data is sorted, we don't have to *scan through the "
+"entire length of the column*! We can instead use *binary search* to search a "
+"value in `O(log n)` as opposed to `O(n)` in case of *vector scan approach*, "
+"where `n` is the number of rows in the *data.table*."
+msgstr "Ahora veamos el enfoque de búsqueda binaria (método 2). Recordemos de [Propiedades de la clave]{1}: *la configuración de claves reordena la tabla de datos por columnas de clave*. Dado que los datos están ordenados, no tenemos que *explorar toda la longitud de la columna*. En cambio, podemos utilizar la *búsqueda binaria* para buscar un valor en `O(log n)` en lugar de `O(n)` en el caso del *enfoque de exploración vectorial*, donde `n` es el número de filas en la *tabla de datos*."
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bheading
 msgid "Binary search approach"
-msgstr ""
+msgstr "Enfoque de búsqueda binaria"
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bp
 msgid ""
 "Here's a very simple illustration. Let's consider the (sorted) numbers shown "
 "below:"
-msgstr ""
+msgstr "He aquí una ilustración muy sencilla. Consideremos los números (ordenados) que se muestran a continuación:"
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bp
 msgid ""
 "Suppose we'd like to find the matching position of the value *1*, using "
 "binary search, this is how we would proceed - because we know that the data "
 "is *sorted*."
-msgstr ""
+msgstr "Supongamos que queremos encontrar la posición coincidente del valor *1*, usando la búsqueda binaria, así es como procederíamos, porque sabemos que los datos están *ordenados*."
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bp
 msgid "=====* Start with the middle value = 19. Is 1 == 19? No. 1 < 19.====="
-msgstr ""
+msgstr "=====* Comienza con el valor del medio = 19. ¿1 = 19? No. 1 < 19.====="
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bp
 msgid ""
 "=====* Since the value we're looking for is smaller than 19, it should be "
-"somewhere before 19. So we can discard the rest of the half that are >= "
-"19.====="
-msgstr ""
+"somewhere before 19. So we can discard the rest of the half that are >= 19."
+"====="
+msgstr "=====* Dado que el valor que buscamos es menor que 19, debería estar en algún lugar anterior a 19. Por lo tanto, podemos descartar el resto de la mitad que sea >= 19.====="
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bp
 msgid ""
 "=====* Our set is now reduced to *1, 5, 10*. Grab the middle value once "
 "again = 5. Is 1 == 5? No. 1 < 5.====="
-msgstr ""
+msgstr "=====* Nuestro conjunto ahora se reduce a *1, 5, 10*. Tomamos el valor medio una vez más = 5. ¿1 == 5? No. 1 < 5.====="
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bp
 msgid ""
 "=====* Our set is reduced to *1*. Is 1 == 1? Yes. The corresponding index is "
 "also 1. And that's the only match.====="
-msgstr ""
+msgstr "=====* Nuestro conjunto se reduce a *1*. ¿1 == 1? Sí. El índice correspondiente también es 1. Y esa es la única coincidencia.====="
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bp
 msgid ""
 "A vector scan approach on the other hand would have to scan through all the "
 "values (here, 7)."
-msgstr ""
+msgstr "Por otro lado, un enfoque de escaneo vectorial tendría que escanear todos los valores (aquí, 7)."
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bp
 msgid ""
@@ -726,41 +727,41 @@ msgid ""
 "Since rows of each column of *data.tables* have contiguous locations in "
 "memory, the operations are performed in a very cache efficient manner (also "
 "contributes to *speed*)."
-msgstr ""
+msgstr "Se puede observar que con cada búsqueda reducimos el número de búsquedas a la mitad. Es por esto que los subconjuntos basados en *búsquedas binarias* son **increíblemente rápidos**. Dado que las filas de cada columna de *data.tables* tienen ubicaciones contiguas en la memoria, las operaciones se realizan de una manera muy eficiente en el uso de la memoria caché (lo que también contribuye a la *velocidad*)."
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bp
 msgid ""
 "In addition, since we obtain the matching row indices directly without "
 "having to create those huge logical vectors (equal to the number of rows in "
 "a *data.table*), it is quite **memory efficient** as well."
-msgstr ""
+msgstr "Además, dado que obtenemos los índices de fila correspondientes directamente sin tener que crear esos enormes vectores lógicos (iguales al número de filas en una *data.table*), también es bastante **eficiente en términos de memoria**."
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bheading
 msgid "Summary"
-msgstr ""
+msgstr "Resumen"
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bp
 msgid ""
 "In this vignette, we have learnt another method to subset rows in `i` by "
 "keying a *data.table*. Setting keys allows us to perform blazing fast "
 "subsets by using *binary search*. In particular, we have seen how to"
-msgstr ""
+msgstr "En esta viñeta, hemos aprendido otro método para crear subconjuntos de filas en `i` mediante la introducción de claves en una *data.table*. La introducción de claves nos permite realizar subconjuntos increíblemente rápidos mediante la *búsqueda binaria*. En particular, hemos visto cómo"
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bp
 msgid "=====* set key and subset using the key on a *data.table*.====="
-msgstr ""
+msgstr "=====* establecer clave y subconjunto usando la clave en una *tabla de datos*.====="
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bp
 msgid ""
-"=====* subset using keys which fetches *row indices* in `i`, but much "
-"faster.====="
-msgstr ""
+"=====* subset using keys which fetches *row indices* in `i`, but much faster."
+"====="
+msgstr "=====* subconjunto que utiliza claves que obtienen *índices de fila* en `i`, pero mucho más rápido.====="
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bp
 msgid ""
 "=====* combine key based subsets with `j` and `by`. Note that the `j` and "
 "`by` operations are exactly the same as before.====="
-msgstr ""
+msgstr "=====* combinar subconjuntos basados en claves con `j` y `by`. Tenga en cuenta que las operaciones `j` y `by` son exactamente las mismas que antes.====="
 
 #: es%5Cdatatable-keys-fast-subset.Rmd.tmp%2Bp
 msgid ""
@@ -768,5 +769,4 @@ msgid ""
 "the task involves *repeated subsetting*. But it may not be always desirable "
 "to set key and physically reorder the *data.table*. In the next vignette, we "
 "will address this using a *new* feature -- *secondary indexes*."
-msgstr ""
-
+msgstr "Los subconjuntos basados en claves son **increíblemente rápidos** y son particularmente útiles cuando la tarea implica *subconjuntos repetidos*. Pero puede que no siempre sea deseable establecer la clave y reordenar físicamente la *tabla de datos*. En el siguiente artículo, abordaremos este tema utilizando una *nueva* característica: *índices secundarios*."

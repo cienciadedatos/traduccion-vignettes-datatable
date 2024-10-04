@@ -1,12 +1,13 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
+"Project-Id-Version: 0.0.1\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-10-04 11:40-0300\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
+"PO-Revision-Date: 2024-10-04 16:53-0300\n"
+"Last-Translator: Nombre Apellido <direccion@ejemplo.com>\n"
+"Language-Team: es\n"
+"Language: es\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -18,18 +19,18 @@ msgid ""
 "packages. If you are interested in using `data.table` C code from a non-R "
 "application, or in calling its C functions directly, jump to the [last "
 "section]{1} of this vignette."
-msgstr ""
+msgstr "Este documento se centra en el uso de `data.table` como dependencia en otros paquetes R. Si está interesado en utilizar el código C de `data.table` desde una aplicación que no sea R, o en llamar directamente a sus funciones C, salte a la [última sección]{1} de esta viñeta."
 
 #: es%5Cdatatable-importing.Rmd.tmp%2Bp
 msgid ""
 "Importing `data.table` is no different from importing other R packages. This "
 "vignette is meant to answer the most common questions arising around that "
 "subject; the lessons presented here can be applied to other R packages."
-msgstr ""
+msgstr "Importar `data.table` no es diferente a importar otros paquetes R. Esta viñeta tiene como objetivo responder las preguntas más comunes que surgen en torno a ese tema; las lecciones presentadas aquí se pueden aplicar a otros paquetes R."
 
 #: es%5Cdatatable-importing.Rmd.tmp%2Bheading
 msgid "Why to import `data.table`"
-msgstr ""
+msgstr "¿Por qué importar `data.table`?"
 
 #: es%5Cdatatable-importing.Rmd.tmp%2Bp
 msgid ""
@@ -40,11 +41,11 @@ msgid ""
 "tasks from your package to `data.table`, you usually get top performance "
 "without needing to re-invent any of these numerical optimization tricks on "
 "your own."
-msgstr ""
+msgstr "Una de las principales características de `data.table` es su sintaxis concisa, que hace que el análisis exploratorio sea más rápido y más fácil de escribir y percibir; esta conveniencia puede impulsar a los autores de paquetes a utilizar `data.table`. Otra razón, quizás más importante, es el alto rendimiento. Al externalizar tareas informáticas pesadas de su paquete a `data.table`, generalmente obtiene el máximo rendimiento sin necesidad de reinventar ninguno de estos trucos de optimización numérica por su cuenta."
 
 #: es%5Cdatatable-importing.Rmd.tmp%2Bheading
 msgid "Importing `data.table` is easy"
-msgstr ""
+msgstr "Importar `data.table` es fácil"
 
 #: es%5Cdatatable-importing.Rmd.tmp%2Bp
 msgid ""
@@ -55,11 +56,11 @@ msgid ""
 "table`. It also means that adding `data.table` as a dependency of your "
 "package will not result in a chain of other recursive dependencies to "
 "install, making it very convenient for offline installation."
-msgstr ""
+msgstr "Es muy fácil usar `data.table` como una dependencia debido al hecho de que `data.table` no tiene ninguna dependencia propia. Esto se aplica tanto al sistema operativo como a las dependencias de R. Significa que si tiene R instalado en su máquina, ya tiene todo lo necesario para instalar `data.table`. También significa que agregar `data.table` como una dependencia de su paquete no resultará en una cadena de otras dependencias recursivas para instalar, lo que lo hace muy conveniente para la instalación fuera de línea."
 
 #: es%5Cdatatable-importing.Rmd.tmp%2Bheading
 msgid "`DESCRIPTION` file {#DESCRIPTION}"
-msgstr ""
+msgstr "Archivo `DESCRIPTION` {#DESCRIPTION}"
 
 #: es%5Cdatatable-importing.Rmd.tmp%2Bp
 msgid ""
@@ -81,11 +82,11 @@ msgid ""
 "table` within your package without inflicting `data.table` on your user. In "
 "fact, we hope the `Depends:` field is eventually deprecated in R since this "
 "is true for all packages."
-msgstr ""
+msgstr "El primer lugar para definir una dependencia en un paquete es el archivo `DESCRIPTION`. Lo más común es que deba agregar `data.table` en el campo `Imports:`. Para ello, será necesario instalar `data.table` antes de que su paquete pueda compilarse/instalarse. Como se mencionó anteriormente, no se instalarán otros paquetes porque `data.table` no tiene ninguna dependencia propia. También puede especificar la versión mínima requerida de una dependencia; por ejemplo, si su paquete usa la función `fwrite`, que se introdujo en `data.table` en la versión 1.9.8, debe incorporarla como `Imports: data.table (>= 1.9.8)`. De esta manera, puede asegurarse de que la versión de `data.table` instalada sea 1.9.8 o posterior antes de que sus usuarios puedan instalar su paquete. Además del campo `Imports:`, también puede utilizar `Depends: data.table`, pero desaconsejamos enfáticamente este enfoque (y es posible que no lo permitamos en el futuro) porque esto carga `data.table` en el espacio de trabajo de su usuario; es decir, habilita la funcionalidad `data.table` en los scripts de su usuario sin que lo soliciten. `Imports:` es la forma correcta de utilizar `data.table` dentro de su paquete sin infligir `data.table` a su usuario. De hecho, esperamos que el campo `Depends:` quede obsoleto en R, ya que esto es cierto para todos los paquetes."
 
 #: es%5Cdatatable-importing.Rmd.tmp%2Bheading
 msgid "`NAMESPACE` file {#NAMESPACE}"
-msgstr ""
+msgstr "Archivo `NAMESPACE` {#NAMESPACE}"
 
 #: es%5Cdatatable-importing.Rmd.tmp%2Bp
 msgid ""
@@ -94,38 +95,38 @@ msgid ""
 "authors will want to use `import(data.table)` which will import all exported "
 "(i.e., listed in `data.table`'s own `NAMESPACE` file) functions from `data."
 "table`."
-msgstr ""
+msgstr "El siguiente paso es definir qué contenido de `data.table` está usando tu paquete. Esto debe hacerse en el archivo `NAMESPACE`. Lo más común es que los autores de paquetes quieran usar `import(data.table)`, que importará todas las funciones exportadas (es decir, las que se enumeran en el archivo `NAMESPACE` de `data.table`) desde `data.table`."
 
 #: es%5Cdatatable-importing.Rmd.tmp%2Bp
 msgid ""
 "You may also want to use just a subset of `data.table` functions; for "
 "example, some packages may simply make use of `data.table`'s high-"
-"performance CSV reader and writer, for which you can add `importFrom("
-"data.table, fread, fwrite)` in your `NAMESPACE` file. It is also possible to "
+"performance CSV reader and writer, for which you can add `importFrom(data."
+"table, fread, fwrite)` in your `NAMESPACE` file. It is also possible to "
 "import all functions from a package _excluding_ particular ones using "
 "`import(data.table, except=c(fread, fwrite))`."
-msgstr ""
+msgstr "También es posible que desee utilizar solo un subconjunto de funciones de `data.table`; por ejemplo, algunos paquetes pueden simplemente hacer uso del lector y escritor CSV de alto rendimiento de `data.table`, para lo cual puede agregar `importFrom(data.table, fread, fwrite)` en su archivo `NAMESPACE`. También es posible importar todas las funciones de un paquete _excluyendo_ algunas en particular usando `import(data.table, except=c(fread, fwrite))`."
 
 #: es%5Cdatatable-importing.Rmd.tmp%2Bp
 msgid ""
 "Be sure to read also the note about non-standard evaluation in `data.table` "
 "in [the section on \"undefined globals\"]{1}"
-msgstr ""
+msgstr "Asegúrese de leer también la nota sobre la evaluación no estándar en `data.table` en [la sección sobre \"globales indefinidos\"]{1}"
 
 #: es%5Cdatatable-importing.Rmd.tmp%2Bheading
 msgid "Usage"
-msgstr ""
+msgstr "Uso"
 
 #: es%5Cdatatable-importing.Rmd.tmp%2Bp
 msgid ""
-"As an example we will define two functions in `a.pkg` package that uses `data"
-".table`. One function, `gen`, will generate a simple `data.table`; another, "
-"`aggr`, will do a simple aggregation of it."
-msgstr ""
+"As an example we will define two functions in `a.pkg` package that uses "
+"`data.table`. One function, `gen`, will generate a simple `data.table`; "
+"another, `aggr`, will do a simple aggregation of it."
+msgstr "Como ejemplo, definiremos dos funciones en el paquete `a.pkg` que utiliza `data.table`. Una función, `gen`, generará un `data.table` simple; otra, `aggr`, realizará una agregación simple de este."
 
 #: es%5Cdatatable-importing.Rmd.tmp%2Bheading
 msgid "Testing"
-msgstr ""
+msgstr "Pruebas"
 
 #: es%5Cdatatable-importing.Rmd.tmp%2Bp
 msgid ""
@@ -135,7 +136,7 @@ msgid ""
 "and inform you before releasing the new version. This of course assumes you "
 "will publish your package to CRAN or Bioconductor. The most basic test can "
 "be a plaintext R script in your package directory `tests/test.R`:"
-msgstr ""
+msgstr "Asegúrese de incluir pruebas en su paquete. Antes de cada lanzamiento importante de `data.table`, verificamos las dependencias inversas. Esto significa que si algún cambio en `data.table` pudiera afectar su código, podremos detectar los cambios que afecten su código e informarle antes de lanzar la nueva versión. Por supuesto, esto supone que publicará su paquete en CRAN o Bioconductor. La prueba más básica puede ser un script R de texto simple en el directorio de su paquete `tests/test.R`:"
 
 #: es%5Cdatatable-importing.Rmd.tmp%2Bp
 msgid ""
@@ -143,36 +144,36 @@ msgid ""
 "test-error`, which will continue after an error and run all your tests (as "
 "opposed to stopping on the first line of script that failed) NB this "
 "requires R 3.4.0 or greater."
-msgstr ""
+msgstr "Al probar su paquete, puede utilizar `R CMD check --no-stop-on-test-error`, que continuará después de un error y ejecutará todas sus pruebas (en lugar de detenerse en la primera línea del script que falló). NB esto requiere R 3.4.0 o superior."
 
 #: es%5Cdatatable-importing.Rmd.tmp%2Bheading
 msgid "Testing using `testthat`"
-msgstr ""
+msgstr "Pruebas usando `testthat`"
 
 #: es%5Cdatatable-importing.Rmd.tmp%2Bp
 msgid ""
 "It is very common to use the `testthat` package for purpose of tests. "
 "Testing a package that imports `data.table` is no different from testing "
 "other packages. An example test script `tests/testthat/test-pkg.R`:"
-msgstr ""
+msgstr "Es muy común utilizar el paquete `testthat` para realizar pruebas. Probar un paquete que importa `data.table` no es diferente de probar otros paquetes. Un ejemplo de script de prueba `tests/testthat/test-pkg.R`:"
 
 #: es%5Cdatatable-importing.Rmd.tmp%2Bp
 msgid ""
 "If `data.table` is in Suggests (but not Imports) then you need to declare `."
 "datatable.aware=TRUE` in one of the R/* files to avoid \"object not found\" "
 "errors when testing via `testthat::test_package` or `testthat::test_check`."
-msgstr ""
+msgstr "Si `data.table` está en Sugerencias (pero no en Importaciones), entonces necesita declarar `.datatable.aware=TRUE` en uno de los archivos R/* para evitar errores de \"objeto no encontrado\" al realizar pruebas a través de `testthat::test_package` o `testthat::test_check`."
 
 #: es%5Cdatatable-importing.Rmd.tmp%2Bheading
 msgid "Dealing with \"undefined global functions or variables\" {#globals}"
-msgstr ""
+msgstr "Cómo manejar \"funciones o variables globales no definidas\" {#globals}"
 
 #: es%5Cdatatable-importing.Rmd.tmp%2Bp
 msgid ""
 "`data.table`'s use of R's deferred evaluation (especially on the left-hand "
-"side of `:=`) is not well-recognised by `R CMD check`. This results in `NOTE`"
-"s like the following during package check:"
-msgstr ""
+"side of `:=`) is not well-recognised by `R CMD check`. This results in "
+"`NOTE`s like the following during package check:"
+msgstr "El uso que hace `data.table` de la evaluación diferida de R (especialmente en el lado izquierdo de `:=`) no es bien reconocido por `R CMD check`. Esto da como resultado `NOTE`s como el siguiente durante la verificación del paquete:"
 
 #: es%5Cdatatable-importing.Rmd.tmp%2Bp
 msgid ""
@@ -180,7 +181,7 @@ msgid ""
 "your package and set them to `NULL`, optionally adding a comment (as is done "
 "in the refined version of `gen` below). When possible, you could also use a "
 "character vector instead of symbols (as in `aggr` below):"
-msgstr ""
+msgstr "La forma más sencilla de solucionar este problema es predefinir esas variables dentro del paquete y configurarlas como `NULL`, agregando opcionalmente un comentario (como se hace en la versión refinada de `gen` a continuación). Cuando sea posible, también puede utilizar un vector de caracteres en lugar de símbolos (como en `aggr` a continuación):"
 
 #: es%5Cdatatable-importing.Rmd.tmp%2Bp
 msgid ""
@@ -191,13 +192,13 @@ msgid ""
 "issues arising from the unlikely scenario that we change the exported value "
 "of these in the future, e.g. if you want to use `.N`, `.I`, and `:=`, a "
 "minimal `NAMESPACE` would have:"
-msgstr ""
+msgstr "El caso de los símbolos especiales de `data.table` (por ejemplo, `.SD` y `.N`) y el operador de asignación (`:=`) es ligeramente diferente (consulte `?.N` para obtener más información, incluida una lista completa de dichos símbolos). Debe importar cualquiera de estos valores que utilice desde el espacio de nombres de `data.table` para protegerse contra cualquier problema que surja del escenario poco probable de que cambiemos el valor exportado de estos en el futuro, por ejemplo, si desea utilizar `.N`, `.I` y `:=`, un `NAMESPACE` mínimo tendría:"
 
 #: es%5Cdatatable-importing.Rmd.tmp%2Bp
 msgid ""
 "Much simpler is to just use `import(data.table)` which will greedily allow "
 "usage in your package's code of any object exported from `data.table`."
-msgstr ""
+msgstr "Mucho más simple es simplemente usar `import(data.table)` que permitirá el uso en el código de su paquete de cualquier objeto exportado desde `data.table`."
 
 #: es%5Cdatatable-importing.Rmd.tmp%2Bp
 msgid ""
@@ -205,11 +206,11 @@ msgid ""
 "your package namespace you can use `?globalVariables`. Be aware that these "
 "notes do not have any impact on the code or its functionality; if you are "
 "not going to publish your package, you may simply choose to ignore them."
-msgstr ""
+msgstr "Si no le importa tener `id` y `grp` registrados como variables globales en el espacio de nombres de su paquete, puede usar `?globalVariables`. Tenga en cuenta que estas notas no tienen ningún impacto en el código ni en su funcionalidad; si no va a publicar su paquete, puede simplemente optar por ignorarlas."
 
 #: es%5Cdatatable-importing.Rmd.tmp%2Bheading
 msgid "Care needed when providing and using options"
-msgstr ""
+msgstr "Se debe tener cuidado al proporcionar y utilizar opciones"
 
 #: es%5Cdatatable-importing.Rmd.tmp%2Bp
 msgid ""
@@ -221,9 +222,9 @@ msgid ""
 "verbose\", FALSE))`. All `data.table` options start with `datatable.` so as "
 "to not conflict with options in other packages. A user simply calls "
 "`options(datatable.verbose=TRUE)` to turn on verbosity. This affects all "
-"data.table function calls unless `verbose=FALSE` is provided explicitly; "
-"e.g. `fun(..., verbose=FALSE)`."
-msgstr ""
+"data.table function calls unless `verbose=FALSE` is provided explicitly; e."
+"g. `fun(..., verbose=FALSE)`."
+msgstr "Una práctica común de los paquetes R es proporcionar opciones de personalización establecidas por `options(name=val)` y obtenidas usando `getOption(\"name\", default)`. Los argumentos de función a menudo especifican una llamada a `getOption()` para que el usuario sepa (desde `?fun` o `args(fun)`) el nombre de la opción que controla el valor predeterminado para ese parámetro; por ejemplo, `fun(..., verbose=getOption(\"datatable.verbose\", FALSE))`. Todas las opciones de `data.table` comienzan con `datatable.` para no entrar en conflicto con las opciones de otros paquetes. Un usuario simplemente llama a `options(datatable.verbose=TRUE)` para activar la verbosidad. Esto afecta a todas las llamadas de función data.table a menos que `verbose=FALSE` se proporcione explícitamente; por ejemplo, `fun(..., verbose=FALSE)`."
 
 #: es%5Cdatatable-importing.Rmd.tmp%2Bp
 msgid ""
@@ -247,18 +248,18 @@ msgid ""
 "use `data.table`. Accordingly, in v1.12.4 (Oct 2019) a message was printed "
 "when the `datatable.nomatch` option was used, and from v1.14.2 it is now "
 "ignored with warning. It was the only `data.table` option with this concern."
-msgstr ""
+msgstr "El mecanismo de opciones en R es _global_. Lo que significa que si un usuario establece una opción `data.table` para su propio uso, esa configuración también afecta al código dentro de cualquier paquete que también esté usando `data.table`. Para una opción como `datatable.verbose`, este es exactamente el comportamiento deseado ya que el deseo es rastrear y registrar todas las operaciones de `data.table` desde donde sea que se originen; activar la verbosidad no afecta los resultados. Otra opción exclusiva de R y excelente para producción es `options(warn=2)` de R que convierte todas las advertencias en errores. Nuevamente, el deseo es afectar cualquier advertencia en cualquier paquete para no perder ninguna advertencia en producción. Hay 6 opciones `datatable.print.*` y 3 opciones de optimización que no afectan el resultado de las operaciones. Sin embargo, hay una opción `data.table` que sí afecta y ahora es una preocupación: `datatable.nomatch`. Esta opción cambia la unión predeterminada de externa a interna. [Aparte, la unión predeterminada es externa porque externa es más segura; [No elimina los datos faltantes de forma silenciosa; además, es coherente con la forma básica de R de hacer coincidir por nombres e índices.] Algunos usuarios prefieren que la unión interna sea la opción predeterminada y les proporcionamos esta opción. Sin embargo, un usuario que configure esta opción puede cambiar involuntariamente el comportamiento de las uniones dentro de los paquetes que usan `data.table`. En consecuencia, en v1.12.4 (octubre de 2019) se imprimía un mensaje cuando se usaba la opción `datatable.nomatch` y, a partir de v1.14.2, ahora se ignora con una advertencia. Era la única opción `data.table` con este problema."
 
 #: es%5Cdatatable-importing.Rmd.tmp%2Bheading
 msgid "Troubleshooting"
-msgstr ""
+msgstr "Solución de problemas"
 
 #: es%5Cdatatable-importing.Rmd.tmp%2Bp
 msgid ""
 "If you face any problems in creating a package that uses data.table, please "
 "confirm that the problem is reproducible in a clean R session using the R "
 "console: `R CMD check package.name`."
-msgstr ""
+msgstr "Si enfrenta algún problema al crear un paquete que usa data.table, confirme que el problema se pueda reproducir en una sesión R limpia usando la consola R: `R CMD check package.name`."
 
 #: es%5Cdatatable-importing.Rmd.tmp%2Bp
 msgid ""
@@ -271,30 +272,30 @@ msgid ""
 "double check using R console (run R on the command line) and ensure the "
 "import is defined in the `DESCRIPTION` and `NAMESPACE` files following the "
 "[instructions]{1} [above]{2}."
-msgstr ""
+msgstr "Algunos de los problemas más comunes a los que se enfrentan los desarrolladores suelen estar relacionados con herramientas auxiliares que están pensadas para automatizar algunas tareas de desarrollo de paquetes, por ejemplo, usar `roxygen` para generar el archivo `NAMESPACE` a partir de los metadatos de los archivos de código R. Otros están relacionados con las herramientas auxiliares que compilan y comprueban el paquete. Desafortunadamente, estas herramientas auxiliares a veces tienen efectos secundarios no deseados u ocultos que pueden ocultar el origen de los problemas. Por lo tanto, asegúrese de volver a comprobarlo usando la consola R (ejecute R en la línea de comandos) y asegúrese de que la importación esté definida en los archivos `DESCRIPTION` y `NAMESPACE` siguiendo las [instrucciones]{1} [arriba]{2}."
 
 #: es%5Cdatatable-importing.Rmd.tmp%2Bp
 msgid ""
 "If you are not able to reproduce problems you have using the plain R console "
 "build and check, you may try to get some support based on past issues we've "
-"encountered with `data.table` interacting with helper tools: "
-"[devtools#192]{1} or [devtools#1472]{2}."
-msgstr ""
+"encountered with `data.table` interacting with helper tools: [devtools#192]"
+"{1} or [devtools#1472]{2}."
+msgstr "Si no puede reproducir los problemas que tiene al usar la compilación y verificación de la consola R simple, puede intentar obtener ayuda en función de los problemas anteriores que hemos encontrado con la interacción de `data.table` con las herramientas auxiliares: [devtools#192]{1} o [devtools#1472]{2}."
 
 #: es%5Cdatatable-importing.Rmd.tmp%2Bheading
 msgid "License"
-msgstr ""
+msgstr "Licencia"
 
 #: es%5Cdatatable-importing.Rmd.tmp%2Bp
 msgid ""
-"Since version 1.10.5 `data.table` is licensed as Mozilla Public License (MPL)"
-". The reasons for the change from GPL should be read in full [here]{1} and "
-"you can read more about MPL on Wikipedia [here]{2} and [here]{3}."
-msgstr ""
+"Since version 1.10.5 `data.table` is licensed as Mozilla Public License "
+"(MPL). The reasons for the change from GPL should be read in full [here]{1} "
+"and you can read more about MPL on Wikipedia [here]{2} and [here]{3}."
+msgstr "Desde la versión 1.10.5, `data.table` tiene licencia pública de Mozilla (MPL). Las razones del cambio de GPL se deben leer en su totalidad [aquí]{1} y se puede leer más sobre MPL en Wikipedia [aquí]{2} y [aquí]{3}."
 
 #: es%5Cdatatable-importing.Rmd.tmp%2Bheading
 msgid "Optionally import `data.table`: Suggests"
-msgstr ""
+msgstr "Importe opcionalmente `data.table`: Sugiere"
 
 #: es%5Cdatatable-importing.Rmd.tmp%2Bp
 msgid ""
@@ -307,14 +308,14 @@ msgid ""
 "demonstrates conditional use of `data.table`'s fast CSV writer `?fwrite`. If "
 "the `data.table` package is not installed, the much-slower base R `?write."
 "table` function is used instead."
-msgstr ""
+msgstr "Si desea utilizar `data.table` de forma condicional, es decir, solo cuando esté instalado, debe utilizar `Suggests: data.table` en su archivo `DESCRIPTION` en lugar de utilizar `Imports: data.table`. De forma predeterminada, esta definición no forzará la instalación de `data.table` al instalar su paquete. Esto también requiere que utilice `data.table` de forma condicional en el código de su paquete, lo que debe hacerse utilizando la función `?requireNamespace`. El siguiente ejemplo demuestra el uso condicional del rápido escritor CSV `?fwrite` de `data.table`. Si el paquete `data.table` no está instalado, se utiliza en su lugar la función base R `?write.table`, mucho más lenta."
 
 #: es%5Cdatatable-importing.Rmd.tmp%2Bp
 msgid ""
 "A slightly more extended version of this would also ensure that the "
 "installed version of `data.table` is recent enough to have the `fwrite` "
 "function available:"
-msgstr ""
+msgstr "Una versión un poco más extendida de esto también garantizaría que la versión instalada de `data.table` sea lo suficientemente reciente como para tener la función `fwrite` disponible:"
 
 #: es%5Cdatatable-importing.Rmd.tmp%2Bp
 msgid ""
@@ -324,11 +325,11 @@ msgid ""
 "`data.table::` prefix because none of them are imported. When using `data."
 "table` in package tests (e.g. tests/testthat/test* files), you need to "
 "declare `.datatable.aware=TRUE` in one of the R/* files."
-msgstr ""
+msgstr "Cuando se utiliza un paquete como dependencia sugerida, no se debe \"importar\" en el archivo \"NAMESPACE\". Solo hay que mencionarlo en el archivo \"DESCRIPTION\". Cuando se utilizan funciones \"data.table\" en el código del paquete (archivos R/*), se debe utilizar el prefijo \"data.table::\" porque ninguna de ellas se importa. Cuando se utiliza \"data.table\" en pruebas de paquetes (por ejemplo, archivos tests/testthat/test*), se debe declarar \".datatable.aware=TRUE\" en uno de los archivos R/*."
 
 #: es%5Cdatatable-importing.Rmd.tmp%2Bheading
 msgid "`data.table` in `Imports` but nothing imported"
-msgstr ""
+msgstr "`data.table` en `Importaciones` pero no se importó nada"
 
 #: es%5Cdatatable-importing.Rmd.tmp%2Bp
 msgid ""
@@ -336,7 +337,7 @@ msgid ""
 "in their `NAMESPACE` file and instead use `data.table::` qualification on "
 "all internal code (of course keeping `data.table` under their `Imports:` in "
 "`DESCRIPTION`)."
-msgstr ""
+msgstr "Algunos usuarios ([eg]{1}) pueden preferir evitar el uso de `importFrom` o `import` en su archivo `NAMESPACE` y en su lugar usar la calificación `data.table::` en todo el código interno (por supuesto, manteniendo `data.table` debajo de su `Imports:` en `DESCRIPTION`)."
 
 #: es%5Cdatatable-importing.Rmd.tmp%2Bp
 msgid ""
@@ -346,7 +347,7 @@ msgid ""
 "of `data.table`'s query API (which could lead to unexpected behavior as the "
 "structure of calls to `[.data.frame` and `[.data.table` fundamentally "
 "differ, e.g. the latter has many more arguments)."
-msgstr ""
+msgstr "En este caso, la función no exportada `[.data.table` volverá a llamar a `[.data.frame` como medida de protección, ya que `[.data.table` no tiene forma de saber que el paquete principal es consciente de que está intentando realizar llamadas contra la sintaxis de la API de consulta de `[.data.table` (lo que podría generar un comportamiento inesperado ya que la estructura de las llamadas a `[.data.frame` y `[.data.table` difieren fundamentalmente, por ejemplo, este último tiene muchos más argumentos)."
 
 #: es%5Cdatatable-importing.Rmd.tmp%2Bp
 msgid ""
@@ -355,30 +356,30 @@ msgid ""
 "export). This tells `data.table` that you as a package developer have "
 "designed your code to intentionally rely on `data.table` functionality even "
 "though it may not be obvious from inspecting your `NAMESPACE` file."
-msgstr ""
+msgstr "Si este es de todos modos su enfoque preferido para el desarrollo de paquetes, defina `.datatable.aware = TRUE` en cualquier parte de su código fuente R (sin necesidad de exportar). Esto le indica a `data.table` que usted, como desarrollador de paquetes, ha diseñado su código para que dependa intencionalmente de la funcionalidad de `data.table`, aunque puede que no sea obvio al inspeccionar su archivo `NAMESPACE`."
 
 #: es%5Cdatatable-importing.Rmd.tmp%2Bp
 msgid ""
 "`data.table` determines on the fly whether the calling function is aware "
-"it's tapping into `data.table` with the internal `cedta` function (**C**"
-"alling **E**nvironment is **D**ata **T**able **A**ware), which, beyond "
+"it's tapping into `data.table` with the internal `cedta` function "
+"(**C**alling **E**nvironment is **D**ata **T**able **A**ware), which, beyond "
 "checking the `?getNamespaceImports` for your package, also checks the "
 "existence of this variable (among other things)."
-msgstr ""
+msgstr "`data.table` determina sobre la marcha si la función que llama es consciente de que está accediendo a `data.table` con la función interna `cedta` (**C**alling **E**nvironment is **D**ata **T**able **A**ware), que, además de verificar `?getNamespaceImports` para su paquete, también verifica la existencia de esta variable (entre otras cosas)."
 
 #: es%5Cdatatable-importing.Rmd.tmp%2Bheading
 msgid "Further information on dependencies"
-msgstr ""
+msgstr "Más información sobre dependencias"
 
 #: es%5Cdatatable-importing.Rmd.tmp%2Bp
 msgid ""
 "For more canonical documentation of defining packages dependency check the "
 "official manual: [Writing R Extensions]{1}."
-msgstr ""
+msgstr "Para obtener documentación más canónica sobre la definición de dependencias de paquetes, consulte el manual oficial: [Escritura de extensiones R]{1}."
 
 #: es%5Cdatatable-importing.Rmd.tmp%2Bheading
 msgid "Importing data.table C routines"
-msgstr ""
+msgstr "Importación de rutinas data.table C"
 
 #: es%5Cdatatable-importing.Rmd.tmp%2Bp
 msgid ""
@@ -386,11 +387,11 @@ msgid ""
 "used in R packages directly from their C code. See [`?cdt`]{1} for details "
 "and [Writing R Extensions]{2} _Linking to native routines in other packages_ "
 "section for usage."
-msgstr ""
+msgstr "Algunas de las rutinas C utilizadas internamente ahora se exportan a nivel C, por lo que se pueden usar en paquetes R directamente desde su código C. Consulte [`?cdt`]{1} para obtener detalles y la sección [Escritura de extensiones R]{2} _Enlace a rutinas nativas en otros paquetes_ para su uso."
 
 #: es%5Cdatatable-importing.Rmd.tmp%2Bheading
 msgid "Importing from non-r Applications {#non-r-api}"
-msgstr ""
+msgstr "Importación desde aplicaciones que no son R {#non-r-api}"
 
 #: es%5Cdatatable-importing.Rmd.tmp%2Bp
 msgid ""
@@ -399,44 +400,44 @@ msgid ""
 "concrete details about this will be provided later; for now you can study "
 "the C code that was isolated from the R C API in [src/fread.c]{1} and [src/"
 "fwrite.c]{2}."
-msgstr ""
+msgstr "Algunas pequeñas partes del código C de `data.table` se aislaron de la API de RC y ahora se pueden usar desde aplicaciones que no sean de R mediante la vinculación a archivos .so / .dll. Más adelante se brindarán detalles más concretos sobre esto; por ahora, puede estudiar el código C que se aisló de la API de RC en [src/fread.c]{1} y [src/fwrite.c]{2}."
 
 #: es%5Cdatatable-importing.Rmd.tmp%2Bheading
 msgid "How to convert your Depends dependency on data.table to Imports"
-msgstr ""
+msgstr "Cómo convertir su dependencia Depends en data.table a Imports"
 
 #: es%5Cdatatable-importing.Rmd.tmp%2Bp
 msgid ""
 "To convert a `Depends` dependency on `data.table` to an `Imports` dependency "
 "in your package, follow these steps:"
-msgstr ""
+msgstr "Para convertir una dependencia `Depends` de `data.table` en una dependencia `Imports` en su paquete, siga estos pasos:"
 
 #: es%5Cdatatable-importing.Rmd.tmp%2Bheading
 msgid "Step 0. Ensure your package is passing R CMD check initially"
-msgstr ""
+msgstr "Paso 0. Asegúrese de que su paquete pase la verificación R CMD inicialmente"
 
 #: es%5Cdatatable-importing.Rmd.tmp%2Bheading
 msgid ""
 "Step 1. Update the DESCRIPTION file to put data.table in Imports, not Depends"
-msgstr ""
+msgstr "Paso 1. Actualice el archivo DESCRIPCIÓN para colocar data.table en Importaciones, no en Dependencias"
 
 #: es%5Cdatatable-importing.Rmd.tmp%2Bp
 msgid "**Before:**"
-msgstr ""
+msgstr "**Antes:**"
 
 #: es%5Cdatatable-importing.Rmd.tmp%2Bp
 msgid "**After:**"
-msgstr ""
+msgstr "**Después:**"
 
 #: es%5Cdatatable-importing.Rmd.tmp%2Bheading
 msgid "Step 2.1: Run `R CMD check`"
-msgstr ""
+msgstr "Paso 2.1: Ejecutar `R CMD check`"
 
 #: es%5Cdatatable-importing.Rmd.tmp%2Bp
 msgid ""
 "Run `R CMD check` to identify any missing imports or symbols. This step "
 "helps:"
-msgstr ""
+msgstr "Ejecute `R CMD check` para identificar las importaciones o los símbolos faltantes. Este paso ayuda a:"
 
 #: es%5Cdatatable-importing.Rmd.tmp%2Bp
 msgid ""
@@ -444,7 +445,7 @@ msgid ""
 "are not explicitly imported.===== =====- Flag missing special symbols like `."
 "N`, `.SD`, and `:=`.===== =====- Provide immediate feedback on what needs to "
 "be added to the NAMESPACE file.====="
-msgstr ""
+msgstr "=====- Detecta automáticamente cualquier función o símbolo de `data.table` que no se importe explícitamente.===== =====- Marca los símbolos especiales faltantes como `.N`, `.SD` y `:=`.===== =====- Proporciona comentarios inmediatos sobre lo que se debe agregar al archivo NAMESPACE.====="
 
 #: es%5Cdatatable-importing.Rmd.tmp%2Bp
 msgid ""
@@ -452,17 +453,17 @@ msgid ""
 "check` skips some symbols/functions in formulas and will completely miss "
 "parsed expressions like `parse(text = \"data.table(a = 1)\")`. Packages will "
 "need good test coverage to detect these edge cases."
-msgstr ""
+msgstr "Nota: No todos estos usos son detectados por `R CMD check`. En particular, `R CMD check` omite algunos símbolos/funciones en fórmulas y no detecta expresiones analizadas como `parse(text = \"data.table(a = 1)\")`. Los paquetes necesitarán una buena cobertura de pruebas para detectar estos casos extremos."
 
 #: es%5Cdatatable-importing.Rmd.tmp%2Bheading
 msgid "Step 2.2: Modify the NAMESPACE file"
-msgstr ""
+msgstr "Paso 2.2: Modificar el archivo NAMESPACE"
 
 #: es%5Cdatatable-importing.Rmd.tmp%2Bp
 msgid ""
 "Based on the `R CMD check` results, ensure all used functions, special "
 "symbols, S3 generics, and S4 classes from `data.table` are imported."
-msgstr ""
+msgstr "Según los resultados de `R CMD check`, asegúrese de que se importen todas las funciones utilizadas, los símbolos especiales, los genéricos S3 y las clases S4 de `data.table`."
 
 #: es%5Cdatatable-importing.Rmd.tmp%2Bp
 msgid ""
@@ -470,17 +471,17 @@ msgid ""
 "functions, and S3 generics, and/or `importClassesFrom(data.table, ...)` "
 "directives for S4 classes as appropriate. See 'Writing R Extensions' for "
 "full details on how to do so properly."
-msgstr ""
+msgstr "Esto significa agregar directivas `importFrom(data.table, ...)` para símbolos, funciones y genéricos de S3, y/o directivas `importClassesFrom(data.table, ...)` para clases de S4 según corresponda. Consulte \"Cómo escribir extensiones de R\" para obtener detalles completos sobre cómo hacerlo correctamente."
 
 #: es%5Cdatatable-importing.Rmd.tmp%2Bheading
 msgid "Blanket import"
-msgstr ""
+msgstr "Importación de mantas"
 
 #: es%5Cdatatable-importing.Rmd.tmp%2Bp
 msgid ""
 "Alternatively, you can import all functions from `data.table` at once, "
 "though this is generally not recommended:"
-msgstr ""
+msgstr "Como alternativa, puede importar todas las funciones de `data.table` a la vez, aunque esto generalmente no se recomienda:"
 
 #: es%5Cdatatable-importing.Rmd.tmp%2Bp
 msgid ""
@@ -491,11 +492,11 @@ msgid ""
 "`import(pkgB)`, but later pkgB exports a function also exported by pkgA, "
 "this will break your package due to conflicts in your namespace, which is "
 "disallowed by `R CMD check` and CRAN.====="
-msgstr ""
+msgstr "**Justificación para evitar importaciones generales:** =====1. **Documentación**: El archivo NAMESPACE puede servir como buena documentación de cómo depende de ciertos paquetes.===== =====2. **Evitar conflictos**: Las importaciones generales lo dejan expuesto a fallas sutiles. Por ejemplo, si `import(pkgA)` e `import(pkgB)`, pero luego pkgB exporta una función también exportada por pkgA, esto romperá su paquete debido a conflictos en su espacio de nombres, lo cual no está permitido por `R CMD check` y CRAN.====="
 
 #: es%5Cdatatable-importing.Rmd.tmp%2Bheading
 msgid "Step 3: Update Your R code files outside the package's R/ directory"
-msgstr ""
+msgstr "Paso 3: Actualice los archivos de código R fuera del directorio R/ del paquete"
 
 #: es%5Cdatatable-importing.Rmd.tmp%2Bp
 msgid ""
@@ -503,19 +504,19 @@ msgid ""
 "automatically attached when your package is loaded. This can be important "
 "for examples, tests, vignettes, and demos, where `Imports` packages need to "
 "be attached explicitly."
-msgstr ""
+msgstr "Cuando mueves un paquete de `Depends` a `Imports`, ya no se adjuntará automáticamente cuando se cargue el paquete. Esto puede ser importante para ejemplos, pruebas, viñetas y demostraciones, donde los paquetes `Imports` deben adjuntarse explícitamente."
 
 #: es%5Cdatatable-importing.Rmd.tmp%2Bp
 msgid "**Before (with `Depends`):**"
-msgstr ""
+msgstr "**Antes (con `Depende`):**"
 
 #: es%5Cdatatable-importing.Rmd.tmp%2Bp
 msgid "**After (with `Imports`):**"
-msgstr ""
+msgstr "**Después (con `Importaciones`):**"
 
 #: es%5Cdatatable-importing.Rmd.tmp%2Bheading
 msgid "Benefits of using `Imports`"
-msgstr ""
+msgstr "Beneficios de utilizar “Importaciones”"
 
 #: es%5Cdatatable-importing.Rmd.tmp%2Bp
 msgid ""
@@ -528,5 +529,4 @@ msgid ""
 "=====- **Easier Maintenance**: It simplifies maintenance tasks as upstream "
 "dependencies' APIs evolve. Depending too much on `Depends` can lead to "
 "conflicts and compatibility issues over time.====="
-msgstr ""
-
+msgstr "=====- **Facilidad de uso**: `Depends` modifica la ruta `search()` de sus usuarios, posiblemente sin que ellos lo deseen.===== =====- **Gestión de espacios de nombres**: Solo las funciones que su paquete importa explícitamente están disponibles, lo que reduce el riesgo de conflictos de nombres de funciones.===== =====- **Carga de paquetes más limpia**: Las dependencias de su paquete no se adjuntan a la ruta de búsqueda, lo que hace que el proceso de carga sea más limpio y potencialmente más rápido.===== =====- **Mantenimiento más sencillo**: Simplifica las tareas de mantenimiento a medida que evolucionan las API de las dependencias ascendentes. Depender demasiado de `Depends` puede provocar conflictos y problemas de compatibilidad con el tiempo.====="

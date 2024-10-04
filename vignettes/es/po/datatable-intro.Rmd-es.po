@@ -1,12 +1,13 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
+"Project-Id-Version: 0.0.1\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-10-04 11:40-0300\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
+"PO-Revision-Date: 2024-10-04 16:53-0300\n"
+"Last-Translator: Nombre Apellido <direccion@ejemplo.com>\n"
+"Language-Team: es\n"
+"Language: es\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -18,38 +19,38 @@ msgid ""
 "*subset* rows, *select and compute* on columns, and perform aggregations *by "
 "group*. Familiarity with the `data.frame` data structure from base R is "
 "useful, but not essential to follow this vignette."
-msgstr ""
+msgstr "Esta viñeta presenta la sintaxis de `data.table`, su forma general, cómo crear *subconjuntos* de filas, *seleccionar y calcular* columnas y realizar agregaciones *por grupo*. Es útil estar familiarizado con la estructura de datos `data.frame` de R básico, pero no es esencial para seguir esta viñeta."
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bheading
 msgid "Data analysis using `data.table`"
-msgstr ""
+msgstr "Análisis de datos utilizando `data.table`"
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
 "Data manipulation operations such as *subset*, *group*, *update*, *join*, "
 "etc. are all inherently related. Keeping these *related operations together* "
 "allows for:"
-msgstr ""
+msgstr "Las operaciones de manipulación de datos como *subconjunto*, *grupo*, *actualización*, *unión*, etc. están todas relacionadas de manera inherente. Mantener juntas estas *operaciones relacionadas* permite:"
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
 "=====* *concise* and *consistent* syntax irrespective of the set of "
 "operations you would like to perform to achieve your end goal.====="
-msgstr ""
+msgstr "=====* Sintaxis *concisa* y *consistente* independientemente del conjunto de operaciones que desee realizar para lograr su objetivo final.====="
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
 "=====* performing analysis *fluidly* without the cognitive burden of having "
 "to map each operation to a particular function from a potentially huge set "
 "of functions available before performing the analysis.====="
-msgstr ""
+msgstr "=====* realizar análisis *de manera fluida* sin la carga cognitiva de tener que asignar cada operación a una función particular de un conjunto potencialmente enorme de funciones disponibles antes de realizar el análisis.====="
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
 "=====* *automatically* optimising operations internally and very effectively "
 "by knowing precisely the data required for each operation, leading to very "
 "fast and memory-efficient code.====="
-msgstr ""
+msgstr "=====* optimizar *automáticamente* las operaciones internamente y de manera muy efectiva al conocer con precisión los datos necesarios para cada operación, lo que genera un código muy rápido y con uso eficiente de la memoria.====="
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
@@ -57,68 +58,68 @@ msgid ""
 "tremendously, then this package is for you. The philosophy that `data.table` "
 "adheres to makes this possible. Our goal is to illustrate it through this "
 "series of vignettes."
-msgstr ""
+msgstr "En resumen, si está interesado en reducir enormemente el tiempo de *programación* y *computación*, este paquete es para usted. La filosofía a la que se adhiere `data.table` lo hace posible. Nuestro objetivo es ilustrarlo a través de esta serie de viñetas."
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bheading
 msgid "Data {#data}"
-msgstr ""
+msgstr "Datos {#data}"
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
 "In this vignette, we will use [NYC-flights14]{1} data obtained from the "
 "[flights]{2} package (available on GitHub only). It contains On-Time flights "
 "data from the Bureau of Transportation Statistics for all the flights that "
-"departed from New York City airports in 2014 (inspired by [nycflights13]{3})"
-". The data is available only for Jan-Oct'14."
-msgstr ""
+"departed from New York City airports in 2014 (inspired by [nycflights13]"
+"{3}). The data is available only for Jan-Oct'14."
+msgstr "En esta viñeta, utilizaremos los datos de [NYC-flights14]{1} obtenidos del paquete [flights]{2} (disponible solo en GitHub). Contiene datos de vuelos puntuales de la Oficina de Estadísticas de Transporte para todos los vuelos que partieron de los aeropuertos de la ciudad de Nueva York en 2014 (inspirados en [nycflights13]{3}). Los datos están disponibles solo para enero-octubre de 2014."
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
 "We can use `data.table`'s fast-and-friendly file reader `fread` to load "
 "`flights` directly as follows:"
-msgstr ""
+msgstr "Podemos usar el lector de archivos rápido y amigable `fread` de `data.table` para cargar `flights` directamente de la siguiente manera:"
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
 "Aside: `fread` accepts `http` and `https` URLs directly, as well as "
 "operating system commands such as `sed` and `awk` output. See `?fread` for "
 "examples."
-msgstr ""
+msgstr "Nota: `fread` acepta URL `http` y `https` directamente, así como comandos del sistema operativo como `sed` y `awk`. Consulta `?fread` para ver ejemplos."
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bheading
 msgid "Introduction"
-msgstr ""
+msgstr "Introducción"
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid "In this vignette, we will"
-msgstr ""
+msgstr "En esta viñeta, vamos a"
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
 "=====1. Start with the basics - what is a `data.table`, its general form, "
 "how to *subset* rows, how to *select and compute* on columns;====="
-msgstr ""
+msgstr "=====1. Comience con lo básico: qué es una `data.table`, su forma general, cómo crear *subconjuntos* de filas, cómo *seleccionar y calcular* columnas;====="
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid "=====2. Then we will look at performing data aggregations by group====="
-msgstr ""
+msgstr "=====2. Luego veremos cómo realizar agregaciones de datos por grupo====="
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bheading
 msgid "1. Basics {#basics-1}"
-msgstr ""
+msgstr "1. Conceptos básicos {#basics-1}"
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bheading
 msgid "a) What is `data.table`? {#what-is-datatable-1a}"
-msgstr ""
+msgstr "a) ¿Qué es `data.table`? {#what-is-datatable-1a}"
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
-"`data.table` is an R package that provides **an enhanced version** of a `data"
-".frame`, the standard data structure for storing data in `base` R. In the "
-"[Data]{1} section above, we saw how to create a `data.table` using `fread()`"
-", but alternatively we can also create one using the `data.table()` "
+"`data.table` is an R package that provides **an enhanced version** of a "
+"`data.frame`, the standard data structure for storing data in `base` R. In "
+"the [Data]{1} section above, we saw how to create a `data.table` using "
+"`fread()`, but alternatively we can also create one using the `data.table()` "
 "function. Here is an example:"
-msgstr ""
+msgstr "`data.table` es un paquete R que proporciona **una versión mejorada** de un `data.frame`, la estructura de datos estándar para almacenar datos en `base` R. En la sección [Data]{1} anterior, vimos cómo crear un `data.table` usando `fread()`, pero también podemos crear uno usando la función `data.table()`. Aquí hay un ejemplo:"
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
@@ -126,17 +127,17 @@ msgid ""
 "`data.frame` and `list` structures) or `as.data.table()` (for other "
 "structures). For more details pertaining to the difference (goes beyond the "
 "scope of this vignette), please see `?setDT` and `?as.data.table`."
-msgstr ""
+msgstr "También puede convertir objetos existentes en una tabla `data.table` utilizando `setDT()` (para estructuras `data.frame` y `list`) o `as.data.table()` (para otras estructuras). Para obtener más detalles sobre la diferencia (que va más allá del alcance de esta viñeta), consulte `?setDT` y `?as.data.table`."
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bheading
 msgid "Note that:"
-msgstr ""
+msgstr "Tenga en cuenta que:"
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
 "=====* Row numbers are printed with a `:` in order to visually separate the "
 "row number from the first column.====="
-msgstr ""
+msgstr "=====* Los números de fila se imprimen con un `:` para separar visualmente el número de fila de la primera columna.====="
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
@@ -147,18 +148,18 @@ msgid ""
 "waiting around while larger tables print-and-page, sometimes seemingly "
 "endlessly. This restriction helps with that, and you can query the default "
 "number like so:====="
-msgstr ""
+msgstr "=====* Cuando el número de filas a imprimir excede la opción global `datatable.print.nrows` (predeterminado = `r getOption(\"datatable.print.nrows\")`), imprime automáticamente solo las primeras 5 y las últimas 5 filas (como se puede ver en la sección [Data]{1}). Para un `data.frame` grande, es posible que se haya encontrado esperando mientras se imprimen y paginan tablas más grandes, a veces aparentemente sin fin. Esta restricción ayuda con eso, y puede consultar el número predeterminado de la siguiente manera:====="
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
 "=====* `data.table` doesn't set or use *row names*, ever. We will see why in "
 "the *\"Keys and fast binary search based subset\"* vignette.====="
-msgstr ""
+msgstr "=====* `data.table` nunca establece ni utiliza *nombres de fila*. Veremos por qué en la viñeta *\"Subconjunto basado en claves y búsqueda binaria rápida\"*.====="
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bheading
 msgid ""
 "b) General form - in what way is a `data.table` *enhanced*? {#enhanced-1b}"
-msgstr ""
+msgstr "b) Forma general: ¿de qué manera se *mejora* una tabla `data.table`? {#enhanced-1b}"
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
@@ -168,38 +169,38 @@ msgid ""
 "\"querying `DT`\", as an analogy or in relevance to SQL). To understand it "
 "we will have to first look at the *general form* of the `data.table` syntax, "
 "as shown below:"
-msgstr ""
+msgstr "A diferencia de un `data.frame`, puedes hacer *mucho más* que simplemente crear subconjuntos de filas y seleccionar columnas dentro del marco de un `data.table`, es decir, dentro de `[...]` (NB: también podríamos referirnos a escribir cosas dentro de `DT[...]` como \"consultar `DT`\", como una analogía o en relación con SQL). Para entenderlo, primero tendremos que mirar la *forma general* de la sintaxis de `data.table`, como se muestra a continuación:"
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
 "Users with an SQL background might perhaps immediately relate to this syntax."
-msgstr ""
+msgstr "Los usuarios con conocimientos de SQL quizás se sientan inmediatamente identificados con esta sintaxis."
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bheading
 msgid "The way to read it (out loud) is:"
-msgstr ""
+msgstr "La forma de leerlo (en voz alta) es:"
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
 "Take `DT`, subset/reorder rows using `i`, then calculate `j`, grouped by "
 "`by`."
-msgstr ""
+msgstr "Tome `DT`, subconjunto/reordene filas usando `i`, luego calcule `j`, agrupado por `by`."
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
 "Let's begin by looking at `i` and `j` first - subsetting rows and operating "
 "on columns."
-msgstr ""
+msgstr "Comencemos mirando primero `i` y `j`: subconjuntando filas y operando en columnas."
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bheading
 msgid "c) Subset rows in `i` {#subset-i-1c}"
-msgstr ""
+msgstr "c) Subconjunto de filas en `i` {#subset-i-1c}"
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bheading
 msgid ""
 "-- Get all the flights with \"JFK\" as the origin airport in the month of "
 "June."
-msgstr ""
+msgstr "-- Obtenga todos los vuelos con \"JFK\" como aeropuerto de origen en el mes de junio."
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
@@ -208,7 +209,7 @@ msgid ""
 "to `origin` and `month` as if they are variables. We do not need to add the "
 "prefix `flights$$$` each time. Nevertheless, using `flights$$$origin` and "
 "`flights$$$month` would work just fine.====="
-msgstr ""
+msgstr "=====* Dentro del marco de una `data.table`, se puede hacer referencia a las columnas *como si fueran variables*, de forma muy similar a SQL o Stata. Por lo tanto, simplemente nos referimos a `origin` y `month` como si fueran variables. No necesitamos agregar el prefijo `flights$$$` cada vez. Sin embargo, usar `flights$$$origin` y `flights$$$month` funcionaría perfectamente.====="
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
@@ -216,45 +217,45 @@ msgid ""
 "month == 6L` are computed, and since there is nothing else left to do, all "
 "columns from `flights` at rows corresponding to those *row indices* are "
 "simply returned as a `data.table`.====="
-msgstr ""
+msgstr "=====* Se calculan los *índices de fila* que satisfacen la condición `origin == \"JFK\" & month == 6L` y, dado que no hay nada más que hacer, todas las columnas de `flights` en las filas correspondientes a esos *índices de fila* simplemente se devuelven como una `data.table`.====="
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
-"=====* A comma after the condition in `i` is not required. But `flights["
-"origin == \"JFK\" & month == 6L, ]` would work just fine. In a `data.frame`, "
-"however, the comma is necessary.====="
-msgstr ""
+"=====* A comma after the condition in `i` is not required. But "
+"`flights[origin == \"JFK\" & month == 6L, ]` would work just fine. In a "
+"`data.frame`, however, the comma is necessary.====="
+msgstr "=====* No es necesario incluir una coma después de la condición en `i`. Pero `flights[origin == \"JFK\" & month == 6L, ]` funcionaría perfectamente. Sin embargo, en un `data.frame`, la coma es necesaria.====="
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bheading
 msgid "-- Get the first two rows from `flights`. {#subset-rows-integer}"
-msgstr ""
+msgstr "-- Obtener las dos primeras filas de `vuelos`. {#subset-rows-integer}"
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
 "=====* In this case, there is no condition. The row indices are already "
 "provided in `i`. We therefore return a `data.table` with all columns from "
 "`flights` at rows for those *row indices*.====="
-msgstr ""
+msgstr "=====* En este caso, no hay ninguna condición. Los índices de fila ya se proporcionan en `i`. Por lo tanto, devolvemos una `data.table` con todas las columnas de `flights` en las filas para esos *índices de fila*.====="
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bheading
 msgid ""
 "-- Sort `flights` first by column `origin` in *ascending* order, and then by "
 "`dest` in *descending* order:"
-msgstr ""
+msgstr "-- Ordena `vuelos` primero por la columna `origen` en orden *ascendente*, y luego por `destino` en orden *descendente*:"
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid "We can use the R function `order()` to accomplish this."
-msgstr ""
+msgstr "Podemos utilizar la función R `order()` para lograr esto."
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bheading
 msgid "`order()` is internally optimised"
-msgstr ""
+msgstr "`order()` está optimizado internamente"
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
 "=====* We can use \"-\" on `character` columns within the frame of a `data."
 "table` to sort in decreasing order.====="
-msgstr ""
+msgstr "=====* Podemos usar \"-\" en columnas de `caracteres` dentro del marco de una `tabla de datos` para ordenar en orden decreciente.====="
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
@@ -263,36 +264,36 @@ msgid ""
 "a compelling improvement over R's `base::order` that the R project adopted "
 "the `data.table` algorithm as its default sort in 2016 for R 3.3.0 (for "
 "reference, check `?sort` and the [R Release NEWS]{1}).====="
-msgstr ""
+msgstr "=====* Además, `order(...)` dentro del marco de una `data.table` utiliza el ordenamiento rápido interno de `data.table` `forder()`. Esta clasificación proporcionó una mejora tan convincente con respecto a `base::order` de R que el proyecto R adoptó el algoritmo `data.table` como su clasificación predeterminada en 2016 para R 3.3.0 (para referencia, consulte `?sort` y [R Release NEWS]{1}).====="
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
-"We will discuss `data.table`'s fast order in more detail in the *`data.table`"
-" internals* vignette."
-msgstr ""
+"We will discuss `data.table`'s fast order in more detail in the *`data."
+"table` internals* vignette."
+msgstr "Discutiremos el orden rápido de `data.table` con más detalle en la viñeta *Aspectos internos de `data.table`*."
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bheading
 msgid "d) Select column(s) in `j` {#select-j-1d}"
-msgstr ""
+msgstr "d) Seleccione la(s) columna(s) en `j` {#select-j-1d}"
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bheading
 msgid "-- Select `arr_delay` column, but return it as a *vector*."
-msgstr ""
+msgstr "-- Selecciona la columna `arr_delay`, pero devuélvela como un *vector*."
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
 "=====* Since columns can be referred to as if they are variables within the "
 "frame of a `data.table`, we directly refer to the *variable* we want to "
 "subset. Since we want *all the rows*, we simply skip `i`.====="
-msgstr ""
+msgstr "=====* Dado que se puede hacer referencia a las columnas como si fueran variables dentro del marco de una `data.table`, hacemos referencia directamente a la *variable* que queremos subconjunto. Como queremos *todas las filas*, simplemente omitimos `i`.====="
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid "=====* It returns *all* the rows for the column `arr_delay`.====="
-msgstr ""
+msgstr "=====* Devuelve *todas* las filas de la columna `arr_delay`.====="
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bheading
 msgid "-- Select `arr_delay` column, but return as a `data.table` instead."
-msgstr ""
+msgstr "-- Seleccione la columna `arr_delay`, pero devuélvala como `data.table` en su lugar."
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
@@ -300,7 +301,7 @@ msgid ""
 "that a `data.table` is returned. In the case of a single column name, not "
 "wrapping with `list()` returns a vector instead, as seen in the [previous "
 "example]{1}.====="
-msgstr ""
+msgstr "=====* Envolvemos las *variables* (nombres de columnas) dentro de `list()`, lo que garantiza que se devuelva una `data.table`. En el caso de un solo nombre de columna, no envolver con `list()` devuelve un vector en su lugar, como se ve en el [ejemplo anterior]{1}.====="
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
@@ -308,7 +309,7 @@ msgid ""
 "`list()`. It is an *alias* to `list()`; they both mean the same. Feel free "
 "to use whichever you prefer; we have noticed most users seem to prefer `.()` "
 "for conciseness, so we will continue to use `.()` hereafter.====="
-msgstr ""
+msgstr "=====* `data.table` también permite encapsular columnas con `.()` en lugar de `list()`. Es un *alias* de `list()`; ambos significan lo mismo. Siéntete libre de usar el que prefieras; hemos notado que la mayoría de los usuarios parecen preferir `.()` por concisión, por lo que continuaremos usando `.()` de aquí en adelante.====="
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
@@ -316,11 +317,11 @@ msgid ""
 "the stipulation that each element has the same length and the `list` has a "
 "`class` attribute. Allowing `j` to return a `list` enables converting and "
 "returning `data.table` very efficiently."
-msgstr ""
+msgstr "Una tabla `data.table` (y también un `data.frame`) es internamente una `lista` también, con la condición de que cada elemento tenga la misma longitud y la `lista` tenga un atributo `class`. Permitir que `j` devuelva una `lista` permite convertir y devolver `data.table` de manera muy eficiente."
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bheading
 msgid "Tip: {#tip-1}"
-msgstr ""
+msgstr "Consejo: {#tip-1}"
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
@@ -328,39 +329,39 @@ msgid ""
 "converted to a column in the resulting `data.table`. This makes `j` quite "
 "powerful, as we will see shortly. It is also very important to understand "
 "this for when you'd like to make more complicated queries!!"
-msgstr ""
+msgstr "Mientras `j-expression` devuelva una `lista`, cada elemento de la lista se convertirá en una columna en la `data.table` resultante. Esto hace que `j` sea bastante potente, como veremos en breve. ¡También es muy importante comprender esto para cuando desee realizar consultas más complicadas!"
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bheading
 msgid "-- Select both `arr_delay` and `dep_delay` columns."
-msgstr ""
+msgstr "-- Seleccione las columnas `arr_delay` y `dep_delay`."
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid "=====* Wrap both columns within `.()`, or `list()`. That's it.====="
-msgstr ""
+msgstr "=====* Envuelve ambas columnas dentro de `.()` o `list()`. Eso es todo.====="
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bheading
 msgid ""
 "-- Select both `arr_delay` and `dep_delay` columns *and* rename them to "
 "`delay_arr` and `delay_dep`."
-msgstr ""
+msgstr "-- Seleccione las columnas `arr_delay` y `dep_delay` *y* cámbieles el nombre a `delay_arr` y `delay_dep`."
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
 "Since `.()` is just an alias for `list()`, we can name columns as we would "
 "while creating a `list`."
-msgstr ""
+msgstr "Dado que `.()` es solo un alias de `list()`, podemos nombrar las columnas como lo haríamos al crear una `lista`."
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bheading
 msgid "e) Compute or *do* in `j`"
-msgstr ""
+msgstr "e) Calcular o *hacer* en `j`"
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bheading
 msgid "-- How many trips have had total delay < 0?"
-msgstr ""
+msgstr "--¿Cuántos viajes han tenido un retraso total < 0?"
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bheading
 msgid "What's happening here?"
-msgstr ""
+msgstr "¿Que está pasando aquí?"
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
@@ -369,32 +370,32 @@ msgid ""
 "surprising, as columns can be referred to as if they are variables. Then we "
 "should be able to *compute* by calling functions on those variables. And "
 "that's what precisely happens here.====="
-msgstr ""
+msgstr "=====* La función `j` de `data.table` puede manejar más que simplemente *seleccionar columnas* - puede manejar *expresiones*, es decir, *hacer cálculos sobre columnas*. Esto no debería sorprender, ya que se puede hacer referencia a las columnas como si fueran variables. Entonces deberíamos poder *hacer cálculos* llamando a funciones sobre esas variables. Y eso es precisamente lo que sucede aquí.====="
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bheading
 msgid "f) Subset in `i` *and* do in `j`"
-msgstr ""
+msgstr "f) Subconjunto en `i` *y* hacer en `j`"
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bheading
 msgid ""
 "-- Calculate the average arrival and departure delay for all flights with "
 "\"JFK\" as the origin airport in the month of June."
-msgstr ""
+msgstr "-- Calcular el retraso medio de llegada y salida para todos los vuelos con aeropuerto de origen \"JFK\" en el mes de junio."
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
 "=====* We first subset in `i` to find matching *row indices* where `origin` "
 "airport equals `\"JFK\"`, and `month` equals `6L`. We *do not* subset the "
 "_entire_ `data.table` corresponding to those rows _yet_.====="
-msgstr ""
+msgstr "=====* Primero creamos un subconjunto en `i` para encontrar los *índices de fila* coincidentes donde `origin` aeropuerto es igual a `\"JFK\"`, y `month` es igual a `6L`. *Todavía* no creamos un subconjunto de la `data.table` _completa_ correspondiente a esas filas.====="
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
 "=====* Now, we look at `j` and find that it uses only *two columns*. And "
 "what we have to do is to compute their `mean()`. Therefore, we subset just "
-"those columns corresponding to the matching rows, and compute their "
-"`mean()`.====="
-msgstr ""
+"those columns corresponding to the matching rows, and compute their `mean()`."
+"====="
+msgstr "=====* Ahora, observamos `j` y descubrimos que utiliza solo *dos columnas*. Y lo que tenemos que hacer es calcular su `media()`. Por lo tanto, creamos un subconjunto de las columnas que corresponden a las filas coincidentes y calculamos su `media()`.====="
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
@@ -404,13 +405,13 @@ msgid ""
 "separately. We are able to therefore avoid the entire subset (i.e., "
 "subsetting the columns _besides_ `arr_delay` and `dep_delay`), for both "
 "speed and memory efficiency."
-msgstr ""
+msgstr "Debido a que los tres componentes principales de la consulta (`i`, `j` y `by`) están *juntos* dentro de `[...]`, `data.table` puede ver los tres y optimizar la consulta en conjunto *antes de la evaluación*, en lugar de optimizar cada uno por separado. Por lo tanto, podemos evitar todo el subconjunto (es decir, crear subconjuntos de las columnas _además de_ `arr_delay` y `dep_delay`), tanto por velocidad como por eficiencia de memoria."
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bheading
 msgid ""
 "-- How many trips have been made in 2014 from \"JFK\" airport in the month "
 "of June?"
-msgstr ""
+msgstr "--¿Cuántos viajes se han realizado en el año 2014 desde el aeropuerto “JFK” en el mes de junio?"
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
@@ -418,69 +419,69 @@ msgid ""
 "the number of rows in the subset. We could have used any other column as the "
 "input argument to `length()`. This approach is reminiscent of `SELECT "
 "COUNT(dest) FROM flights WHERE origin = 'JFK' AND month = 6` in SQL."
-msgstr ""
+msgstr "La función length() requiere un argumento de entrada. Solo necesitamos calcular la cantidad de filas en el subconjunto. Podríamos haber usado cualquier otra columna como argumento de entrada para length(). Este enfoque recuerda a SELECT COUNT(dest) FROM flights WHERE origin = 'JFK' AND month = 6 en SQL."
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
-"This type of operation occurs quite frequently, especially while grouping ("
-"as we will see in the next section), to the point where `data.table` "
+"This type of operation occurs quite frequently, especially while grouping "
+"(as we will see in the next section), to the point where `data.table` "
 "provides a *special symbol* `.N` for it."
-msgstr ""
+msgstr "Este tipo de operación ocurre con bastante frecuencia, especialmente durante la agrupación (como veremos en la siguiente sección), hasta el punto donde `data.table` proporciona un *símbolo especial* `.N` para ello."
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bheading
 msgid "g) Handle non-existing elements in `i`"
-msgstr ""
+msgstr "g) Manejar elementos inexistentes en `i`"
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bheading
 msgid "-- What happens when querying for non-existing elements?"
-msgstr ""
+msgstr "--¿Qué sucede cuando se consultan elementos no existentes?"
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
 "When querying a `data.table` for elements that do not exist, the behavior "
 "differs based on the method used."
-msgstr ""
+msgstr "Al consultar una `data.table` en busca de elementos que no existen, el comportamiento difiere según el método utilizado."
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid "=====* **Key-based subsetting: `dt[\"d\"]`**====="
-msgstr ""
+msgstr "=====* **Subconjunto basado en clave: `dt[\"d\"]`**====="
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
-"This performs a right join on the key column `x`, resulting in a row with `d`"
-" and `NA` for columns not found. When using `setkeyv`, the table is sorted "
-"by the specified keys and an internal index is created, enabling binary "
-"search for efficient subsetting."
-msgstr ""
+"This performs a right join on the key column `x`, resulting in a row with "
+"`d` and `NA` for columns not found. When using `setkeyv`, the table is "
+"sorted by the specified keys and an internal index is created, enabling "
+"binary search for efficient subsetting."
+msgstr "Esto realiza una unión a la derecha en la columna de clave `x`, lo que da como resultado una fila con `d` y `NA` para las columnas que no se encuentran. Al utilizar `setkeyv`, la tabla se ordena por las claves especificadas y se crea un índice interno, lo que permite la búsqueda binaria para una subdivisión eficiente."
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid "=====* **Logical subsetting: `dt[x == \"d\"]`**====="
-msgstr ""
+msgstr "=====* **Subconjunto lógico: `dt[x == \"d\"]`**====="
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
 "This performs a standard subset operation that does not find any matching "
 "rows and thus returns an empty `data.table`."
-msgstr ""
+msgstr "Esto realiza una operación de subconjunto estándar que no encuentra ninguna fila coincidente y, por lo tanto, devuelve una `data.table` vacía."
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid "=====* **Exact match using `nomatch=NULL`**====="
-msgstr ""
+msgstr "=====* **Coincidencia exacta usando `nomatch=NULL`**====="
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
 "For exact matches without `NA` for non-existing elements, use `nomatch=NULL`:"
-msgstr ""
+msgstr "Para coincidencias exactas sin `NA` para elementos inexistentes, utilice `nomatch=NULL`:"
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
 "Understanding these behaviors can help prevent confusion when dealing with "
 "non-existing elements in your data."
-msgstr ""
+msgstr "Comprender estos comportamientos puede ayudar a evitar confusiones al tratar con elementos inexistentes en sus datos."
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bheading
 msgid "Special symbol `.N`: {#special-N}"
-msgstr ""
+msgstr "Símbolo especial `.N`: {#special-N}"
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
@@ -488,32 +489,32 @@ msgid ""
 "_in the current group_. It is particularly useful when combined with `by` as "
 "we'll see in the next section. In the absence of group by operations, it "
 "simply returns the number of rows in the subset."
-msgstr ""
+msgstr "`.N` es una variable incorporada especial que contiene la cantidad de observaciones _en el grupo actual_. Es particularmente útil cuando se combina con `by` como veremos en la siguiente sección. En ausencia de operaciones de agrupamiento por, simplemente devuelve la cantidad de filas en el subconjunto."
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
 "Now that we now, we can now accomplish the same task by using `.N` as "
 "follows:"
-msgstr ""
+msgstr "Ahora que lo sabemos, podemos realizar la misma tarea utilizando `.N` de la siguiente manera:"
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
 "=====* Once again, we subset in `i` to get the *row indices* where `origin` "
 "airport equals *\"JFK\"*, and `month` equals *6*.====="
-msgstr ""
+msgstr "=====* Una vez más, subconjunto en `i` para obtener los *índices de fila* donde el aeropuerto `origen` es igual a *\"JFK\"*, y el mes es igual a *6*.====="
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
 "=====* We see that `j` uses only `.N` and no other columns. Therefore, the "
 "entire subset is not materialised. We simply return the number of rows in "
 "the subset (which is just the length of row indices).====="
-msgstr ""
+msgstr "=====* Vemos que `j` utiliza solo `.N` y ninguna otra columna. Por lo tanto, no se materializa el subconjunto completo. Simplemente devolvemos la cantidad de filas en el subconjunto (que es solo la longitud de los índices de fila).====="
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
 "=====* Note that we did not wrap `.N` with `list()` or `.()`. Therefore, a "
 "vector is returned.====="
-msgstr ""
+msgstr "=====* Tenga en cuenta que no hemos incluido `.N` en `list()` o `.()`. Por lo tanto, se devuelve un vector.====="
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
@@ -523,34 +524,34 @@ msgid ""
 "return the rows using `nrow()`, which is unnecessary and inefficient. We "
 "will cover this and other optimisation aspects in detail under the *`data."
 "table` design* vignette."
-msgstr ""
+msgstr "Podríamos haber realizado la misma operación haciendo `nrow(flights[origin == \"JFK\" & month == 6L])`. Sin embargo, tendríamos que crear primero un subconjunto de toda la `data.table` correspondiente a los *índices de fila* en `i` *y luego* devolver las filas usando `nrow()`, lo cual es innecesario e ineficiente. Trataremos este y otros aspectos de optimización en detalle en la viñeta de *diseño de `data.table`*."
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bheading
 msgid ""
 "h) Great! But how can I refer to columns by names in `j` (like in a `data."
 "frame`)? {#refer_j}"
-msgstr ""
+msgstr "h) ¡Genial! Pero, ¿cómo puedo hacer referencia a las columnas por nombres en `j` (como en un `data.frame`)? {#refer_j}"
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
 "If you're writing out the column names explicitly, there's no difference "
 "compared to a `data.frame` (since v1.9.8)."
-msgstr ""
+msgstr "Si escribe los nombres de las columnas explícitamente, no hay diferencia en comparación con un `data.frame` (desde v1.9.8)."
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bheading
 msgid ""
 "-- Select both `arr_delay` and `dep_delay` columns the `data.frame` way."
-msgstr ""
+msgstr "-- Seleccione las columnas `arr_delay` y `dep_delay` mediante el método `data.frame`."
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
 "If you've stored the desired columns in a character vector, there are two "
 "options: Using the `..` prefix, or using the `with` argument."
-msgstr ""
+msgstr "Si ha almacenado las columnas deseadas en un vector de caracteres, hay dos opciones: utilizar el prefijo `..` o utilizar el argumento `with`."
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bheading
 msgid "-- Select columns named in a variable using the `..` prefix"
-msgstr ""
+msgstr "-- Seleccionar columnas nombradas en una variable usando el prefijo `..`"
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
@@ -559,46 +560,46 @@ msgid ""
 "happening here -- the `..` signals to `data.table` to look for the "
 "`select_cols` variable \"up-one-level\", i.e., within the global environment "
 "in this case."
-msgstr ""
+msgstr "Para aquellos familiarizados con la terminal Unix, el prefijo `..` debería recordar al comando \"up-one-level\", que es análogo a lo que sucede aquí: `..` indica a `data.table` que busque la variable `select_cols` \"up-one-level\", es decir, dentro del entorno global en este caso."
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bheading
 msgid "-- Select columns named in a variable using `with = FALSE`"
-msgstr ""
+msgstr "-- Seleccionar columnas nombradas en una variable usando `with = FALSE`"
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
 "The argument is named `with` after the R function `with()` because of "
 "similar functionality. Suppose you have a `data.frame` `DF` and you'd like "
 "to subset all rows where `x > 1`. In `base` R you can do the following:"
-msgstr ""
+msgstr "El argumento se llama `with` en honor a la función R `with()` debido a que tiene una funcionalidad similar. Supongamos que tiene un `data.frame` `DF` y desea crear un subconjunto de todas las filas donde `x > 1`. En `base` R puede hacer lo siguiente:"
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
 "=====* Using `with()` in (2) allows using `DF`'s column `x` as if it were a "
 "variable.====="
-msgstr ""
+msgstr "=====* El uso de `with()` en (2) permite usar la columna `x` de `DF` como si fuera una variable.====="
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
 "=====* We can also *deselect* columns using `-` or `!`. For example:====="
-msgstr ""
+msgstr "=====* También podemos *deseleccionar* columnas usando `-` o `!`. Por ejemplo:====="
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
 "=====* From `v1.9.5+`, we can also select by specifying start and end column "
 "names, e.g., `year:day` to select the first three columns.====="
-msgstr ""
+msgstr "=====* Desde `v1.9.5+`, también podemos seleccionar especificando los nombres de las columnas de inicio y fin, por ejemplo, `año:día` para seleccionar las primeras tres columnas.====="
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
 "`with = TRUE` is the default in `data.table` because we can do much more by "
 "allowing `j` to handle expressions - especially when combined with `by`, as "
 "we'll see in a moment."
-msgstr ""
+msgstr "`with = TRUE` es el valor predeterminado en `data.table` porque podemos hacer mucho más al permitir que `j` maneje expresiones, especialmente cuando se combina con `by`, como veremos en un momento."
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bheading
 msgid "2. Aggregations"
-msgstr ""
+msgstr "2. Agregaciones"
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
@@ -606,23 +607,23 @@ msgid ""
 "previous section. In this section, we'll see how they can be combined "
 "together with `by` to perform operations *by group*. Let's look at some "
 "examples."
-msgstr ""
+msgstr "Ya hemos visto `i` y `j` de la forma general de `data.table` en la sección anterior. En esta sección, veremos cómo se pueden combinar con `by` para realizar operaciones *por grupo*. Veamos algunos ejemplos."
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bheading
 msgid "a) Grouping using `by`"
-msgstr ""
+msgstr "a) Agrupación mediante `by`"
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bheading
 msgid ""
 "-- How can we get the number of trips corresponding to each origin airport?"
-msgstr ""
+msgstr "--¿Cómo podemos obtener el número de viajes correspondientes a cada aeropuerto de origen?"
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
 "=====* We know `.N` [is a special variable]{1} that holds the number of rows "
 "in the current group. Grouping by `origin` obtains the number of rows, `.N`, "
 "for each group.====="
-msgstr ""
+msgstr "=====* Sabemos que `.N` [es una variable especial]{1} que contiene la cantidad de filas en el grupo actual. Al agrupar por `origen` se obtiene la cantidad de filas, `.N`, para cada grupo.====="
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
@@ -630,13 +631,13 @@ msgid ""
 "in the order *\"JFK\"*, *\"LGA\"*, and *\"EWR\"*. The original order of "
 "grouping variables is preserved in the result. _This is important to keep in "
 "mind!_====="
-msgstr ""
+msgstr "=====* Al ejecutar `head(flights)`, puede ver que los aeropuertos de origen aparecen en el orden *\"JFK\"*, *\"LGA\"* y *\"EWR\"*. El orden original de agrupación de las variables se conserva en el resultado. ¡Es importante tener esto en cuenta!_====="
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
 "=====* Since we did not provide a name for the column returned in `j`, it "
 "was named `N` automatically by recognising the special symbol `.N`.====="
-msgstr ""
+msgstr "=====* Dado que no proporcionamos un nombre para la columna devuelta en `j`, se la denominó `N` automáticamente al reconocer el símbolo especial `.N`.====="
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
@@ -644,31 +645,31 @@ msgid ""
 "particularly useful for coding programmatically, e.g., designing a function "
 "with the grouping columns (in the form of a `character` vector) as a "
 "function argument.====="
-msgstr ""
+msgstr "=====* `by` también acepta un vector de caracteres de nombres de columnas. Esto es particularmente útil para la codificación programática, por ejemplo, para diseñar una función con las columnas de agrupación (en forma de un vector de `carácter`) como argumento de función.====="
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
-"=====* When there's only one column or expression to refer to in `j` and `by`"
-", we can drop the `.()` notation. This is purely for convenience. We could "
-"instead do:====="
-msgstr ""
+"=====* When there's only one column or expression to refer to in `j` and "
+"`by`, we can drop the `.()` notation. This is purely for convenience. We "
+"could instead do:====="
+msgstr "=====* Cuando solo hay una columna o expresión a la que hacer referencia en `j` y `by`, podemos omitir la notación `.()`. Esto es puramente por conveniencia. En su lugar, podríamos hacer lo siguiente:====="
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bheading
 msgid ""
 "-- How can we calculate the number of trips for each origin airport for "
 "carrier code `\"AA\"`? {#origin-.N}"
-msgstr ""
+msgstr "-- ¿Cómo podemos calcular el número de viajes para cada aeropuerto de origen para el código de aerolínea `\"AA\"`? {#origin-.N}"
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
 "The unique carrier code `\"AA\"` corresponds to *American Airlines Inc.*"
-msgstr ""
+msgstr "El código único de aerolínea `\"AA\"` corresponde a *American Airlines Inc.*"
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
-"=====* We first obtain the row indices for the expression `carrier == \"AA\"`"
-" from `i`.====="
-msgstr ""
+"=====* We first obtain the row indices for the expression `carrier == "
+"\"AA\"` from `i`.====="
+msgstr "=====* Primero obtenemos los índices de fila para la expresión `carrier == \"AA\"` de `i`.====="
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
@@ -676,13 +677,13 @@ msgid ""
 "by `origin`. Once again no columns are actually materialised here, because "
 "the `j-expression` does not require any columns to be actually subsetted and "
 "is therefore fast and memory efficient.====="
-msgstr ""
+msgstr "=====* Al utilizar esos *índices de fila*, obtenemos la cantidad de filas agrupadas por `origen`. Una vez más, aquí no se materializan columnas, ya que la `j-expression` no requiere que se creen subconjuntos de ninguna columna y, por lo tanto, es rápida y eficiente en el uso de la memoria.====="
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bheading
 msgid ""
 "-- How can we get the total number of trips for each `origin, dest` pair for "
 "carrier code `\"AA\"`? {#origin-dest-.N}"
-msgstr ""
+msgstr "-- ¿Cómo podemos obtener el número total de viajes para cada par `origen, destino` para el código de transportista `\"AA\"`? {#origin-dest-.N}"
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
@@ -690,36 +691,35 @@ msgid ""
 "which to group by. Note the use of `.()` again in `by` -- again, this is "
 "just shorthand for `list()`, and `list()` can be used here as well. Again, "
 "we'll stick with `.()` in this vignette.====="
-msgstr ""
+msgstr "=====* `by` acepta múltiples columnas. Simplemente proporcionamos todas las columnas por las que se agrupará. Observe el uso de `.()` nuevamente en `by`; nuevamente, esto es solo una forma abreviada de `list()`, y `list()` también se puede usar aquí. Nuevamente, nos quedaremos con `.()` en esta viñeta.====="
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bheading
 msgid ""
-"-- How can we get the average arrival and departure delay for each "
-"`orig,dest` pair for each month for carrier code `\"AA\"`? {#origin-dest-"
-"month}"
-msgstr ""
+"-- How can we get the average arrival and departure delay for each `orig,"
+"dest` pair for each month for carrier code `\"AA\"`? {#origin-dest-month}"
+msgstr "-- ¿Cómo podemos obtener el retraso promedio de llegada y salida para cada par `orig,dest` para cada mes para el código de operador `\"AA\"`? {#origin-dest-month}"
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
 "=====* Since we did not provide column names for the expressions in `j`, "
 "they were automatically generated as `V1` and `V2`.====="
-msgstr ""
+msgstr "=====* Dado que no proporcionamos nombres de columnas para las expresiones en `j`, se generaron automáticamente como `V1` y `V2`.====="
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
 "=====* Once again, note that the input order of grouping columns is "
 "preserved in the result.====="
-msgstr ""
+msgstr "=====* Una vez más, tenga en cuenta que el orden de entrada de las columnas de agrupación se conserva en el resultado.====="
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
 "Now what if we would like to order the result by those grouping columns "
 "`origin`, `dest` and `month`?"
-msgstr ""
+msgstr "¿Y ahora qué pasa si queremos ordenar el resultado por las columnas de agrupación «origen», «destino» y «mes»?"
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bheading
 msgid "b) Sorted `by`: `keyby`"
-msgstr ""
+msgstr "b) Ordenado `por`: `keyby`"
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
@@ -727,11 +727,11 @@ msgid ""
 "design. There are cases when preserving the original order is essential. But "
 "at times we would like to automatically sort by the variables in our "
 "grouping."
-msgstr ""
+msgstr "El hecho de que `data.table` conserve el orden original de los grupos es intencional y está diseñado de esa manera. Hay casos en los que es esencial conservar el orden original, pero en ocasiones nos gustaría ordenar automáticamente por variables en nuestra agrupación."
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bheading
 msgid "-- So how can we directly order by all the grouping variables?"
-msgstr ""
+msgstr "--Entonces, ¿cómo podemos ordenar directamente por todas las variables de agrupación?"
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
@@ -740,87 +740,87 @@ msgid ""
 "internal implementation of `by` first requiring a sort before recovering the "
 "original table's order, `keyby` is typically faster than `by` because it "
 "doesn't require this second step.====="
-msgstr ""
+msgstr "=====* Todo lo que hicimos fue cambiar `by` por `keyby`. Esto ordena automáticamente el resultado por las variables de agrupación en orden creciente. De hecho, debido a que la implementación interna de `by` requiere primero una clasificación antes de recuperar el orden de la tabla original, `keyby` es típicamente más rápido que `by` porque no requiere este segundo paso.====="
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
-"**Keys:** Actually `keyby` does a little more than *just ordering*. It also *"
-"sets a key* after ordering by setting an `attribute` called `sorted`."
-msgstr ""
+"**Keys:** Actually `keyby` does a little more than *just ordering*. It also "
+"*sets a key* after ordering by setting an `attribute` called `sorted`."
+msgstr "**Claves:** En realidad, `keyby` hace un poco más que *simplemente ordenar*. También *establece una clave* después de ordenar, estableciendo un `atributo` llamado `sorted`."
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
 "We'll learn more about `keys` in the *Keys and fast binary search based "
 "subset* vignette; for now, all you have to know is that you can use `keyby` "
 "to automatically order the result by the columns specified in `by`."
-msgstr ""
+msgstr "Aprenderemos más sobre `claves` en la viñeta *Subconjunto basado en claves y búsqueda binaria rápida*; por ahora, todo lo que tiene que saber es que puede usar `keyby` para ordenar automáticamente el resultado por las columnas especificadas en `by`."
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bheading
 msgid "c) Chaining"
-msgstr ""
+msgstr "c) Encadenamiento"
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
-"Let's reconsider the task of [getting the total number of trips for each `"
-"origin, dest` pair for carrier *\"AA\"*]{1}."
-msgstr ""
+"Let's reconsider the task of [getting the total number of trips for each "
+"`origin, dest` pair for carrier *\"AA\"*]{1}."
+msgstr "Reconsideremos la tarea de [obtener el número total de viajes para cada par `origen, destino` para el transportista *\"AA\"*]{1}."
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bheading
 msgid ""
 "-- How can we order `ans` using the columns `origin` in ascending order, and "
 "`dest` in descending order?"
-msgstr ""
+msgstr "-- ¿Cómo podemos ordenar `ans` utilizando las columnas `origin` en orden ascendente y `dest` en orden descendente?"
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
-"We can store the intermediate result in a variable, and then use `order("
-"origin, -dest)` on that variable. It seems fairly straightforward."
-msgstr ""
+"We can store the intermediate result in a variable, and then use "
+"`order(origin, -dest)` on that variable. It seems fairly straightforward."
+msgstr "Podemos almacenar el resultado intermedio en una variable y luego usar `order(origin, -dest)` en esa variable. Parece bastante sencillo."
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
 "=====* Recall that we can use `-` on a `character` column in `order()` "
 "within the frame of a `data.table`. This is possible due to `data.table`'s "
 "internal query optimisation.====="
-msgstr ""
+msgstr "=====* Recordemos que podemos usar `-` en una columna `character` en `order()` dentro del marco de un `data.table`. Esto es posible gracias a la optimización de consultas internas de `data.table`.====="
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
-"=====* Also recall that `order(...)` with the frame of a `data.table` is *"
-"automatically optimised* to use `data.table`'s internal fast radix order "
+"=====* Also recall that `order(...)` with the frame of a `data.table` is "
+"*automatically optimised* to use `data.table`'s internal fast radix order "
 "`forder()` for speed. ====="
-msgstr ""
+msgstr "=====* Recuerde también que `order(...)` con el marco de una `data.table` se *optimiza automáticamente* para usar el orden de base rápido interno de `data.table` `forder()` para mayor velocidad. ====="
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
 "But this requires having to assign the intermediate result and then "
 "overwriting that result. We can do one better and avoid this intermediate "
 "assignment to a temporary variable altogether by *chaining* expressions."
-msgstr ""
+msgstr "Pero esto requiere tener que asignar el resultado intermedio y luego sobrescribirlo. Podemos hacer algo mejor y evitar por completo esta asignación intermedia a una variable temporal *encadenando* expresiones."
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
 "=====* We can tack expressions one after another, *forming a chain* of "
 "operations, i.e., `DT[ ... ][ ... ][ ... ]`.====="
-msgstr ""
+msgstr "=====* Podemos unir expresiones una tras otra, *formando una cadena* de operaciones, es decir, `DT[ ... ][ ... ][ ... ]`.====="
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid "=====* Or you can also chain them vertically:====="
-msgstr ""
+msgstr "=====* O también puedes encadenarlos verticalmente:====="
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bheading
 msgid "d) Expressions in `by`"
-msgstr ""
+msgstr "d) Expresiones en `by`"
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bheading
 msgid "-- Can `by` accept *expressions* as well or does it just take columns?"
-msgstr ""
+msgstr "-- ¿Puede `by` también aceptar *expresiones* o sólo toma columnas?"
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
 "Yes it does. As an example, if we would like to find out how many flights "
 "started late but arrived early (or on time), started and arrived late etc..."
-msgstr ""
+msgstr "Sí, lo hace. Por ejemplo, si queremos saber cuántos vuelos empezaron con retraso pero llegaron antes (o a tiempo), empezaron y llegaron con retraso, etc."
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
@@ -828,36 +828,35 @@ msgid ""
 "= FALSE`. We can see that `r flights[!is.na(arr_delay) & !is.na(dep_delay), ."
 "N, .(dep_delay>0, arr_delay>0)][, N[4L]]` flights started late but arrived "
 "early (or on time).====="
-msgstr ""
+msgstr "=====* La última fila corresponde a `dep_delay > 0 = TRUE` y `arr_delay > 0 = FALSE`. Podemos ver que `r flights[!is.na(arr_delay) & !is.na(dep_delay), .N, .(dep_delay>0, arr_delay>0)][, N[4L]]` los vuelos partieron tarde pero llegaron temprano (o a tiempo).====="
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
 "=====* Note that we did not provide any names to `by-expression`. Therefore, "
 "names have been automatically assigned in the result. As with `j`, you can "
-"name these expressions as you would for elements of any `list`, like for "
-"e.g. `DT[, .N, .(dep_delayed = dep_delay>0, arr_delayed = "
-"arr_delay>0)]`.====="
-msgstr ""
+"name these expressions as you would for elements of any `list`, like for e."
+"g. `DT[, .N, .(dep_delayed = dep_delay>0, arr_delayed = arr_delay>0)]`.====="
+msgstr "=====* Tenga en cuenta que no proporcionamos ningún nombre a `by-expression`. Por lo tanto, los nombres se han asignado automáticamente en el resultado. Al igual que con `j`, puede nombrar estas expresiones como lo haría para los elementos de cualquier `lista`, como por ejemplo `DT[, .N, .(dep_delayed = dep_delay>0, arr_delayed = arr_delay>0)]`.====="
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
 "=====* You can provide other columns along with expressions, for example: "
 "`DT[, .N, by = .(a, b>0)]`.====="
-msgstr ""
+msgstr "=====* Puede proporcionar otras columnas junto con expresiones, por ejemplo: `DT[, .N, by = .(a, b>0)]`.====="
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bheading
 msgid "e) Multiple columns in `j` - `.SD`"
-msgstr ""
+msgstr "e) Varias columnas en `j` - `.SD`"
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bheading
 msgid "-- Do we have to compute `mean()` for each column individually?"
-msgstr ""
+msgstr "-- ¿Tenemos que calcular `mean()` para cada columna individualmente?"
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
 "It is of course not practical to have to type `mean(myCol)` for every column "
 "one by one. What if you had 100 columns to average `mean()`?"
-msgstr ""
+msgstr "Por supuesto, no es práctico tener que escribir `mean(myCol)` para cada columna una por una. ¿Qué sucedería si tuviera 100 columnas para calcular el promedio de `mean()`?"
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
@@ -868,67 +867,67 @@ msgid ""
 "grouping*, we can then loop through all the columns of that variable using "
 "the already- or soon-to-be-familiar base function `lapply()`. No new names "
 "to learn specific to `data.table`."
-msgstr ""
+msgstr "¿Cómo podemos hacer esto de manera eficiente y concisa? Para lograrlo, repasemos [este consejo]{1}: *\"Siempre que la expresión `j` devuelva una `lista`, cada elemento de la `lista` se convertirá en una columna en la `tabla de datos` resultante\"*. Si podemos hacer referencia al *subconjunto de datos de cada grupo* como una variable *mientras agrupamos*, podemos recorrer todas las columnas de esa variable utilizando la función base `lapply()`, que ya nos resulta familiar o que pronto nos resultará familiar. No hay que aprender nuevos nombres específicos de `data.table`."
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bheading
 msgid "Special symbol `.SD`: {#special-SD}"
-msgstr ""
+msgstr "Símbolo especial `.SD`: {#special-SD}"
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
-"`data.table` provides a *special* symbol called `.SD`. It stands for **S**"
-"ubset of **D**ata. It by itself is a `data.table` that holds the data for *"
-"the current group* defined using `by`."
-msgstr ""
+"`data.table` provides a *special* symbol called `.SD`. It stands for "
+"**S**ubset of **D**ata. It by itself is a `data.table` that holds the data "
+"for *the current group* defined using `by`."
+msgstr "`data.table` proporciona un símbolo *especial* llamado `.SD`. Significa **S**subset of **D**ata. Es en sí mismo una `data.table` que contiene los datos para *el grupo actual* definido usando `by`."
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
 "Recall that a `data.table` is internally a `list` as well with all its "
 "columns of equal length."
-msgstr ""
+msgstr "Recuerde que una `data.table` es internamente también una `lista` con todas sus columnas de igual longitud."
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
 "Let's use the [`data.table` `DT` from before]{1} to get a glimpse of what `."
 "SD` looks like."
-msgstr ""
+msgstr "Utilicemos la [`data.table` `DT` de antes]{1} para tener una idea de cómo se ve `.SD`."
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
 "=====* `.SD` contains all the columns *except the grouping columns* by "
 "default.====="
-msgstr ""
+msgstr "=====* `.SD` contiene todas las columnas *excepto las columnas de agrupación* de forma predeterminada.====="
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
 "=====* It is also generated by preserving the original order - data "
 "corresponding to `ID = \"b\"`, then `ID = \"a\"`, and then `ID = \"c\"`.====="
-msgstr ""
+msgstr "=====* También se genera conservando el orden original: datos correspondientes a `ID = \"b\"`, luego `ID = \"a\"`, y luego `ID = \"c\"`.====="
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
 "To compute on (multiple) columns, we can then simply use the base R function "
 "`lapply()`."
-msgstr ""
+msgstr "Para calcular en (múltiples) columnas, podemos simplemente usar la función base R `lapply()`."
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
 "=====* `.SD` holds the rows corresponding to columns `a`, `b` and `c` for "
 "that group. We compute the `mean()` on each of these columns using the "
 "already-familiar base function `lapply()`.====="
-msgstr ""
+msgstr "=====* `.SD` contiene las filas correspondientes a las columnas `a`, `b` y `c` de ese grupo. Calculamos la `media()` de cada una de estas columnas utilizando la función base `lapply()`, que ya conocemos.====="
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
 "=====* Each group returns a list of three elements containing the mean value "
 "which will become the columns of the resulting `data.table`.====="
-msgstr ""
+msgstr "=====* Cada grupo devuelve una lista de tres elementos que contienen el valor medio que se convertirán en las columnas de la tabla `data.table` resultante.====="
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
 "=====* Since `lapply()` returns a `list`, so there is no need to wrap it "
 "with an additional `.()` (if necessary, refer to [this tip]{1}).====="
-msgstr ""
+msgstr "=====* Dado que `lapply()` devuelve una `lista`, no es necesario envolverla con un `.()` adicional (si es necesario, consulte [este consejo]{1}).====="
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
@@ -936,62 +935,62 @@ msgid ""
 "`flights` `data.table`, we only wanted to calculate the `mean()` of the two "
 "columns `arr_delay` and `dep_delay`. But `.SD` would contain all the columns "
 "other than the grouping variables by default."
-msgstr ""
+msgstr "Ya casi estamos listos. Queda un pequeño detalle por resolver. En nuestra tabla de datos `flights`, solo queríamos calcular la `mean()` de las dos columnas `arr_delay` y `dep_delay`. Pero `.SD` contendría todas las columnas excepto las variables de agrupamiento de forma predeterminada."
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bheading
 msgid ""
 "-- How can we specify just the columns we would like to compute the `mean()` "
 "on?"
-msgstr ""
+msgstr "-- ¿Cómo podemos especificar sólo las columnas en las que nos gustaría calcular la `media()`?"
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bheading
 msgid ".SDcols"
-msgstr ""
+msgstr ".SDcols"
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
 "Using the argument `.SDcols`. It accepts either column names or column "
 "indices. For example, `.SDcols = c(\"arr_delay\", \"dep_delay\")` ensures "
 "that `.SD` contains only these two columns for each group."
-msgstr ""
+msgstr "Utilizando el argumento `.SDcols`. Acepta nombres de columnas o índices de columnas. Por ejemplo, `.SDcols = c(\"arr_delay\", \"dep_delay\")` garantiza que `.SD` contenga solo estas dos columnas para cada grupo."
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
 "Similar to [part g)]{1}, you can also specify the columns to remove instead "
 "of columns to keep using `-` or `!`. Additionally, you can select "
-"consecutive columns as `colA:colB` and deselect them as `!(colA:colB)` or "
-"`-(colA:colB)`."
-msgstr ""
+"consecutive columns as `colA:colB` and deselect them as `!(colA:colB)` or `-"
+"(colA:colB)`."
+msgstr "De manera similar a [parte g)]{1}, también puede especificar las columnas que desea eliminar en lugar de las columnas que desea conservar utilizando `-` o `!`. Además, puede seleccionar columnas consecutivas como `colA:colB` y deseleccionarlas como `!(colA:colB)` o `-(colA:colB)`."
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
 "Now let us try to use `.SD` along with `.SDcols` to get the `mean()` of "
 "`arr_delay` and `dep_delay` columns grouped by `origin`, `dest` and `month`."
-msgstr ""
+msgstr "Ahora intentemos usar `.SD` junto con `.SDcols` para obtener la `media()` de las columnas `arr_delay` y `dep_delay` agrupadas por `origen`, `dest` y `mes`."
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bheading
 msgid "f) Subset `.SD` for each group:"
-msgstr ""
+msgstr "f) Subconjunto `.SD` para cada grupo:"
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bheading
 msgid "-- How can we return the first two rows for each `month`?"
-msgstr ""
+msgstr "-- ¿Cómo podemos devolver las dos primeras filas de cada \"mes\"?"
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
 "=====* `.SD` is a `data.table` that holds all the rows for *that group*. We "
 "simply subset the first two rows as we have seen [here]{1} already.====="
-msgstr ""
+msgstr "=====* `.SD` es una `data.table` que contiene todas las filas de *ese grupo*. Simplemente creamos un subconjunto de las dos primeras filas como ya hemos visto [aquí]{1}.====="
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
 "=====* For each group, `head(.SD, 2)` returns the first two rows as a `data."
 "table`, which is also a `list`, so we do not have to wrap it with `.()`.====="
-msgstr ""
+msgstr "=====* Para cada grupo, `head(.SD, 2)` devuelve las primeras dos filas como una `data.table`, que también es una `lista`, por lo que no tenemos que envolverla con `.()`.====="
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bheading
 msgid "g) Why keep `j` so flexible?"
-msgstr ""
+msgstr "g) ¿Por qué mantener `j` tan flexible?"
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
@@ -999,49 +998,49 @@ msgid ""
 "familiar) base functions instead of learning new functions. To illustrate, "
 "let us use the `data.table` `DT` that we created at the very beginning under "
 "the section [What is a data.table?]{1}."
-msgstr ""
+msgstr "Para que tengamos una sintaxis consistente y sigamos usando funciones base ya existentes (y conocidas) en lugar de aprender nuevas funciones, para ilustrarlo, usemos la tabla `data.table` `DT` que creamos al principio en la sección [¿Qué es una tabla data.table?]{1}."
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bheading
 msgid "-- How can we concatenate columns `a` and `b` for each group in `ID`?"
-msgstr ""
+msgstr "-- ¿Cómo podemos concatenar las columnas `a` y `b` para cada grupo en `ID`?"
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
 "=====* That's it. There is no special syntax required. All we need to know "
 "is the base function `c()` which concatenates vectors and [the tip from "
 "before]{1}.====="
-msgstr ""
+msgstr "=====* Eso es todo. No se requiere ninguna sintaxis especial. Todo lo que necesitamos saber es la función base `c()` que concatena vectores y [el consejo de antes]{1}.====="
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bheading
 msgid ""
 "-- What if we would like to have all the values of column `a` and `b` "
 "concatenated, but returned as a list column?"
-msgstr ""
+msgstr "-- ¿Qué pasa si queremos tener todos los valores de las columnas `a` y `b` concatenados, pero devueltos como una columna de lista?"
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
 "=====* Here, we first concatenate the values with `c(a,b)` for each group, "
 "and wrap that with `list()`. So for each group, we return a list of all "
 "concatenated values.====="
-msgstr ""
+msgstr "=====* Aquí, primero concatenamos los valores con `c(a,b)` para cada grupo y los envolvemos con `list()`. Por lo tanto, para cada grupo, devolvemos una lista de todos los valores concatenados.====="
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
 "=====* Note that those commas are for display only. A list column can "
 "contain any object in each cell, and in this example, each cell is itself a "
 "vector and some cells contain longer vectors than others.====="
-msgstr ""
+msgstr "=====* Tenga en cuenta que esas comas son solo para visualización. Una columna de lista puede contener cualquier objeto en cada celda y, en este ejemplo, cada celda es en sí misma un vector y algunas celdas contienen vectores más largos que otras.====="
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
 "Once you start internalising usage in `j`, you will realise how powerful the "
 "syntax can be. A very useful way to understand it is by playing around, with "
 "the help of `print()`."
-msgstr ""
+msgstr "Una vez que comiences a internalizar el uso de `j`, te darás cuenta de lo poderosa que puede ser la sintaxis. Una forma muy útil de entenderla es jugando con ella, con la ayuda de `print()`."
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid "For example:"
-msgstr ""
+msgstr "Por ejemplo:"
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
@@ -1049,76 +1048,76 @@ msgid ""
 "However, (2) returns a list of length 1 for each group, with its first "
 "element holding vectors of length 6,4,2. Therefore, (1) results in a length "
 "of ` 6+4+2 = `r 6+4+2``, whereas (2) returns `1+1+1=`r 1+1+1``."
-msgstr ""
+msgstr "En (1), para cada grupo, se devuelve un vector, con longitud = 6,4,2 aquí. Sin embargo, (2) devuelve una lista de longitud 1 para cada grupo, con su primer elemento que contiene vectores de longitud 6,4,2. Por lo tanto, (1) da como resultado una longitud de ` 6+4+2 = `r 6+4+2``, mientras que (2) devuelve `1+1+1=`r 1+1+1``."
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bheading
 msgid "Summary"
-msgstr ""
+msgstr "Resumen"
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid "The general form of `data.table` syntax is:"
-msgstr ""
+msgstr "La forma general de la sintaxis de `data.table` es:"
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid "We have seen so far that,"
-msgstr ""
+msgstr "Hemos visto hasta ahora que,"
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bheading
 msgid "Using `i`:"
-msgstr ""
+msgstr "Usando `i`:"
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
 "=====* We can subset rows similar to a `data.frame`- except you don't have "
 "to use `DT$$$` repetitively since columns within the frame of a `data.table` "
 "are seen as if they are *variables*.====="
-msgstr ""
+msgstr "=====* Podemos crear subconjuntos de filas de manera similar a un `data.frame`, excepto que no es necesario usar `DT$$$` repetidamente, ya que las columnas dentro del marco de un `data.table` se ven como si fueran *variables*.====="
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
 "=====* We can also sort a `data.table` using `order()`, which internally "
 "uses data.table's fast order for better performance.====="
-msgstr ""
+msgstr "=====* También podemos ordenar una `data.table` usando `order()`, que internamente usa el orden rápido de data.table para un mejor rendimiento.====="
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
 "We can do much more in `i` by keying a `data.table`, which allows for "
 "blazing fast subsets and joins. We will see this in the *\"Keys and fast "
 "binary search based subsets\"* and *\"Joins and rolling joins\"* vignette."
-msgstr ""
+msgstr "Podemos hacer mucho más en `i` introduciendo claves en `data.table`, lo que permite crear subconjuntos y uniones con una velocidad increíble. Veremos esto en la viñeta *\"Claves y subconjuntos basados en búsqueda binaria rápida\"* y *\"Uniones y uniones continuas\"*."
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bheading
 msgid "Using `j`:"
-msgstr ""
+msgstr "Usando `j`:"
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
 "=====1. Select columns the `data.table` way: `DT[, .(colA, colB)]`.====="
-msgstr ""
+msgstr "=====1. Seleccione columnas con el método `data.table`: `DT[, .(colA, colB)]`.====="
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
-"=====2. Select columns the `data.frame` way: `DT[, c(\"colA\", \"colB\""
-")]`.====="
-msgstr ""
+"=====2. Select columns the `data.frame` way: `DT[, c(\"colA\", \"colB\")]`."
+"====="
+msgstr "=====2. Seleccione columnas con el método `data.frame`: `DT[, c(\"colA\", \"colB\")]`.====="
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid "=====3. Compute on columns: `DT[, .(sum(colA), mean(colB))]`.====="
-msgstr ""
+msgstr "=====3. Calcular en las columnas: `DT[, .(sum(colA), mean(colB))]`.====="
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
 "=====4. Provide names if necessary: `DT[, .(sA = sum(colA), mB = "
 "mean(colB))]`.====="
-msgstr ""
+msgstr "=====4. Proporcione nombres si es necesario: `DT[, .(sA = suma(colA), mB = media(colB))]`.====="
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid "=====5. Combine with `i`: `DT[colA > value, sum(colB)]`.====="
-msgstr ""
+msgstr "=====5. Combine con `i`: `DT[colA > valor, suma(colB)]`.====="
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bheading
 msgid "Using `by`:"
-msgstr ""
+msgstr "Usando `por`:"
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
@@ -1126,56 +1125,55 @@ msgid ""
 "or a *character vector of column names* or even *expressions*. The "
 "flexibility of `j`, combined with `by` and `i`, makes for a very powerful "
 "syntax.====="
-msgstr ""
+msgstr "=====* Al usar `by`, podemos agrupar por columnas especificando una *lista de columnas* o un *vector de caracteres de nombres de columnas* o incluso *expresiones*. La flexibilidad de `j`, combinada con `by` e `i`, crea una sintaxis muy poderosa.====="
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid "=====* `by` can handle multiple columns and also *expressions*.====="
-msgstr ""
+msgstr "=====* `by` puede manejar múltiples columnas y también *expresiones*.====="
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
 "=====* We can `keyby` grouping columns to automatically sort the grouped "
 "result.====="
-msgstr ""
+msgstr "=====* Podemos agrupar columnas mediante clave para ordenar automáticamente el resultado agrupado.====="
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
 "=====* We can use `.SD` and `.SDcols` in `j` to operate on multiple columns "
 "using already familiar base functions. Here are some examples:====="
-msgstr ""
+msgstr "=====* Podemos usar `.SD` y `.SDcols` en `j` para operar en múltiples columnas usando funciones base que ya conocemos. A continuación se muestran algunos ejemplos:====="
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
 "=====_1. `DT[, lapply(.SD, fun), by = ..., .SDcols = ...]` - applies `fun` "
 "to all columns specified in `.SDcols` while grouping by the columns "
 "specified in `by`.====="
-msgstr ""
+msgstr "=====_1. `DT[, lapply(.SD, fun), by = ..., .SDcols = ...]` - aplica `fun` a todas las columnas especificadas en `.SDcols` mientras agrupa por las columnas especificadas en `by`.====="
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
 "=====_2. `DT[, head(.SD, 2), by = ...]` - return the first two rows for each "
 "group.====="
-msgstr ""
+msgstr "=====_2. `DT[, head(.SD, 2), by = ...]` - devuelve las dos primeras filas de cada grupo.====="
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
-"=====_3. `DT[col > val, head(.SD, 1), by = ...]` - combine `i` along with `j`"
-" and `by`.====="
-msgstr ""
+"=====_3. `DT[col > val, head(.SD, 1), by = ...]` - combine `i` along with "
+"`j` and `by`.====="
+msgstr "=====_3. `DT[col > val, head(.SD, 1), by = ...]` - combina `i` junto con `j` y `by`.====="
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bheading
 msgid "And remember the tip:"
-msgstr ""
+msgstr "Y recuerda el consejo:"
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
 "As long as `j` returns a `list`, each element of the list will become a "
 "column in the resulting `data.table`."
-msgstr ""
+msgstr "Siempre que `j` devuelva una `lista`, cada elemento de la lista se convertirá en una columna en la `data.table` resultante."
 
 #: es%5Cdatatable-intro.Rmd.tmp%2Bp
 msgid ""
 "We will see how to *add/update/delete* columns *by reference* and how to "
 "combine them with `i` and `by` in the next vignette."
-msgstr ""
-
+msgstr "Veremos cómo *agregar/actualizar/eliminar* columnas *por referencia* y cómo combinarlas con `i` y `by` en la próxima viñeta."

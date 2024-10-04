@@ -1,12 +1,13 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
+"Project-Id-Version: 0.0.1\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-10-04 11:40-0300\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
+"PO-Revision-Date: 2024-10-04 16:53-0300\n"
+"Last-Translator: Nombre Apellido <direccion@ejemplo.com>\n"
+"Language-Team: es\n"
+"Language: es\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -16,18 +17,18 @@ msgstr ""
 msgid ""
 "This document is meant to guide on measuring performance of `data.table`. "
 "Single place to document best practices and traps to avoid."
-msgstr ""
+msgstr "Este documento tiene como objetivo orientar sobre cómo medir el rendimiento de `data.table`. Un único lugar para documentar las mejores prácticas y las trampas que se deben evitar."
 
 #: es%5Cdatatable-benchmarking.Rmd.tmp%2Bheading
 msgid "fread: clear caches"
-msgstr ""
+msgstr "fread: borrar cachés"
 
 #: es%5Cdatatable-benchmarking.Rmd.tmp%2Bp
 msgid ""
 "Ideally each `fread` call should be run in fresh session with the following "
 "commands preceding R execution. This clears OS cache file in RAM and HD "
 "cache."
-msgstr ""
+msgstr "Lo ideal sería que cada llamada `fread` se ejecute en una sesión nueva con los siguientes comandos antes de la ejecución de R. Esto borra el archivo de caché del sistema operativo en la RAM y la caché del disco duro."
 
 #: es%5Cdatatable-benchmarking.Rmd.tmp%2Bp
 msgid ""
@@ -38,21 +39,21 @@ msgid ""
 "(such as `fread` alone), it's a good idea to benchmark the total time of an "
 "end-to-end pipeline of tasks such as reading data, manipulating it, and "
 "producing final output."
-msgstr ""
+msgstr "Al comparar `fread` con soluciones que no sean de R, tenga en cuenta que R requiere que los valores de las columnas de caracteres se agreguen a la _caché de cadenas global de R_. Esto lleva tiempo al leer datos, pero las operaciones posteriores se benefician porque las cadenas de caracteres ya se han almacenado en caché. En consecuencia, además de cronometrar tareas aisladas (como `fread` solo), es una buena idea comparar el tiempo total de una secuencia de tareas de extremo a extremo, como leer datos, manipularlos y producir el resultado final."
 
 #: es%5Cdatatable-benchmarking.Rmd.tmp%2Bheading
 msgid "subset: threshold for index optimization on compound queries"
-msgstr ""
+msgstr "subconjunto: umbral para la optimización del índice en consultas compuestas"
 
 #: es%5Cdatatable-benchmarking.Rmd.tmp%2Bp
 msgid ""
 "Index optimization for compound filter queries will be not be used when "
 "cross product of elements provided to filter on exceeds 1e4 elements."
-msgstr ""
+msgstr "La optimización de índice para consultas de filtros compuestos no se utilizará cuando el producto cruzado de los elementos proporcionados para filtrar exceda 1e4 elementos."
 
 #: es%5Cdatatable-benchmarking.Rmd.tmp%2Bheading
 msgid "subset: index aware benchmarking"
-msgstr ""
+msgstr "subconjunto: evaluación comparativa basada en índices"
 
 #: es%5Cdatatable-benchmarking.Rmd.tmp%2Bp
 msgid ""
@@ -63,7 +64,7 @@ msgid ""
 "using an index separately. Having such timings it is easy to decide what is "
 "the optimal strategy for your use case. To control usage of index use "
 "following options:"
-msgstr ""
+msgstr "Para mayor comodidad, `data.table` crea automáticamente un índice en los campos que utiliza para crear subconjuntos de datos. Esto agregará algo de sobrecarga al primer subconjunto en campos específicos, pero reduce en gran medida el tiempo para consultar esas columnas en ejecuciones posteriores. Al medir la velocidad, la mejor manera es medir la creación de índices y la consulta utilizando un índice por separado. Con estos tiempos, es fácil decidir cuál es la estrategia óptima para su caso de uso. Para controlar el uso del índice, utilice las siguientes opciones:"
 
 #: es%5Cdatatable-benchmarking.Rmd.tmp%2Bp
 msgid ""
@@ -71,14 +72,14 @@ msgid ""
 "they exist, but existing keys are still used for optimization.===== =====- "
 "`auto.index=FALSE` disables building index automatically when doing subset "
 "on non-indexed data, but if indices were created before this option was set, "
-"or explicitly by calling `setindex` they still will be used for "
-"optimization.====="
-msgstr ""
+"or explicitly by calling `setindex` they still will be used for optimization."
+"====="
+msgstr "=====- `use.index=FALSE` forzará la consulta a no usar índices incluso si existen, pero las claves existentes aún se usan para la optimización.===== =====- `auto.index=FALSE` deshabilita la creación automática de índices al hacer un subconjunto en datos no indexados, pero si los índices se crearon antes de que se estableciera esta opción, o explícitamente al llamar a `setindex`, aún se usarán para la optimización.====="
 
 #: es%5Cdatatable-benchmarking.Rmd.tmp%2Bp
 msgid ""
 "Two other options control optimization globally, including use of indices:"
-msgstr ""
+msgstr "Otras dos opciones controlan la optimización globalmente, incluido el uso de índices:"
 
 #: es%5Cdatatable-benchmarking.Rmd.tmp%2Bp
 msgid ""
@@ -86,31 +87,31 @@ msgid ""
 "completely, while `options(datatable.optimize=3L)` will switch it back on. "
 "Those options affect many more optimizations and thus should not be used "
 "when only control of indices is needed. Read more in `?datatable.optimize`."
-msgstr ""
+msgstr "`options(datatable.optimize=2L)` desactivará por completo la optimización de subconjuntos, mientras que `options(datatable.optimize=3L)` la volverá a activar. Esas opciones afectan a muchas más optimizaciones y, por lo tanto, no se deben utilizar cuando solo se necesita el control de índices. Lea más en `?datatable.optimize`."
 
 #: es%5Cdatatable-benchmarking.Rmd.tmp%2Bheading
 msgid "_by reference_ operations"
-msgstr ""
+msgstr "Operaciones _por referencia_"
 
 #: es%5Cdatatable-benchmarking.Rmd.tmp%2Bp
 msgid ""
 "When benchmarking `set*` functions it only makes sense to measure the first "
 "run. These functions update their input by reference, so subsequent runs "
 "will use the already-processed `data.table`, biasing the results."
-msgstr ""
+msgstr "Al evaluar las funciones `set*`, solo tiene sentido medir la primera ejecución. Estas funciones actualizan su entrada por referencia, por lo que las ejecuciones posteriores utilizarán la `data.table` ya procesada, lo que sesgará los resultados."
 
 #: es%5Cdatatable-benchmarking.Rmd.tmp%2Bp
 msgid ""
 "Protecting your `data.table` from being updated by reference operations can "
-"be achieved using `copy` or `data.table:::shallow` functions. Be aware `copy`"
-" might be very expensive as it needs to duplicate whole object. It is "
+"be achieved using `copy` or `data.table:::shallow` functions. Be aware "
+"`copy` might be very expensive as it needs to duplicate whole object. It is "
 "unlikely we want to include duplication time in time of the actual task we "
 "are benchmarking."
-msgstr ""
+msgstr "Para proteger su tabla `data.table` de ser actualizada por operaciones de referencia, puede usar las funciones `copy` o `data.table:::shallow`. Tenga en cuenta que `copy` puede ser muy costoso, ya que necesita duplicar el objeto completo. Es poco probable que queramos incluir el tiempo de duplicación en el tiempo de la tarea real que estamos evaluando."
 
 #: es%5Cdatatable-benchmarking.Rmd.tmp%2Bheading
 msgid "try to benchmark atomic processes"
-msgstr ""
+msgstr "Intentar comparar los procesos atómicos"
 
 #: es%5Cdatatable-benchmarking.Rmd.tmp%2Bp
 msgid ""
@@ -128,21 +129,21 @@ msgid ""
 "the other hand, the _global string cache_ might speed up processes like "
 "_grouping_. In such cases when comparing R to other languages it might be "
 "useful to include total timing."
-msgstr ""
+msgstr "Si su evaluación comparativa está destinada a ser publicada, será mucho más esclarecedora si la divide para medir el tiempo de los procesos atómicos. De esta manera, sus lectores pueden ver cuánto tiempo se dedicó a leer los datos de la fuente, limpiarlos, transformarlos realmente y exportar los resultados. Por supuesto, si su evaluación comparativa está destinada a presentar un _flujo de trabajo de principio a fin_, entonces tiene todo el sentido presentar el tiempo general. Sin embargo, separar el tiempo de los pasos individuales es útil para comprender qué pasos son los principales cuellos de botella de un flujo de trabajo. Hay otros casos en los que la evaluación comparativa atómica puede no ser deseable, por ejemplo, cuando se _lee un csv_, seguido de _agrupamiento_. R requiere llenar _la caché de cadenas global de R_, lo que agrega una sobrecarga adicional al importar datos de caracteres a una sesión de R. Por otro lado, la _caché de cadenas global_ puede acelerar procesos como _agrupamiento_. En tales casos, al comparar R con otros lenguajes, puede ser útil incluir el tiempo total."
 
 #: es%5Cdatatable-benchmarking.Rmd.tmp%2Bheading
 msgid "avoid class coercion"
-msgstr ""
+msgstr "evitar la coerción de clase"
 
 #: es%5Cdatatable-benchmarking.Rmd.tmp%2Bp
 msgid ""
 "Unless this is what you truly want to measure you should prepare input "
 "objects of the expected class for every tool you are benchmarking."
-msgstr ""
+msgstr "A menos que esto sea lo que realmente desea medir, debe preparar objetos de entrada de la clase esperada para cada herramienta que esté evaluando."
 
 #: es%5Cdatatable-benchmarking.Rmd.tmp%2Bheading
 msgid "avoid `microbenchmark(..., times=100)`"
-msgstr ""
+msgstr "evitar `microbenchmark(..., veces=100)`"
 
 #: es%5Cdatatable-benchmarking.Rmd.tmp%2Bp
 msgid ""
@@ -152,7 +153,7 @@ msgid ""
 "these tools will actually be used, namely for data processing tasks, which "
 "consist of batches of sequentially provided transformations, each run once. "
 "Matt once said:"
-msgstr ""
+msgstr "Repetir un punto de referencia muchas veces no suele ofrecer la imagen más clara para las herramientas de procesamiento de datos. Por supuesto, tiene todo el sentido para cálculos más atómicos, pero no es una buena representación de la forma más común en que se utilizarán realmente estas herramientas, es decir, para tareas de procesamiento de datos, que consisten en lotes de transformaciones proporcionadas secuencialmente, cada una de las cuales se ejecuta una vez. Matt dijo una vez:"
 
 #: es%5Cdatatable-benchmarking.Rmd.tmp%2Bquote.p
 msgid ""
@@ -161,18 +162,18 @@ msgid ""
 "repetition count of 500 is setting off alarm bells. 3-5 runs should be "
 "enough to convince on larger data. Call overhead and time to GC affect "
 "inferences at this very small scale."
-msgstr ""
+msgstr "Soy muy cauteloso con los puntos de referencia medidos en cualquier valor inferior a 1 segundo. Prefiero mucho más de 10 segundos para una sola ejecución, lograda aumentando el tamaño de los datos. Un recuento de repeticiones de 500 hace sonar las alarmas. 3-5 ejecuciones deberían ser suficientes para convencer con datos más grandes. La sobrecarga de llamadas y el tiempo de recolección de basura afectan las inferencias a esta escala tan pequeña."
 
 #: es%5Cdatatable-benchmarking.Rmd.tmp%2Bp
 msgid ""
 "This is very valid. The smaller time measurement is the relatively bigger "
 "noise is. Noise generated by method dispatch, package/class initialization, "
 "etc. Main focus of benchmark should be on real use case scenarios."
-msgstr ""
+msgstr "Esto es muy válido. Cuanto menor sea la medición de tiempo, mayor será el ruido relativo. Ruido generado por el envío de métodos, la inicialización de paquetes o clases, etc. El enfoque principal del análisis comparativo debería estar en escenarios de casos de uso reales."
 
 #: es%5Cdatatable-benchmarking.Rmd.tmp%2Bheading
 msgid "multithreaded processing"
-msgstr ""
+msgstr "procesamiento multiproceso"
 
 #: es%5Cdatatable-benchmarking.Rmd.tmp%2Bp
 msgid ""
@@ -180,26 +181,25 @@ msgid ""
 "threads available to your R session. In recent versions of `data.table`, "
 "some functions are parallelized. You can control the number of threads you "
 "want to use with `setDTthreads`."
-msgstr ""
+msgstr "Uno de los principales factores que probablemente afecten los tiempos es la cantidad de subprocesos disponibles para su sesión R. En versiones recientes de `data.table`, algunas funciones están paralelizadas. Puede controlar la cantidad de subprocesos que desea utilizar con `setDTthreads`."
 
 #: es%5Cdatatable-benchmarking.Rmd.tmp%2Bheading
 msgid "inside a loop prefer `set` instead of `:=`"
-msgstr ""
+msgstr "Dentro de un bucle se prefiere `set` en lugar de `:=`"
 
 #: es%5Cdatatable-benchmarking.Rmd.tmp%2Bp
 msgid ""
 "Unless you are utilizing index when doing _sub-assign by reference_ you "
-"should prefer `set` function which does not impose overhead of `[.data.table`"
-" method call."
-msgstr ""
+"should prefer `set` function which does not impose overhead of `[.data."
+"table` method call."
+msgstr "A menos que esté utilizando el índice al realizar una _subasignación por referencia_, debería preferir la función `set`, que no impone la sobrecarga de la llamada al método `[.data.table`."
 
 #: es%5Cdatatable-benchmarking.Rmd.tmp%2Bheading
 msgid "inside a loop prefer `setDT` instead of `data.table()`"
-msgstr ""
+msgstr "Dentro de un bucle, prefiera `setDT` en lugar de `data.table()`"
 
 #: es%5Cdatatable-benchmarking.Rmd.tmp%2Bp
 msgid ""
 "As of now `data.table()` has an overhead, thus inside loops it is preferred "
 "to use `as.data.table()` or `setDT()` on a valid list."
-msgstr ""
-
+msgstr "A partir de ahora, `data.table()` tiene una sobrecarga, por lo tanto, dentro de los bucles se prefiere utilizar `as.data.table()` o `setDT()` en una lista válida."
