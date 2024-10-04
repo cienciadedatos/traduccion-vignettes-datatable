@@ -1,0 +1,498 @@
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-10-04 11:41-0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Translate Toolkit 3.13.3\n"
+
+#: es%5Cdatatable-secondary-indices-and-auto-indexing.Rmd.tmp%2Bp
+msgid ""
+"This vignette assumes that the reader is familiar with data.table's `[i, j, "
+"by]` syntax, and how to perform fast key based subsets. If you're not "
+"familiar with these concepts, please read the *\"Introduction to data.table\""
+"*, *\"Reference semantics\"* and *\"Keys and fast binary search based "
+"subset\"* vignettes first."
+msgstr ""
+
+#: es%5Cdatatable-secondary-indices-and-auto-indexing.Rmd.tmp%2Bheading
+msgid "Data {#data}"
+msgstr ""
+
+#: es%5Cdatatable-secondary-indices-and-auto-indexing.Rmd.tmp%2Bp
+msgid ""
+"We will use the same `flights` data as in the *\"Introduction to data.table\""
+"* vignette."
+msgstr ""
+
+#: es%5Cdatatable-secondary-indices-and-auto-indexing.Rmd.tmp%2Bheading
+msgid "Introduction"
+msgstr ""
+
+#: es%5Cdatatable-secondary-indices-and-auto-indexing.Rmd.tmp%2Bp
+msgid "In this vignette, we will"
+msgstr ""
+
+#: es%5Cdatatable-secondary-indices-and-auto-indexing.Rmd.tmp%2Bp
+msgid ""
+"=====* discuss *secondary indices* and provide rationale as to why we need "
+"them by citing cases where setting keys is not necessarily ideal,====="
+msgstr ""
+
+#: es%5Cdatatable-secondary-indices-and-auto-indexing.Rmd.tmp%2Bp
+msgid ""
+"=====* perform fast subsetting, once again, but using the new `on` argument, "
+"which computes secondary indices internally for the task (temporarily), and "
+"reuses if one already exists,====="
+msgstr ""
+
+#: es%5Cdatatable-secondary-indices-and-auto-indexing.Rmd.tmp%2Bp
+msgid ""
+"=====* and finally look at *auto indexing* which goes a step further and "
+"creates secondary indices automatically, but does so on native R syntax for "
+"subsetting.====="
+msgstr ""
+
+#: es%5Cdatatable-secondary-indices-and-auto-indexing.Rmd.tmp%2Bheading
+msgid "1. Secondary indices"
+msgstr ""
+
+#: es%5Cdatatable-secondary-indices-and-auto-indexing.Rmd.tmp%2Bheading
+msgid "a) What are secondary indices?"
+msgstr ""
+
+#: es%5Cdatatable-secondary-indices-and-auto-indexing.Rmd.tmp%2Bp
+msgid ""
+"Secondary indices are similar to `keys` in *data.table*, except for two "
+"major differences:"
+msgstr ""
+
+#: es%5Cdatatable-secondary-indices-and-auto-indexing.Rmd.tmp%2Bp
+msgid ""
+"=====* It *doesn't* physically reorder the entire data.table in RAM. "
+"Instead, it only computes the order for the set of columns provided and "
+"stores that *order vector* in an additional attribute called `index`.====="
+msgstr ""
+
+#: es%5Cdatatable-secondary-indices-and-auto-indexing.Rmd.tmp%2Bp
+msgid ""
+"=====* There can be more than one secondary index for a data.table (as we "
+"will see below).====="
+msgstr ""
+
+#: es%5Cdatatable-secondary-indices-and-auto-indexing.Rmd.tmp%2Bheading
+msgid "b) Set and get secondary indices"
+msgstr ""
+
+#: es%5Cdatatable-secondary-indices-and-auto-indexing.Rmd.tmp%2Bheading
+msgid ""
+"-- How can we set the column `origin` as a secondary index in the *data."
+"table* `flights`?"
+msgstr ""
+
+#: es%5Cdatatable-secondary-indices-and-auto-indexing.Rmd.tmp%2Bp
+msgid ""
+"=====* `setindex` and `setindexv()` allows adding a secondary index to the "
+"data.table.====="
+msgstr ""
+
+#: es%5Cdatatable-secondary-indices-and-auto-indexing.Rmd.tmp%2Bp
+msgid ""
+"=====* Note that `flights` is **not** physically reordered in increasing "
+"order of `origin`, as would have been the case with `setkey()`.====="
+msgstr ""
+
+#: es%5Cdatatable-secondary-indices-and-auto-indexing.Rmd.tmp%2Bp
+msgid ""
+"=====* Also note that the attribute `index` has been added to `flights`.====="
+msgstr ""
+
+#: es%5Cdatatable-secondary-indices-and-auto-indexing.Rmd.tmp%2Bp
+msgid ""
+"=====* `setindex(flights, NULL)` would remove all secondary indices.====="
+msgstr ""
+
+#: es%5Cdatatable-secondary-indices-and-auto-indexing.Rmd.tmp%2Bheading
+msgid "-- How can we get all the secondary indices set so far in `flights`?"
+msgstr ""
+
+#: es%5Cdatatable-secondary-indices-and-auto-indexing.Rmd.tmp%2Bp
+msgid ""
+"=====* The function `indices()` returns all current secondary indices in the "
+"data.table. If none exists, `NULL` is returned.====="
+msgstr ""
+
+#: es%5Cdatatable-secondary-indices-and-auto-indexing.Rmd.tmp%2Bp
+msgid ""
+"=====* Note that by creating another index on the columns `origin, dest`, we "
+"do not lose the first index created on the column `origin`, i.e., we can "
+"have multiple secondary indices.====="
+msgstr ""
+
+#: es%5Cdatatable-secondary-indices-and-auto-indexing.Rmd.tmp%2Bheading
+msgid "c) Why do we need secondary indices?"
+msgstr ""
+
+#: es%5Cdatatable-secondary-indices-and-auto-indexing.Rmd.tmp%2Bheading
+msgid "-- Reordering a data.table can be expensive and not always ideal"
+msgstr ""
+
+#: es%5Cdatatable-secondary-indices-and-auto-indexing.Rmd.tmp%2Bp
+msgid ""
+"Consider the case where you would like to perform a fast key based subset on "
+"`origin` column for the value \"JFK\". We'd do this as:"
+msgstr ""
+
+#: es%5Cdatatable-secondary-indices-and-auto-indexing.Rmd.tmp%2Bheading
+msgid "`setkey()` requires:"
+msgstr ""
+
+#: es%5Cdatatable-secondary-indices-and-auto-indexing.Rmd.tmp%2Bp
+msgid ""
+"a) computing the order vector for the column(s) provided, here, `origin`, and"
+msgstr ""
+
+#: es%5Cdatatable-secondary-indices-and-auto-indexing.Rmd.tmp%2Bp
+msgid ""
+"b) reordering the entire data.table, by reference, based on the order vector "
+"computed."
+msgstr ""
+
+#: es%5Cdatatable-secondary-indices-and-auto-indexing.Rmd.tmp%2Bp
+msgid ""
+"Computing the order isn't the time consuming part, since data.table uses "
+"true radix sorting on integer, character and numeric vectors. However, "
+"reordering the data.table could be time consuming (depending on the number "
+"of rows and columns)."
+msgstr ""
+
+#: es%5Cdatatable-secondary-indices-and-auto-indexing.Rmd.tmp%2Bp
+msgid ""
+"Unless our task involves repeated subsetting on the same column, fast key "
+"based subsetting could effectively be nullified by the time to reorder, "
+"depending on our data.table dimensions."
+msgstr ""
+
+#: es%5Cdatatable-secondary-indices-and-auto-indexing.Rmd.tmp%2Bheading
+msgid "-- There can be only one `key` at the most"
+msgstr ""
+
+#: es%5Cdatatable-secondary-indices-and-auto-indexing.Rmd.tmp%2Bp
+msgid ""
+"Now if we would like to repeat the same operation but on `dest` column "
+"instead, for the value \"LAX\", then we have to `setkey()`, *again*."
+msgstr ""
+
+#: es%5Cdatatable-secondary-indices-and-auto-indexing.Rmd.tmp%2Bp
+msgid ""
+"And this reorders `flights` by `dest`, *again*. What we would really like is "
+"to be able to perform the fast subsetting by eliminating the reordering step."
+msgstr ""
+
+#: es%5Cdatatable-secondary-indices-and-auto-indexing.Rmd.tmp%2Bp
+msgid "And this is precisely what *secondary indices* allow for!"
+msgstr ""
+
+#: es%5Cdatatable-secondary-indices-and-auto-indexing.Rmd.tmp%2Bheading
+msgid "-- Secondary indices can be reused"
+msgstr ""
+
+#: es%5Cdatatable-secondary-indices-and-auto-indexing.Rmd.tmp%2Bp
+msgid ""
+"Since there can be multiple secondary indices, and creating an index is as "
+"simple as storing the order vector as an attribute, this allows us to even "
+"eliminate the time to recompute the order vector if an index already exists."
+msgstr ""
+
+#: es%5Cdatatable-secondary-indices-and-auto-indexing.Rmd.tmp%2Bheading
+msgid ""
+"-- The new `on` argument allows for cleaner syntax and automatic creation "
+"and reuse of secondary indices"
+msgstr ""
+
+#: es%5Cdatatable-secondary-indices-and-auto-indexing.Rmd.tmp%2Bp
+msgid ""
+"As we will see in the next section, the `on` argument provides several "
+"advantages:"
+msgstr ""
+
+#: es%5Cdatatable-secondary-indices-and-auto-indexing.Rmd.tmp%2Bheading
+msgid "`on` argument"
+msgstr ""
+
+#: es%5Cdatatable-secondary-indices-and-auto-indexing.Rmd.tmp%2Bp
+msgid ""
+"=====* enables subsetting by computing secondary indices on the fly. This "
+"eliminates having to do `setindex()` every time.====="
+msgstr ""
+
+#: es%5Cdatatable-secondary-indices-and-auto-indexing.Rmd.tmp%2Bp
+msgid ""
+"=====* allows easy reuse of existing indices by just checking the "
+"attributes.====="
+msgstr ""
+
+#: es%5Cdatatable-secondary-indices-and-auto-indexing.Rmd.tmp%2Bp
+msgid ""
+"=====* allows for a cleaner syntax by having the columns on which the subset "
+"is performed as part of the syntax. This makes the code easier to follow "
+"when looking at it at a later point.====="
+msgstr ""
+
+#: es%5Cdatatable-secondary-indices-and-auto-indexing.Rmd.tmp%2Bheading
+msgid "2. Fast subsetting using `on` argument and secondary indices"
+msgstr ""
+
+#: es%5Cdatatable-secondary-indices-and-auto-indexing.Rmd.tmp%2Bheading
+msgid "a) Fast subsets in `i`"
+msgstr ""
+
+#: es%5Cdatatable-secondary-indices-and-auto-indexing.Rmd.tmp%2Bheading
+msgid ""
+"-- Subset all rows where the origin airport matches *\"JFK\"* using `on`"
+msgstr ""
+
+#: es%5Cdatatable-secondary-indices-and-auto-indexing.Rmd.tmp%2Bp
+msgid ""
+"=====* This statement performs a fast binary search based subset as well, by "
+"computing the index on the fly. However, note that it doesn't save the index "
+"as an attribute automatically. This may change in the future.====="
+msgstr ""
+
+#: es%5Cdatatable-secondary-indices-and-auto-indexing.Rmd.tmp%2Bp
+msgid ""
+"=====* If we had already created a secondary index, using `setindex()`, then "
+"`on` would reuse it instead of (re)computing it. We can see that by using `"
+"verbose = TRUE`:====="
+msgstr ""
+
+#: es%5Cdatatable-secondary-indices-and-auto-indexing.Rmd.tmp%2Bheading
+msgid "-- How can I subset based on `origin` *and* `dest` columns?"
+msgstr ""
+
+#: es%5Cdatatable-secondary-indices-and-auto-indexing.Rmd.tmp%2Bp
+msgid "For example, if we want to subset `\"JFK\", \"LAX\"` combination, then:"
+msgstr ""
+
+#: es%5Cdatatable-secondary-indices-and-auto-indexing.Rmd.tmp%2Bp
+msgid ""
+"=====* `on` argument accepts a character vector of column names "
+"corresponding to the order provided to `i-argument`.====="
+msgstr ""
+
+#: es%5Cdatatable-secondary-indices-and-auto-indexing.Rmd.tmp%2Bp
+msgid ""
+"=====* Since the time to compute the secondary index is quite small, we "
+"don't have to use `setindex()`, unless, once again, the task involves "
+"repeated subsetting on the same column.====="
+msgstr ""
+
+#: es%5Cdatatable-secondary-indices-and-auto-indexing.Rmd.tmp%2Bheading
+msgid "b) Select in `j`"
+msgstr ""
+
+#: es%5Cdatatable-secondary-indices-and-auto-indexing.Rmd.tmp%2Bp
+msgid ""
+"All the operations we will discuss below are no different to the ones we "
+"already saw in the *Keys and fast binary search based subset* vignette. "
+"Except we'll be using the `on` argument instead of setting keys."
+msgstr ""
+
+#: es%5Cdatatable-secondary-indices-and-auto-indexing.Rmd.tmp%2Bheading
+msgid ""
+"-- Return `arr_delay` column alone as a data.table corresponding to `origin "
+"= \"LGA\"` and `dest = \"TPA\"`"
+msgstr ""
+
+#: es%5Cdatatable-secondary-indices-and-auto-indexing.Rmd.tmp%2Bheading
+msgid "c) Chaining"
+msgstr ""
+
+#: es%5Cdatatable-secondary-indices-and-auto-indexing.Rmd.tmp%2Bheading
+msgid ""
+"-- On the result obtained above, use chaining to order the column in "
+"decreasing order."
+msgstr ""
+
+#: es%5Cdatatable-secondary-indices-and-auto-indexing.Rmd.tmp%2Bheading
+msgid "d) Compute or *do* in `j`"
+msgstr ""
+
+#: es%5Cdatatable-secondary-indices-and-auto-indexing.Rmd.tmp%2Bheading
+msgid ""
+"-- Find the maximum arrival delay corresponding to `origin = \"LGA\"` and `"
+"dest = \"TPA\"`."
+msgstr ""
+
+#: es%5Cdatatable-secondary-indices-and-auto-indexing.Rmd.tmp%2Bheading
+msgid "e) *sub-assign* by reference using `:=` in `j`"
+msgstr ""
+
+#: es%5Cdatatable-secondary-indices-and-auto-indexing.Rmd.tmp%2Bp
+msgid ""
+"We have seen this example already in the *Reference semantics* and *Keys and "
+"fast binary search based subset* vignette. Let's take a look at all the "
+"`hours` available in the `flights` *data.table*:"
+msgstr ""
+
+#: es%5Cdatatable-secondary-indices-and-auto-indexing.Rmd.tmp%2Bp
+msgid ""
+"We see that there are totally `25` unique values in the data. Both *0* and "
+"*24* hours seem to be present. Let's go ahead and replace *24* with *0*, but "
+"this time using `on` instead of setting keys."
+msgstr ""
+
+#: es%5Cdatatable-secondary-indices-and-auto-indexing.Rmd.tmp%2Bp
+msgid "Now, let's check if `24` is replaced with `0` in the `hour` column."
+msgstr ""
+
+#: es%5Cdatatable-secondary-indices-and-auto-indexing.Rmd.tmp%2Bp
+msgid ""
+"=====* This is particularly a huge advantage of secondary indices. "
+"Previously, just to update a few rows of `hour`, we had to `setkey()` on it, "
+"which inevitably reorders the entire data.table. With `on`, the order is "
+"preserved, and the operation is much faster! Looking at the code, the task "
+"we wanted to perform is also quite clear.====="
+msgstr ""
+
+#: es%5Cdatatable-secondary-indices-and-auto-indexing.Rmd.tmp%2Bheading
+msgid "f) Aggregation using `by`"
+msgstr ""
+
+#: es%5Cdatatable-secondary-indices-and-auto-indexing.Rmd.tmp%2Bheading
+msgid ""
+"-- Get the maximum departure delay for each `month` corresponding to `origin "
+"= \"JFK\"`. Order the result by `month`"
+msgstr ""
+
+#: es%5Cdatatable-secondary-indices-and-auto-indexing.Rmd.tmp%2Bp
+msgid ""
+"=====* We would have had to set the `key` back to `origin, dest` again, if "
+"we did not use `on` which internally builds secondary indices on the "
+"fly.====="
+msgstr ""
+
+#: es%5Cdatatable-secondary-indices-and-auto-indexing.Rmd.tmp%2Bheading
+msgid "g) The *mult* argument"
+msgstr ""
+
+#: es%5Cdatatable-secondary-indices-and-auto-indexing.Rmd.tmp%2Bp
+msgid ""
+"The other arguments including `mult` work exactly the same way as we saw in "
+"the *Keys and fast binary search based subset* vignette. The default value "
+"for `mult` is \"all\". We can choose, instead only the \"first\" or \"last\" "
+"matching rows should be returned."
+msgstr ""
+
+#: es%5Cdatatable-secondary-indices-and-auto-indexing.Rmd.tmp%2Bheading
+msgid ""
+"-- Subset only the first matching row where `dest` matches *\"BOS\"* and *"
+"\"DAY\"*"
+msgstr ""
+
+#: es%5Cdatatable-secondary-indices-and-auto-indexing.Rmd.tmp%2Bheading
+msgid ""
+"-- Subset only the last matching row where `origin` matches *\"LGA\", \"JFK\""
+", \"EWR\"* and `dest` matches *\"XNA\"*"
+msgstr ""
+
+#: es%5Cdatatable-secondary-indices-and-auto-indexing.Rmd.tmp%2Bheading
+msgid "h) The *nomatch* argument"
+msgstr ""
+
+#: es%5Cdatatable-secondary-indices-and-auto-indexing.Rmd.tmp%2Bp
+msgid ""
+"We can choose if queries that do not match should return `NA` or be skipped "
+"altogether using the `nomatch` argument."
+msgstr ""
+
+#: es%5Cdatatable-secondary-indices-and-auto-indexing.Rmd.tmp%2Bheading
+msgid "-- From the previous example, subset all rows only if there's a match"
+msgstr ""
+
+#: es%5Cdatatable-secondary-indices-and-auto-indexing.Rmd.tmp%2Bp
+msgid ""
+"=====* There are no flights connecting \"JFK\" and \"XNA\". Therefore, that "
+"row is skipped in the result.====="
+msgstr ""
+
+#: es%5Cdatatable-secondary-indices-and-auto-indexing.Rmd.tmp%2Bheading
+msgid "3. Auto indexing"
+msgstr ""
+
+#: es%5Cdatatable-secondary-indices-and-auto-indexing.Rmd.tmp%2Bp
+msgid ""
+"First we looked at how to fast subset using binary search using *keys*. Then "
+"we figured out that we could improve performance even further and have "
+"cleaner syntax by using secondary indices."
+msgstr ""
+
+#: es%5Cdatatable-secondary-indices-and-auto-indexing.Rmd.tmp%2Bp
+msgid ""
+"That is what *auto indexing* does. At the moment, it is only implemented for "
+"binary operators `==` and `%in%`. An index is automatically created *and* "
+"saved as an attribute. That is, unlike the `on` argument which computes the "
+"index on the fly each time (unless one already exists), a secondary index is "
+"created here."
+msgstr ""
+
+#: es%5Cdatatable-secondary-indices-and-auto-indexing.Rmd.tmp%2Bp
+msgid ""
+"Let's start by creating a data.table big enough to highlight the advantage."
+msgstr ""
+
+#: es%5Cdatatable-secondary-indices-and-auto-indexing.Rmd.tmp%2Bp
+msgid ""
+"When we use `==` or `%in%` on a single column for the first time, a "
+"secondary index is created automatically, and it is used to perform the "
+"subset."
+msgstr ""
+
+#: es%5Cdatatable-secondary-indices-and-auto-indexing.Rmd.tmp%2Bp
+msgid ""
+"The time to subset the first time is the time to create the index + the time "
+"to subset. Since creating a secondary index involves only creating the order "
+"vector, this combined operation is faster than vector scans in many cases. "
+"But the real advantage comes in successive subsets. They are extremely fast."
+msgstr ""
+
+#: es%5Cdatatable-secondary-indices-and-auto-indexing.Rmd.tmp%2Bp
+msgid ""
+"=====* Running the first time took `r sprintf(\"%.3f\", t1[\"elapsed\"])` "
+"seconds where as the second time took `r sprintf(\"%.3f\", t2[\"elapsed\"])` "
+"seconds.====="
+msgstr ""
+
+#: es%5Cdatatable-secondary-indices-and-auto-indexing.Rmd.tmp%2Bp
+msgid ""
+"=====* Auto indexing can be disabled by setting the global argument `options("
+"datatable.auto.index = FALSE)`.====="
+msgstr ""
+
+#: es%5Cdatatable-secondary-indices-and-auto-indexing.Rmd.tmp%2Bp
+msgid ""
+"=====* Disabling auto indexing still allows to use indices created "
+"explicitly with `setindex` or `setindexv`. You can disable indices fully by "
+"setting global argument `options(datatable.use.index = FALSE)`.====="
+msgstr ""
+
+#: es%5Cdatatable-secondary-indices-and-auto-indexing.Rmd.tmp%2Bp
+msgid ""
+"In recent version we extended auto indexing to expressions involving more "
+"than one column (combined with `&` operator). In the future, we plan to "
+"extend binary search to work with more binary operators like `<`, `<=`, `>` "
+"and `>=`."
+msgstr ""
+
+#: es%5Cdatatable-secondary-indices-and-auto-indexing.Rmd.tmp%2Bp
+msgid ""
+"We will discuss fast *subsets* using keys and secondary indices to *joins* "
+"in the next vignette, *\"Joins and rolling joins\"*."
+msgstr ""
+
