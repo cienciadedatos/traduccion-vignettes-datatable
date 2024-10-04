@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<title>Using .SD for Data Analysis</title>
+<style type="text/css">
+/**
+ * Prism.s theme ported from highlight.js's xcode style
+ */
+pre code {
+  padding: 1em;
+}
+.token.comment {
+  color: #007400;
+}
+.token.punctuation {
+  color: #999;
+}
+.token.tag,
+.token.selector {
+  color: #aa0d91;
+}
+.token.boolean,
+.token.number,
+.token.constant,
+.token.symbol {
+  color: #1c00cf;
+}
+.token.property,
+.token.attr-name,
+.token.string,
+.token.char,
+.token.builtin {
+  color: #c41a16;
+}
+.token.inserted {
+  background-color: #ccffd8;
+}
+.token.deleted {
+  background-color: #ffebe9;
+}
+.token.operator,
+.token.entity,
+.token.url,
+.language-css .token.string,
+.style .token.string {
+  color: #9a6e3a;
+}
+.token.atrule,
+.token.attr-value,
+.token.keyword {
+  color: #836c28;
+}
+.token.function,
+.token.class-name {
+  color: #DD4A68;
+}
+.token.regex,
+.token.important,
+.token.variable {
+  color: #5c2699;
+}
+.token.important,
+.token.bold {
+  font-weight: bold;
+}
+.token.italic {
+  font-style: italic;
+}
+</style>
+<style type="text/css">
+body {
+  font-family: sans-serif;
+  max-width: 800px;
+  margin: auto;
+  padding: 1em;
+  line-height: 1.5;
+  box-sizing: border-box;
+}
+body, .footnotes, code { font-size: .9em; }
+li li { font-size: .95em; }
+*, *:before, *:after {
+  box-sizing: inherit;
+}
+pre, img { max-width: 100%; }
+pre, pre:hover {
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+pre code {
+  display: block;
+  overflow-x: auto;
+}
+code { font-family: 'DejaVu Sans Mono', 'Droid Sans Mono', 'Lucida Console', Consolas, Monaco, monospace; }
+:not(pre) > code, code[class] { background-color: #F8F8F8; }
+code.language-undefined, pre > code:not([class]) {
+  background-color: inherit;
+  border: 1px solid #eee;
+}
+table {
+  margin: auto;
+  border-top: 1px solid #666;
+}
+table thead th { border-bottom: 1px solid #ddd; }
+th, td { padding: 5px; }
+thead, tfoot, tr:nth-child(even) { background: #eee; }
+blockquote {
+  color: #666;
+  margin: 0;
+  padding-left: 1em;
+  border-left: 0.5em solid #eee;
+}
+hr, .footnotes::before { border: 1px dashed #ddd; }
+.frontmatter { text-align: center; }
+#TOC .numbered li { list-style: none; }
+#TOC .numbered { padding-left: 0; }
+#TOC .numbered ul { padding-left: 1em; }
+table, .body h2 { border-bottom: 1px solid #666; }
+.body .appendix, .appendix ~ h2 { border-bottom-style: dashed; }
+.footnote-ref a::before { content: "["; }
+.footnote-ref a::after { content: "]"; }
+section.footnotes::before {
+  content: "";
+  display: block;
+  max-width: 20em;
+}
+
+@media print {
+  body {
+    font-size: 12pt;
+    max-width: 100%;
+  }
+  tr, img { page-break-inside: avoid; }
+}
+@media only screen and (min-width: 992px) {
+  pre { white-space: pre; }
+}
+</style>
+<style type="text/css">
+#TOC {
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding-left: 1em;
+  background: #f6f6f6;
+}
+</style>
+</head>
+<body>
+<div class="frontmatter">
+<div class="title"><h1>Using .SD for Data Analysis</h1></div>
+<div class="author"><h2></h2></div>
+<div class="date"><h3>2024-10-04</h3></div>
+</div>
+<div class="body">
+<div id="TOC">
+<ul class="numbered">
+<li><a href="#qu-es-sd"><span class="section-number">1.</span> ¿Qué es «.SD»?</a>
+<ul>
+<li><a href="#carga-y-vista-previa-de-datos-de-lahman"><span class="section-number">1.1</span> Carga y vista previa de datos de Lahman</a></li>
+</ul>
+</li>
+<li><a href="#sd-en-datos-no-agrupados"><span class="section-number">2.</span> <code>.SD</code> en datos no agrupados</a>
+<ul>
+<li><a href="#subconjunto-de-columna-sdcols"><span class="section-number">2.1</span> Subconjunto de columna: <code>.SDcols</code></a></li>
+<li><a href="#conversi-n-de-tipo-de-columna"><span class="section-number">2.2</span> Conversión de tipo de columna</a></li>
+<li><a href="#controlar-el-lado-derecho-de-un-modelo"><span class="section-number">2.3</span> Controlar el lado derecho de un modelo</a></li>
+<li><a href="#uniones-condicionales"><span class="section-number">2.4</span> Uniones condicionales</a></li>
+</ul>
+</li>
+<li><a href="#operaciones-agrupadas-sd"><span class="section-number">3.</span> Operaciones agrupadas <code>.SD</code></a>
+<ul>
+<li><a href="#subconjunto-de-grupo"><span class="section-number">3.1</span> Subconjunto de grupo</a></li>
+<li><a href="#grupo-optima"><span class="section-number">3.2</span> Grupo Optima</a></li>
+<li><a href="#regresi-n-agrupada"><span class="section-number">3.3</span> Regresión agrupada</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<p>Esta viñeta explica las formas más comunes de usar la variable <code>.SD</code> en los análisis de <code>data.table</code>. Es una adaptación de <a href="https://stackoverflow.com/a/47406952/3576984">esta respuesta</a> proporcionada en StackOverflow.</p>
+<h1 id="qu-es-sd"><span class="section-number">1.</span> ¿Qué es «.SD»?</h1>
+<p>En el sentido más amplio, <code>.SD</code> es simplemente una abreviatura para capturar una variable que aparece con frecuencia en el contexto del análisis de datos. Puede entenderse como <em>S</em>ubset, <em>S</em>elfsame, o <em>S</em>elf-reference of the <em>D</em>ata. Es decir, <code>.SD</code> es en su forma más básica una <em>referencia reflexiva</em> a la <code>data.table</code> en sí misma – como veremos en los ejemplos a continuación, esto es particularmente útil para encadenar “consultas” (extracciones/subconjuntos/etc. usando <code>[</code>). En particular, esto también significa que <code>.SD</code> es <em>en sí mismo una <code>data.table</code></em> (con la salvedad de que no permite la asignación con <code>:=</code>).</p>
+<p>El uso más simple de <code>.SD</code> es para la creación de subconjuntos de columnas (es decir, cuando se especifica <code>.SDcols</code>); como esta versión es mucho más sencilla de entender, la abordaremos primero a continuación. La interpretación de <code>.SD</code> en su segundo uso, los escenarios de agrupación (es decir, cuando se especifica <code>by = </code> o <code>keyby = </code>), es ligeramente diferente, conceptualmente (aunque en esencia es la misma, ya que, después de todo, una operación no agrupada es un caso extremo de agrupación con un solo grupo).</p>
+<h2 id="carga-y-vista-previa-de-datos-de-lahman"><span class="section-number">1.1</span> Carga y vista previa de datos de Lahman</h2>
+<p>Para que esto parezca más real, en lugar de inventar datos, carguemos algunos conjuntos de datos sobre béisbol desde la <a href="https://github.com/cdalzell/Lahman">base de datos Lahman</a>. En el uso típico de R, simplemente cargaríamos estos conjuntos de datos desde el paquete R <code>Lahman</code>; en este ejemplo, los hemos descargado previamente directamente desde la página de GitHub del paquete.</p>
+<pre><code class="language-r">load('Teams.RData')
+setDT(Teams)
+Teams
+#       yearID   lgID teamID franchID  divID  Rank     G Ghome     W     L DivWin  WCWin  LgWin
+#        &lt;int&gt; &lt;fctr&gt; &lt;fctr&gt;   &lt;fctr&gt; &lt;char&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;char&gt; &lt;char&gt; &lt;char&gt;
+#    1:   1871     NA    BS1      BNA   &lt;NA&gt;     3    31    NA    20    10   &lt;NA&gt;   &lt;NA&gt;      N
+#    2:   1871     NA    CH1      CNA   &lt;NA&gt;     2    28    NA    19     9   &lt;NA&gt;   &lt;NA&gt;      N
+#    3:   1871     NA    CL1      CFC   &lt;NA&gt;     8    29    NA    10    19   &lt;NA&gt;   &lt;NA&gt;      N
+#    4:   1871     NA    FW1      KEK   &lt;NA&gt;     7    19    NA     7    12   &lt;NA&gt;   &lt;NA&gt;      N
+#    5:   1871     NA    NY2      NNA   &lt;NA&gt;     5    33    NA    16    17   &lt;NA&gt;   &lt;NA&gt;      N
+#   ---                                                                                        
+# 2891:   2018     NL    SLN      STL      C     3   162    81    88    74      N      N      N
+# 2892:   2018     AL    TBA      TBD      E     3   162    81    90    72      N      N      N
+# 2893:   2018     AL    TEX      TEX      W     5   162    81    67    95      N      N      N
+# 2894:   2018     AL    TOR      TOR      E     4   162    81    73    89      N      N      N
+# 2895:   2018     NL    WAS      WSN      E     2   162    81    82    80      N      N      N
+#        WSWin     R    AB     H   X2B   X3B    HR    BB    SO    SB    CS   HBP    SF    RA    ER
+#       &lt;char&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;num&gt; &lt;int&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt;
+#    1:   &lt;NA&gt;   401  1372   426    70    37     3    60    19    73    16    NA    NA   303   109
+#    2:   &lt;NA&gt;   302  1196   323    52    21    10    60    22    69    21    NA    NA   241    77
+#    3:   &lt;NA&gt;   249  1186   328    35    40     7    26    25    18     8    NA    NA   341   116
+#    4:   &lt;NA&gt;   137   746   178    19     8     2    33     9    16     4    NA    NA   243    97
+#    5:   &lt;NA&gt;   302  1404   403    43    21     1    33    15    46    15    NA    NA   313   121
+#   ---                                                                                           
+# 2891:      N   759  5498  1369   248     9   205   525  1380    63    32    80    48   691   622
+# 2892:      N   716  5475  1415   274    43   150   540  1388   128    51   101    50   646   602
+# 2893:      N   737  5453  1308   266    24   194   555  1484    74    35    88    34   848   783
+# 2894:      N   709  5477  1336   320    16   217   499  1387    47    30    58    37   832   772
+# 2895:      N   771  5517  1402   284    25   191   631  1289   119    33    59    40   682   649
+#         ERA    CG   SHO    SV IPouts    HA   HRA   BBA   SOA     E    DP    FP
+#       &lt;num&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt;  &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;num&gt;
+#    1:  3.55    22     1     3    828   367     2    42    23   243    24 0.834
+#    2:  2.76    25     0     1    753   308     6    28    22   229    16 0.829
+#    3:  4.11    23     0     0    762   346    13    53    34   234    15 0.818
+#    4:  5.17    19     1     0    507   261     5    21    17   163     8 0.803
+#    5:  3.72    32     1     0    879   373     7    42    22   235    14 0.840
+#   ---                                                                         
+# 2891:  3.85     1     8    43   4366  1354   144   593  1337   133   151 0.978
+# 2892:  3.74     0    14    52   4345  1236   164   501  1421    85   136 0.986
+# 2893:  4.92     1     5    42   4293  1516   222   491  1121   120   168 0.980
+# 2894:  4.85     0     3    39   4301  1476   208   551  1298   101   138 0.983
+# 2895:  4.04     2     7    40   4338  1320   198   487  1417    64   115 0.989
+#                          name                          park attendance   BPF   PPF teamIDBR
+#                        &lt;char&gt;                        &lt;char&gt;      &lt;int&gt; &lt;int&gt; &lt;int&gt;   &lt;char&gt;
+#    1:    Boston Red Stockings           South End Grounds I         NA   103    98      BOS
+#    2: Chicago White Stockings       Union Base-Ball Grounds         NA   104   102      CHI
+#    3:  Cleveland Forest Citys  National Association Grounds         NA    96   100      CLE
+#    4:    Fort Wayne Kekiongas                Hamilton Field         NA   101   107      KEK
+#    5:        New York Mutuals      Union Grounds (Brooklyn)         NA    90    88      NYU
+#   ---                                                                                      
+# 2891:     St. Louis Cardinals             Busch Stadium III    3403587    97    96      STL
+# 2892:          Tampa Bay Rays               Tropicana Field    1154973    97    97      TBR
+# 2893:           Texas Rangers Rangers Ballpark in Arlington    2107107   112   113      TEX
+# 2894:       Toronto Blue Jays                 Rogers Centre    2325281    97    98      TOR
+# 2895:    Washington Nationals                Nationals Park    2529604   106   105      WSN
+#       teamIDlahman45 teamIDretro
+#               &lt;char&gt;      &lt;char&gt;
+#    1:            BS1         BS1
+#    2:            CH1         CH1
+#    3:            CL1         CL1
+#    4:            FW1         FW1
+#    5:            NY2         NY2
+#   ---                           
+# 2891:            SLN         SLN
+# 2892:            TBA         TBA
+# 2893:            TEX         TEX
+# 2894:            TOR         TOR
+# 2895:            MON         WAS
+
+load('Pitching.RData')
+setDT(Pitching)
+Pitching
+#         playerID yearID stint teamID   lgID     W     L     G    GS    CG   SHO    SV IPouts     H
+#           &lt;char&gt;  &lt;int&gt; &lt;int&gt; &lt;fctr&gt; &lt;fctr&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt;  &lt;int&gt; &lt;int&gt;
+#     1: bechtge01   1871     1    PH1     NA     1     2     3     3     2     0     0     78    43
+#     2: brainas01   1871     1    WS3     NA    12    15    30    30    30     0     0    792   361
+#     3: fergubo01   1871     1    NY2     NA     0     0     1     0     0     0     0      3     8
+#     4: fishech01   1871     1    RC1     NA     4    16    24    24    22     1     0    639   295
+#     5: fleetfr01   1871     1    NY2     NA     0     1     1     1     1     0     0     27    20
+#    ---                                                                                            
+# 46695: zamorda01   2018     1    NYN     NL     1     0    16     0     0     0     0     27     6
+# 46696: zastrro01   2018     1    CHN     NL     1     0     6     0     0     0     0     17     6
+# 46697: zieglbr01   2018     1    MIA     NL     1     5    53     0     0     0    10    156    49
+# 46698: zieglbr01   2018     2    ARI     NL     1     1    29     0     0     0     0     65    22
+# 46699: zimmejo02   2018     1    DET     AL     7     8    25    25     0     0     0    394   140
+#           ER    HR    BB    SO BAOpp   ERA   IBB    WP   HBP    BK   BFP    GF     R    SH    SF
+#        &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;num&gt; &lt;num&gt; &lt;int&gt; &lt;int&gt; &lt;num&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt;
+#     1:    23     0    11     1    NA  7.96    NA     7    NA     0   146     0    42    NA    NA
+#     2:   132     4    37    13    NA  4.50    NA     7    NA     0  1291     0   292    NA    NA
+#     3:     3     0     0     0    NA 27.00    NA     2    NA     0    14     0     9    NA    NA
+#     4:   103     3    31    15    NA  4.35    NA    20    NA     0  1080     1   257    NA    NA
+#     5:    10     0     3     0    NA 10.00    NA     0    NA     0    57     0    21    NA    NA
+#    ---                                                                                          
+# 46695:     3     1     3    16 0.194  3.00     1     0     1     0    36     4     3     1     0
+# 46696:     3     0     4     3 0.286  4.76     0     0     1     0    26     2     3     0     0
+# 46697:    23     7    17    37 0.254  3.98     4     1     2     0   213    23    25     0     1
+# 46698:     9     1     8    13 0.265  3.74     2     0     0     0    92     1     9     0     1
+# 46699:    66    28    26   111 0.269  4.52     0     1     2     0   556     0    76     2     5
+#         GIDP
+#        &lt;int&gt;
+#     1:    NA
+#     2:    NA
+#     3:    NA
+#     4:    NA
+#     5:    NA
+#    ---      
+# 46695:     1
+# 46696:     0
+# 46697:    11
+# 46698:     3
+# 46699:     4
+</code></pre>
+<p>Los lectores familiarizados con la jerga del béisbol encontrarán familiar el contenido de las tablas: “Equipos” registra algunas estadísticas de un equipo determinado en un año determinado, mientras que “Lanzamientos” registra las estadísticas de un lanzador determinado en un año determinado. Consulte la <a href="https://github.com/cdalzell/Lahman">documentación</a> y explore los datos un poco antes de familiarizarse con su estructura.</p>
+<h1 id="sd-en-datos-no-agrupados"><span class="section-number">2.</span> <code>.SD</code> en datos no agrupados</h1>
+<p>Para ilustrar lo que quiero decir sobre la naturaleza reflexiva de «.SD», consideremos su uso más banal:</p>
+<pre><code class="language-r">Pitching[ , .SD]
+#         playerID yearID stint teamID   lgID     W     L     G    GS    CG   SHO    SV IPouts     H
+#           &lt;char&gt;  &lt;int&gt; &lt;int&gt; &lt;fctr&gt; &lt;fctr&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt;  &lt;int&gt; &lt;int&gt;
+#     1: bechtge01   1871     1    PH1     NA     1     2     3     3     2     0     0     78    43
+#     2: brainas01   1871     1    WS3     NA    12    15    30    30    30     0     0    792   361
+#     3: fergubo01   1871     1    NY2     NA     0     0     1     0     0     0     0      3     8
+#     4: fishech01   1871     1    RC1     NA     4    16    24    24    22     1     0    639   295
+#     5: fleetfr01   1871     1    NY2     NA     0     1     1     1     1     0     0     27    20
+#    ---                                                                                            
+# 46695: zamorda01   2018     1    NYN     NL     1     0    16     0     0     0     0     27     6
+# 46696: zastrro01   2018     1    CHN     NL     1     0     6     0     0     0     0     17     6
+# 46697: zieglbr01   2018     1    MIA     NL     1     5    53     0     0     0    10    156    49
+# 46698: zieglbr01   2018     2    ARI     NL     1     1    29     0     0     0     0     65    22
+# 46699: zimmejo02   2018     1    DET     AL     7     8    25    25     0     0     0    394   140
+#           ER    HR    BB    SO BAOpp   ERA   IBB    WP   HBP    BK   BFP    GF     R    SH    SF
+#        &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;num&gt; &lt;num&gt; &lt;int&gt; &lt;int&gt; &lt;num&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt;
+#     1:    23     0    11     1    NA  7.96    NA     7    NA     0   146     0    42    NA    NA
+#     2:   132     4    37    13    NA  4.50    NA     7    NA     0  1291     0   292    NA    NA
+#     3:     3     0     0     0    NA 27.00    NA     2    NA     0    14     0     9    NA    NA
+#     4:   103     3    31    15    NA  4.35    NA    20    NA     0  1080     1   257    NA    NA
+#     5:    10     0     3     0    NA 10.00    NA     0    NA     0    57     0    21    NA    NA
+#    ---                                                                                          
+# 46695:     3     1     3    16 0.194  3.00     1     0     1     0    36     4     3     1     0
+# 46696:     3     0     4     3 0.286  4.76     0     0     1     0    26     2     3     0     0
+# 46697:    23     7    17    37 0.254  3.98     4     1     2     0   213    23    25     0     1
+# 46698:     9     1     8    13 0.265  3.74     2     0     0     0    92     1     9     0     1
+# 46699:    66    28    26   111 0.269  4.52     0     1     2     0   556     0    76     2     5
+#         GIDP
+#        &lt;int&gt;
+#     1:    NA
+#     2:    NA
+#     3:    NA
+#     4:    NA
+#     5:    NA
+#    ---      
+# 46695:     1
+# 46696:     0
+# 46697:    11
+# 46698:     3
+# 46699:     4
+</code></pre>
+<p>Es decir, <code>Pitching[ , .SD]</code> simplemente ha devuelto la tabla completa, es decir, esta era una forma demasiado verbosa de escribir <code>Pitching</code> o <code>Pitching[]</code>:</p>
+<pre><code class="language-r">identical(Pitching, Pitching[ , .SD])
+# [1] TRUE
+</code></pre>
+<p>En términos de subconjuntos, <code>.SD</code> sigue siendo un subconjunto de los datos, sólo que es trivial (el conjunto en sí).</p>
+<h2 id="subconjunto-de-columna-sdcols"><span class="section-number">2.1</span> Subconjunto de columna: <code>.SDcols</code></h2>
+<p>La primera forma de influir en lo que es <code>.SD</code> es limitar las <em>columnas</em> contenidas en <code>.SD</code> usando el argumento <code>.SDcols</code> a <code>[</code>:</p>
+<pre><code class="language-r"># W: Wins; L: Losses; G: Games
+Pitching[ , .SD, .SDcols = c('W', 'L', 'G')]
+#            W     L     G
+#        &lt;int&gt; &lt;int&gt; &lt;int&gt;
+#     1:     1     2     3
+#     2:    12    15    30
+#     3:     0     0     1
+#     4:     4    16    24
+#     5:     0     1     1
+#    ---                  
+# 46695:     1     0    16
+# 46696:     1     0     6
+# 46697:     1     5    53
+# 46698:     1     1    29
+# 46699:     7     8    25
+</code></pre>
+<p>Esto es solo para ilustrar y fue bastante aburrido. Además de aceptar un vector de caracteres, <code>.SDcols</code> también acepta:</p>
+<ol>
+<li>cualquier función como <code>is.character</code> para filtrar <em>columnas</em></li>
+<li>la función^{*} <code>patterns()</code> para filtrar <em>nombres de columnas</em> mediante expresiones regulares</li>
+<li>vectores enteros y lógicos</li>
+</ol>
+<p>*ver <code>?patrones</code> para más detalles</p>
+<p>Este uso simple se presta a una amplia variedad de operaciones de manipulación de datos altamente beneficiosas y omnipresentes:</p>
+<h2 id="conversi-n-de-tipo-de-columna"><span class="section-number">2.2</span> Conversión de tipo de columna</h2>
+<p>La conversión de tipos de columnas es una realidad en la manipulación de datos. Aunque <a href="https://github.com/Rdatatable/data.table/pull/2545"><code>fwrite</code> recientemente obtuvo la capacidad de declarar la clase de cada columna por adelantado</a>, no todos los conjuntos de datos provienen de <code>fread</code> (por ejemplo, en esta viñeta) y las conversiones entre tipos <code>character</code>/<code>factor</code>/<code>numeric</code> son comunes. Podemos usar <code>.SD</code> y <code>.SDcols</code> para convertir por lotes grupos de columnas a un tipo común.</p>
+<p>Observamos que las siguientes columnas se almacenan como “carácter” en el conjunto de datos “Equipos”, pero sería más lógico almacenarlas como “factor”:</p>
+<pre><code class="language-r"># teamIDBR: Team ID used by Baseball Reference website
+# teamIDlahman45: Team ID used in Lahman database version 4.5
+# teamIDretro: Team ID used by Retrosheet
+fkt = c('teamIDBR', 'teamIDlahman45', 'teamIDretro')
+# confirm that they're stored as `character`
+str(Teams[ , ..fkt])
+# Classes 'data.table' and 'data.frame':	2895 obs. of  3 variables:
+#  $ teamIDBR      : chr  &quot;BOS&quot; &quot;CHI&quot; &quot;CLE&quot; &quot;KEK&quot; ...
+#  $ teamIDlahman45: chr  &quot;BS1&quot; &quot;CH1&quot; &quot;CL1&quot; &quot;FW1&quot; ...
+#  $ teamIDretro   : chr  &quot;BS1&quot; &quot;CH1&quot; &quot;CL1&quot; &quot;FW1&quot; ...
+#  - attr(*, &quot;.internal.selfref&quot;)=&lt;externalptr&gt;
+</code></pre>
+<p>La sintaxis para convertir ahora estas columnas a “factor” es sencilla:</p>
+<pre><code class="language-r">Teams[ , names(.SD) := lapply(.SD, factor), .SDcols = patterns('teamID')]
+#       yearID   lgID teamID franchID  divID  Rank     G Ghome     W     L DivWin  WCWin  LgWin
+#        &lt;int&gt; &lt;fctr&gt; &lt;fctr&gt;   &lt;fctr&gt; &lt;char&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;char&gt; &lt;char&gt; &lt;char&gt;
+#    1:   1871     NA    BS1      BNA   &lt;NA&gt;     3    31    NA    20    10   &lt;NA&gt;   &lt;NA&gt;      N
+#    2:   1871     NA    CH1      CNA   &lt;NA&gt;     2    28    NA    19     9   &lt;NA&gt;   &lt;NA&gt;      N
+#    3:   1871     NA    CL1      CFC   &lt;NA&gt;     8    29    NA    10    19   &lt;NA&gt;   &lt;NA&gt;      N
+#    4:   1871     NA    FW1      KEK   &lt;NA&gt;     7    19    NA     7    12   &lt;NA&gt;   &lt;NA&gt;      N
+#    5:   1871     NA    NY2      NNA   &lt;NA&gt;     5    33    NA    16    17   &lt;NA&gt;   &lt;NA&gt;      N
+#   ---                                                                                        
+# 2891:   2018     NL    SLN      STL      C     3   162    81    88    74      N      N      N
+# 2892:   2018     AL    TBA      TBD      E     3   162    81    90    72      N      N      N
+# 2893:   2018     AL    TEX      TEX      W     5   162    81    67    95      N      N      N
+# 2894:   2018     AL    TOR      TOR      E     4   162    81    73    89      N      N      N
+# 2895:   2018     NL    WAS      WSN      E     2   162    81    82    80      N      N      N
+#        WSWin     R    AB     H   X2B   X3B    HR    BB    SO    SB    CS   HBP    SF    RA    ER
+#       &lt;char&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;num&gt; &lt;int&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt;
+#    1:   &lt;NA&gt;   401  1372   426    70    37     3    60    19    73    16    NA    NA   303   109
+#    2:   &lt;NA&gt;   302  1196   323    52    21    10    60    22    69    21    NA    NA   241    77
+#    3:   &lt;NA&gt;   249  1186   328    35    40     7    26    25    18     8    NA    NA   341   116
+#    4:   &lt;NA&gt;   137   746   178    19     8     2    33     9    16     4    NA    NA   243    97
+#    5:   &lt;NA&gt;   302  1404   403    43    21     1    33    15    46    15    NA    NA   313   121
+#   ---                                                                                           
+# 2891:      N   759  5498  1369   248     9   205   525  1380    63    32    80    48   691   622
+# 2892:      N   716  5475  1415   274    43   150   540  1388   128    51   101    50   646   602
+# 2893:      N   737  5453  1308   266    24   194   555  1484    74    35    88    34   848   783
+# 2894:      N   709  5477  1336   320    16   217   499  1387    47    30    58    37   832   772
+# 2895:      N   771  5517  1402   284    25   191   631  1289   119    33    59    40   682   649
+#         ERA    CG   SHO    SV IPouts    HA   HRA   BBA   SOA     E    DP    FP
+#       &lt;num&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt;  &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;num&gt;
+#    1:  3.55    22     1     3    828   367     2    42    23   243    24 0.834
+#    2:  2.76    25     0     1    753   308     6    28    22   229    16 0.829
+#    3:  4.11    23     0     0    762   346    13    53    34   234    15 0.818
+#    4:  5.17    19     1     0    507   261     5    21    17   163     8 0.803
+#    5:  3.72    32     1     0    879   373     7    42    22   235    14 0.840
+#   ---                                                                         
+# 2891:  3.85     1     8    43   4366  1354   144   593  1337   133   151 0.978
+# 2892:  3.74     0    14    52   4345  1236   164   501  1421    85   136 0.986
+# 2893:  4.92     1     5    42   4293  1516   222   491  1121   120   168 0.980
+# 2894:  4.85     0     3    39   4301  1476   208   551  1298   101   138 0.983
+# 2895:  4.04     2     7    40   4338  1320   198   487  1417    64   115 0.989
+#                          name                          park attendance   BPF   PPF teamIDBR
+#                        &lt;char&gt;                        &lt;char&gt;      &lt;int&gt; &lt;int&gt; &lt;int&gt;   &lt;fctr&gt;
+#    1:    Boston Red Stockings           South End Grounds I         NA   103    98      BOS
+#    2: Chicago White Stockings       Union Base-Ball Grounds         NA   104   102      CHI
+#    3:  Cleveland Forest Citys  National Association Grounds         NA    96   100      CLE
+#    4:    Fort Wayne Kekiongas                Hamilton Field         NA   101   107      KEK
+#    5:        New York Mutuals      Union Grounds (Brooklyn)         NA    90    88      NYU
+#   ---                                                                                      
+# 2891:     St. Louis Cardinals             Busch Stadium III    3403587    97    96      STL
+# 2892:          Tampa Bay Rays               Tropicana Field    1154973    97    97      TBR
+# 2893:           Texas Rangers Rangers Ballpark in Arlington    2107107   112   113      TEX
+# 2894:       Toronto Blue Jays                 Rogers Centre    2325281    97    98      TOR
+# 2895:    Washington Nationals                Nationals Park    2529604   106   105      WSN
+#       teamIDlahman45 teamIDretro
+#               &lt;fctr&gt;      &lt;fctr&gt;
+#    1:            BS1         BS1
+#    2:            CH1         CH1
+#    3:            CL1         CL1
+#    4:            FW1         FW1
+#    5:            NY2         NY2
+#   ---                           
+# 2891:            SLN         SLN
+# 2892:            TBA         TBA
+# 2893:            TEX         TEX
+# 2894:            TOR         TOR
+# 2895:            MON         WAS
+# print out the first column to demonstrate success
+head(unique(Teams[[fkt[1L]]]))
+# [1] BOS CHI CLE KEK NYU ATH
+# 101 Levels: ALT ANA ARI ATH ATL BAL BLA BLN BLU BOS BRA BRG BRO BSN BTT BUF BWW CAL CEN CHC ... WSN
+</code></pre>
+<p>Nota:</p>
+<ol>
+<li><code>:=</code> es un operador de asignación para actualizar la <code>data.table</code> en su lugar sin hacer una copia. Consulte <a href="https://cran.r-project.org/package=data.table/vignettes/datatable-reference-semantics.html">semántica de referencia</a> para obtener más información.</li>
+<li>El LHS, <code>names(.SD)</code>, indica qué columnas estamos actualizando; en este caso, actualizamos todo el <code>.SD</code>.</li>
+<li>El RHS, <code>lapply()</code>, recorre cada columna del <code>.SD</code> y convierte la columna en un factor.</li>
+<li>Usamos <code>.SDcols</code> para seleccionar solo columnas que tengan el patrón <code>teamID</code>.</li>
+</ol>
+<p>Nuevamente, el argumento <code>.SDcols</code> es bastante flexible; anteriormente, proporcionamos <code>patrones</code> pero también podríamos haber proporcionado <code>fkt</code> o cualquier vector <code>carácter</code> de nombres de columnas. En otras situaciones, es más conveniente proporcionar un vector <code>entero</code> de posiciones de columnas o un vector <code>lógico</code> que indique la inclusión/exclusión de cada columna. Finalmente, el uso de una función para filtrar columnas es muy útil.</p>
+<p>Por ejemplo, podríamos hacer lo siguiente para convertir todas las columnas de tipo «factor» a «carácter»:</p>
+<pre><code class="language-r">fct_idx = Teams[, which(sapply(.SD, is.factor))] # column numbers to show the class changing
+str(Teams[[fct_idx[1L]]])
+#  Factor w/ 7 levels &quot;AA&quot;,&quot;AL&quot;,&quot;FL&quot;,..: 4 4 4 4 4 4 4 4 4 4 ...
+Teams[ , names(.SD) := lapply(.SD, as.character), .SDcols = is.factor]
+#       yearID   lgID teamID franchID  divID  Rank     G Ghome     W     L DivWin  WCWin  LgWin
+#        &lt;int&gt; &lt;char&gt; &lt;char&gt;   &lt;char&gt; &lt;char&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;char&gt; &lt;char&gt; &lt;char&gt;
+#    1:   1871     NA    BS1      BNA   &lt;NA&gt;     3    31    NA    20    10   &lt;NA&gt;   &lt;NA&gt;      N
+#    2:   1871     NA    CH1      CNA   &lt;NA&gt;     2    28    NA    19     9   &lt;NA&gt;   &lt;NA&gt;      N
+#    3:   1871     NA    CL1      CFC   &lt;NA&gt;     8    29    NA    10    19   &lt;NA&gt;   &lt;NA&gt;      N
+#    4:   1871     NA    FW1      KEK   &lt;NA&gt;     7    19    NA     7    12   &lt;NA&gt;   &lt;NA&gt;      N
+#    5:   1871     NA    NY2      NNA   &lt;NA&gt;     5    33    NA    16    17   &lt;NA&gt;   &lt;NA&gt;      N
+#   ---                                                                                        
+# 2891:   2018     NL    SLN      STL      C     3   162    81    88    74      N      N      N
+# 2892:   2018     AL    TBA      TBD      E     3   162    81    90    72      N      N      N
+# 2893:   2018     AL    TEX      TEX      W     5   162    81    67    95      N      N      N
+# 2894:   2018     AL    TOR      TOR      E     4   162    81    73    89      N      N      N
+# 2895:   2018     NL    WAS      WSN      E     2   162    81    82    80      N      N      N
+#        WSWin     R    AB     H   X2B   X3B    HR    BB    SO    SB    CS   HBP    SF    RA    ER
+#       &lt;char&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;num&gt; &lt;int&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt;
+#    1:   &lt;NA&gt;   401  1372   426    70    37     3    60    19    73    16    NA    NA   303   109
+#    2:   &lt;NA&gt;   302  1196   323    52    21    10    60    22    69    21    NA    NA   241    77
+#    3:   &lt;NA&gt;   249  1186   328    35    40     7    26    25    18     8    NA    NA   341   116
+#    4:   &lt;NA&gt;   137   746   178    19     8     2    33     9    16     4    NA    NA   243    97
+#    5:   &lt;NA&gt;   302  1404   403    43    21     1    33    15    46    15    NA    NA   313   121
+#   ---                                                                                           
+# 2891:      N   759  5498  1369   248     9   205   525  1380    63    32    80    48   691   622
+# 2892:      N   716  5475  1415   274    43   150   540  1388   128    51   101    50   646   602
+# 2893:      N   737  5453  1308   266    24   194   555  1484    74    35    88    34   848   783
+# 2894:      N   709  5477  1336   320    16   217   499  1387    47    30    58    37   832   772
+# 2895:      N   771  5517  1402   284    25   191   631  1289   119    33    59    40   682   649
+#         ERA    CG   SHO    SV IPouts    HA   HRA   BBA   SOA     E    DP    FP
+#       &lt;num&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt;  &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;num&gt;
+#    1:  3.55    22     1     3    828   367     2    42    23   243    24 0.834
+#    2:  2.76    25     0     1    753   308     6    28    22   229    16 0.829
+#    3:  4.11    23     0     0    762   346    13    53    34   234    15 0.818
+#    4:  5.17    19     1     0    507   261     5    21    17   163     8 0.803
+#    5:  3.72    32     1     0    879   373     7    42    22   235    14 0.840
+#   ---                                                                         
+# 2891:  3.85     1     8    43   4366  1354   144   593  1337   133   151 0.978
+# 2892:  3.74     0    14    52   4345  1236   164   501  1421    85   136 0.986
+# 2893:  4.92     1     5    42   4293  1516   222   491  1121   120   168 0.980
+# 2894:  4.85     0     3    39   4301  1476   208   551  1298   101   138 0.983
+# 2895:  4.04     2     7    40   4338  1320   198   487  1417    64   115 0.989
+#                          name                          park attendance   BPF   PPF teamIDBR
+#                        &lt;char&gt;                        &lt;char&gt;      &lt;int&gt; &lt;int&gt; &lt;int&gt;   &lt;char&gt;
+#    1:    Boston Red Stockings           South End Grounds I         NA   103    98      BOS
+#    2: Chicago White Stockings       Union Base-Ball Grounds         NA   104   102      CHI
+#    3:  Cleveland Forest Citys  National Association Grounds         NA    96   100      CLE
+#    4:    Fort Wayne Kekiongas                Hamilton Field         NA   101   107      KEK
+#    5:        New York Mutuals      Union Grounds (Brooklyn)         NA    90    88      NYU
+#   ---                                                                                      
+# 2891:     St. Louis Cardinals             Busch Stadium III    3403587    97    96      STL
+# 2892:          Tampa Bay Rays               Tropicana Field    1154973    97    97      TBR
+# 2893:           Texas Rangers Rangers Ballpark in Arlington    2107107   112   113      TEX
+# 2894:       Toronto Blue Jays                 Rogers Centre    2325281    97    98      TOR
+# 2895:    Washington Nationals                Nationals Park    2529604   106   105      WSN
+#       teamIDlahman45 teamIDretro
+#               &lt;char&gt;      &lt;char&gt;
+#    1:            BS1         BS1
+#    2:            CH1         CH1
+#    3:            CL1         CL1
+#    4:            FW1         FW1
+#    5:            NY2         NY2
+#   ---                           
+# 2891:            SLN         SLN
+# 2892:            TBA         TBA
+# 2893:            TEX         TEX
+# 2894:            TOR         TOR
+# 2895:            MON         WAS
+str(Teams[[fct_idx[1L]]])
+#  chr [1:2895] &quot;NA&quot; &quot;NA&quot; &quot;NA&quot; &quot;NA&quot; &quot;NA&quot; &quot;NA&quot; &quot;NA&quot; &quot;NA&quot; &quot;NA&quot; &quot;NA&quot; &quot;NA&quot; &quot;NA&quot; &quot;NA&quot; &quot;NA&quot; &quot;NA&quot; &quot;NA&quot; ...
+</code></pre>
+<p>Por último, podemos hacer una coincidencia basada en patrones de columnas en <code>.SDcols</code> para seleccionar todas las columnas que contienen <code>team</code> hasta <code>factor</code>:</p>
+<pre><code class="language-r">Teams[ , .SD, .SDcols = patterns('team')]
+#       teamID teamIDBR teamIDlahman45 teamIDretro
+#       &lt;char&gt;   &lt;char&gt;         &lt;char&gt;      &lt;char&gt;
+#    1:    BS1      BOS            BS1         BS1
+#    2:    CH1      CHI            CH1         CH1
+#    3:    CL1      CLE            CL1         CL1
+#    4:    FW1      KEK            FW1         FW1
+#    5:    NY2      NYU            NY2         NY2
+#   ---                                           
+# 2891:    SLN      STL            SLN         SLN
+# 2892:    TBA      TBR            TBA         TBA
+# 2893:    TEX      TEX            TEX         TEX
+# 2894:    TOR      TOR            TOR         TOR
+# 2895:    WAS      WSN            MON         WAS
+Teams[ , names(.SD) := lapply(.SD, factor), .SDcols = patterns('team')]
+#       yearID   lgID teamID franchID  divID  Rank     G Ghome     W     L DivWin  WCWin  LgWin
+#        &lt;int&gt; &lt;char&gt; &lt;fctr&gt;   &lt;char&gt; &lt;char&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;char&gt; &lt;char&gt; &lt;char&gt;
+#    1:   1871     NA    BS1      BNA   &lt;NA&gt;     3    31    NA    20    10   &lt;NA&gt;   &lt;NA&gt;      N
+#    2:   1871     NA    CH1      CNA   &lt;NA&gt;     2    28    NA    19     9   &lt;NA&gt;   &lt;NA&gt;      N
+#    3:   1871     NA    CL1      CFC   &lt;NA&gt;     8    29    NA    10    19   &lt;NA&gt;   &lt;NA&gt;      N
+#    4:   1871     NA    FW1      KEK   &lt;NA&gt;     7    19    NA     7    12   &lt;NA&gt;   &lt;NA&gt;      N
+#    5:   1871     NA    NY2      NNA   &lt;NA&gt;     5    33    NA    16    17   &lt;NA&gt;   &lt;NA&gt;      N
+#   ---                                                                                        
+# 2891:   2018     NL    SLN      STL      C     3   162    81    88    74      N      N      N
+# 2892:   2018     AL    TBA      TBD      E     3   162    81    90    72      N      N      N
+# 2893:   2018     AL    TEX      TEX      W     5   162    81    67    95      N      N      N
+# 2894:   2018     AL    TOR      TOR      E     4   162    81    73    89      N      N      N
+# 2895:   2018     NL    WAS      WSN      E     2   162    81    82    80      N      N      N
+#        WSWin     R    AB     H   X2B   X3B    HR    BB    SO    SB    CS   HBP    SF    RA    ER
+#       &lt;char&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;num&gt; &lt;int&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt;
+#    1:   &lt;NA&gt;   401  1372   426    70    37     3    60    19    73    16    NA    NA   303   109
+#    2:   &lt;NA&gt;   302  1196   323    52    21    10    60    22    69    21    NA    NA   241    77
+#    3:   &lt;NA&gt;   249  1186   328    35    40     7    26    25    18     8    NA    NA   341   116
+#    4:   &lt;NA&gt;   137   746   178    19     8     2    33     9    16     4    NA    NA   243    97
+#    5:   &lt;NA&gt;   302  1404   403    43    21     1    33    15    46    15    NA    NA   313   121
+#   ---                                                                                           
+# 2891:      N   759  5498  1369   248     9   205   525  1380    63    32    80    48   691   622
+# 2892:      N   716  5475  1415   274    43   150   540  1388   128    51   101    50   646   602
+# 2893:      N   737  5453  1308   266    24   194   555  1484    74    35    88    34   848   783
+# 2894:      N   709  5477  1336   320    16   217   499  1387    47    30    58    37   832   772
+# 2895:      N   771  5517  1402   284    25   191   631  1289   119    33    59    40   682   649
+#         ERA    CG   SHO    SV IPouts    HA   HRA   BBA   SOA     E    DP    FP
+#       &lt;num&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt;  &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;num&gt;
+#    1:  3.55    22     1     3    828   367     2    42    23   243    24 0.834
+#    2:  2.76    25     0     1    753   308     6    28    22   229    16 0.829
+#    3:  4.11    23     0     0    762   346    13    53    34   234    15 0.818
+#    4:  5.17    19     1     0    507   261     5    21    17   163     8 0.803
+#    5:  3.72    32     1     0    879   373     7    42    22   235    14 0.840
+#   ---                                                                         
+# 2891:  3.85     1     8    43   4366  1354   144   593  1337   133   151 0.978
+# 2892:  3.74     0    14    52   4345  1236   164   501  1421    85   136 0.986
+# 2893:  4.92     1     5    42   4293  1516   222   491  1121   120   168 0.980
+# 2894:  4.85     0     3    39   4301  1476   208   551  1298   101   138 0.983
+# 2895:  4.04     2     7    40   4338  1320   198   487  1417    64   115 0.989
+#                          name                          park attendance   BPF   PPF teamIDBR
+#                        &lt;char&gt;                        &lt;char&gt;      &lt;int&gt; &lt;int&gt; &lt;int&gt;   &lt;fctr&gt;
+#    1:    Boston Red Stockings           South End Grounds I         NA   103    98      BOS
+#    2: Chicago White Stockings       Union Base-Ball Grounds         NA   104   102      CHI
+#    3:  Cleveland Forest Citys  National Association Grounds         NA    96   100      CLE
+#    4:    Fort Wayne Kekiongas                Hamilton Field         NA   101   107      KEK
+#    5:        New York Mutuals      Union Grounds (Brooklyn)         NA    90    88      NYU
+#   ---                                                                                      
+# 2891:     St. Louis Cardinals             Busch Stadium III    3403587    97    96      STL
+# 2892:          Tampa Bay Rays               Tropicana Field    1154973    97    97      TBR
+# 2893:           Texas Rangers Rangers Ballpark in Arlington    2107107   112   113      TEX
+# 2894:       Toronto Blue Jays                 Rogers Centre    2325281    97    98      TOR
+# 2895:    Washington Nationals                Nationals Park    2529604   106   105      WSN
+#       teamIDlahman45 teamIDretro
+#               &lt;fctr&gt;      &lt;fctr&gt;
+#    1:            BS1         BS1
+#    2:            CH1         CH1
+#    3:            CL1         CL1
+#    4:            FW1         FW1
+#    5:            NY2         NY2
+#   ---                           
+# 2891:            SLN         SLN
+# 2892:            TBA         TBA
+# 2893:            TEX         TEX
+# 2894:            TOR         TOR
+# 2895:            MON         WAS
+</code></pre>
+<p>** Una salvedad a lo anterior: usar números de columna <em>explícitamente</em> (como <code>DT[ , (1) := rnorm(.N)]</code>) es una mala práctica y puede provocar que el código se corrompa de forma silenciosa con el tiempo si cambian las posiciones de las columnas. Incluso el uso implícito de números puede ser peligroso si no mantenemos un control inteligente/estricto sobre el orden en que creamos el índice numerado y cuándo lo usamos.</p>
+<h2 id="controlar-el-lado-derecho-de-un-modelo"><span class="section-number">2.3</span> Controlar el lado derecho de un modelo</h2>
+<p>La variación de la especificación del modelo es una característica fundamental del análisis estadístico sólido. Intentemos predecir la efectividad (promedio de carreras limpias, una medida del rendimiento) de un lanzador utilizando el pequeño conjunto de covariables disponibles en la tabla “Lanzamiento”. ¿Cómo varía la relación (lineal) entre “W” (victorias) y “ERA” según qué otras covariables se incluyan en la especificación?</p>
+<p>A continuación se muestra un breve script que aprovecha el poder de <code>.SD</code> y que explora esta pregunta:</p>
+<pre><code class="language-r"># this generates a list of the 2^k possible extra variables
+#   for models of the form ERA ~ G + (...)
+extra_var = c('yearID', 'teamID', 'G', 'L')
+models = unlist(
+  lapply(0L:length(extra_var), combn, x = extra_var, simplify = FALSE),
+  recursive = FALSE
+)
+
+# here are 16 visually distinct colors, taken from the list of 20 here:
+#   https://sashat.me/2017/01/11/list-of-20-simple-distinct-colors/
+col16 = c('#e6194b', '#3cb44b', '#ffe119', '#0082c8',
+          '#f58231', '#911eb4', '#46f0f0', '#f032e6',
+          '#d2f53c', '#fabebe', '#008080', '#e6beff',
+          '#aa6e28', '#fffac8', '#800000', '#aaffc3')
+
+par(oma = c(2, 0, 0, 0))
+lm_coef = sapply(models, function(rhs) {
+  # using ERA ~ . and data = .SD, then varying which
+  #   columns are included in .SD allows us to perform this
+  #   iteration over 16 models succinctly.
+  #   coef(.)['W'] extracts the W coefficient from each model fit
+  Pitching[ , coef(lm(ERA ~ ., data = .SD))['W'], .SDcols = c('W', rhs)]
+})
+barplot(lm_coef, names.arg = sapply(models, paste, collapse = '/'),
+        main = 'Wins Coefficient\nWith Various Covariates',
+        col = col16, las = 2L, cex.names = 0.8)
+</code></pre>
+<div class="figure">
+<img src="data:image/png;base64,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" alt="Fit OLS coefficient on W, various specifications, depicted as bars with distinct colors." width="100%" />
+<p class="caption">Fit OLS coefficient on W, various specifications, depicted as bars with distinct colors.</p>
+</div>
+<p>El coeficiente siempre tiene el signo esperado (los mejores lanzadores tienden a tener más victorias y menos carreras permitidas), pero la magnitud puede variar sustancialmente dependiendo de qué más controlemos.</p>
+<h2 id="uniones-condicionales"><span class="section-number">2.4</span> Uniones condicionales</h2>
+<p>La sintaxis de <code>data.table</code> es hermosa por su simplicidad y robustez. La sintaxis <code>x[i]</code> maneja de manera flexible tres enfoques comunes para la creación de subconjuntos: cuando <code>i</code> es un vector <code>lógico</code>, <code>x[i]</code> devolverá aquellas filas de <code>x</code> correspondientes a donde <code>i</code> es <code>VERDADERO</code>; cuando <code>i</code> es <em>otra <code>data.table</code></em> (o una <code>lista</code>), se realiza una <code>unión</code> (derecha) (en la forma simple, utilizando las <code>key</code>s de <code>x</code> e <code>i</code>, de lo contrario, cuando se especifica <code>on = </code>, utilizando las coincidencias de esas columnas); y cuando <code>i</code> es un carácter, se interpreta como una abreviatura de <code>x[list(i)]</code>, es decir, como una unión.</p>
+<p>Esto es excelente en general, pero se queda corto cuando deseamos realizar una <em>unión condicional</em>, en donde la naturaleza exacta de la relación entre tablas depende de algunas características de las filas en una o más columnas.</p>
+<p>Este ejemplo es ciertamente un poco artificial, pero ilustra la idea; véase aquí (<a href="https://stackoverflow.com/questions/31329939/conditional-keyed-join-update-and-update-a-flag-column-for-matches">1</a>, <a href="https://stackoverflow.com/questions/29658627/conditional-binary-join-and-update-by-reference-using-the-data-table-package">2</a>) para más información.</p>
+<p>El objetivo es agregar una columna <code>team_performance</code> a la tabla <code>Pitching</code> que registre el desempeño (rango) del mejor lanzador de cada equipo (medido por la ERA más baja, entre los lanzadores con al menos 6 juegos registrados).</p>
+<pre><code class="language-r"># to exclude pitchers with exceptional performance in a few games,
+#   subset first; then define rank of pitchers within their team each year
+#   (in general, we should put more care into the 'ties.method' of frank)
+Pitching[G &gt; 5, rank_in_team := frank(ERA), by = .(teamID, yearID)]
+#         playerID yearID stint teamID   lgID     W     L     G    GS    CG   SHO    SV IPouts     H
+#           &lt;char&gt;  &lt;int&gt; &lt;int&gt; &lt;fctr&gt; &lt;fctr&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt;  &lt;int&gt; &lt;int&gt;
+#     1: bechtge01   1871     1    PH1     NA     1     2     3     3     2     0     0     78    43
+#     2: brainas01   1871     1    WS3     NA    12    15    30    30    30     0     0    792   361
+#     3: fergubo01   1871     1    NY2     NA     0     0     1     0     0     0     0      3     8
+#     4: fishech01   1871     1    RC1     NA     4    16    24    24    22     1     0    639   295
+#     5: fleetfr01   1871     1    NY2     NA     0     1     1     1     1     0     0     27    20
+#    ---                                                                                            
+# 46695: zamorda01   2018     1    NYN     NL     1     0    16     0     0     0     0     27     6
+# 46696: zastrro01   2018     1    CHN     NL     1     0     6     0     0     0     0     17     6
+# 46697: zieglbr01   2018     1    MIA     NL     1     5    53     0     0     0    10    156    49
+# 46698: zieglbr01   2018     2    ARI     NL     1     1    29     0     0     0     0     65    22
+# 46699: zimmejo02   2018     1    DET     AL     7     8    25    25     0     0     0    394   140
+#           ER    HR    BB    SO BAOpp   ERA   IBB    WP   HBP    BK   BFP    GF     R    SH    SF
+#        &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;num&gt; &lt;num&gt; &lt;int&gt; &lt;int&gt; &lt;num&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt;
+#     1:    23     0    11     1    NA  7.96    NA     7    NA     0   146     0    42    NA    NA
+#     2:   132     4    37    13    NA  4.50    NA     7    NA     0  1291     0   292    NA    NA
+#     3:     3     0     0     0    NA 27.00    NA     2    NA     0    14     0     9    NA    NA
+#     4:   103     3    31    15    NA  4.35    NA    20    NA     0  1080     1   257    NA    NA
+#     5:    10     0     3     0    NA 10.00    NA     0    NA     0    57     0    21    NA    NA
+#    ---                                                                                          
+# 46695:     3     1     3    16 0.194  3.00     1     0     1     0    36     4     3     1     0
+# 46696:     3     0     4     3 0.286  4.76     0     0     1     0    26     2     3     0     0
+# 46697:    23     7    17    37 0.254  3.98     4     1     2     0   213    23    25     0     1
+# 46698:     9     1     8    13 0.265  3.74     2     0     0     0    92     1     9     0     1
+# 46699:    66    28    26   111 0.269  4.52     0     1     2     0   556     0    76     2     5
+#         GIDP rank_in_team
+#        &lt;int&gt;        &lt;num&gt;
+#     1:    NA           NA
+#     2:    NA          1.0
+#     3:    NA           NA
+#     4:    NA          1.0
+#     5:    NA           NA
+#    ---                   
+# 46695:     1          4.0
+# 46696:     0         21.0
+# 46697:    11          4.5
+# 46698:     3         11.0
+# 46699:     4         10.0
+Pitching[rank_in_team == 1, team_performance :=
+           Teams[.SD, Rank, on = c('teamID', 'yearID')]]
+# Índice: &lt;rank_in_team&gt;
+#         playerID yearID stint teamID   lgID     W     L     G    GS    CG   SHO    SV IPouts     H
+#           &lt;char&gt;  &lt;int&gt; &lt;int&gt; &lt;fctr&gt; &lt;fctr&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt;  &lt;int&gt; &lt;int&gt;
+#     1: bechtge01   1871     1    PH1     NA     1     2     3     3     2     0     0     78    43
+#     2: brainas01   1871     1    WS3     NA    12    15    30    30    30     0     0    792   361
+#     3: fergubo01   1871     1    NY2     NA     0     0     1     0     0     0     0      3     8
+#     4: fishech01   1871     1    RC1     NA     4    16    24    24    22     1     0    639   295
+#     5: fleetfr01   1871     1    NY2     NA     0     1     1     1     1     0     0     27    20
+#    ---                                                                                            
+# 46695: zamorda01   2018     1    NYN     NL     1     0    16     0     0     0     0     27     6
+# 46696: zastrro01   2018     1    CHN     NL     1     0     6     0     0     0     0     17     6
+# 46697: zieglbr01   2018     1    MIA     NL     1     5    53     0     0     0    10    156    49
+# 46698: zieglbr01   2018     2    ARI     NL     1     1    29     0     0     0     0     65    22
+# 46699: zimmejo02   2018     1    DET     AL     7     8    25    25     0     0     0    394   140
+#           ER    HR    BB    SO BAOpp   ERA   IBB    WP   HBP    BK   BFP    GF     R    SH    SF
+#        &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;num&gt; &lt;num&gt; &lt;int&gt; &lt;int&gt; &lt;num&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt;
+#     1:    23     0    11     1    NA  7.96    NA     7    NA     0   146     0    42    NA    NA
+#     2:   132     4    37    13    NA  4.50    NA     7    NA     0  1291     0   292    NA    NA
+#     3:     3     0     0     0    NA 27.00    NA     2    NA     0    14     0     9    NA    NA
+#     4:   103     3    31    15    NA  4.35    NA    20    NA     0  1080     1   257    NA    NA
+#     5:    10     0     3     0    NA 10.00    NA     0    NA     0    57     0    21    NA    NA
+#    ---                                                                                          
+# 46695:     3     1     3    16 0.194  3.00     1     0     1     0    36     4     3     1     0
+# 46696:     3     0     4     3 0.286  4.76     0     0     1     0    26     2     3     0     0
+# 46697:    23     7    17    37 0.254  3.98     4     1     2     0   213    23    25     0     1
+# 46698:     9     1     8    13 0.265  3.74     2     0     0     0    92     1     9     0     1
+# 46699:    66    28    26   111 0.269  4.52     0     1     2     0   556     0    76     2     5
+#         GIDP rank_in_team team_performance
+#        &lt;int&gt;        &lt;num&gt;            &lt;int&gt;
+#     1:    NA           NA               NA
+#     2:    NA          1.0                4
+#     3:    NA           NA               NA
+#     4:    NA          1.0                9
+#     5:    NA           NA               NA
+#    ---                                    
+# 46695:     1          4.0               NA
+# 46696:     0         21.0               NA
+# 46697:    11          4.5               NA
+# 46698:     3         11.0               NA
+# 46699:     4         10.0               NA
+</code></pre>
+<p>Tenga en cuenta que la sintaxis <code>x[y]</code> devuelve valores <code>nrow(y)</code> (es decir, es una unión derecha), por lo que <code>.SD</code> está a la derecha en <code>Teams[.SD]</code> (ya que el RHS de <code>:=</code> en este caso requiere valores <code>nrow(Pitching[rank_in_team == 1])</code>).</p>
+<h1 id="operaciones-agrupadas-sd"><span class="section-number">3.</span> Operaciones agrupadas <code>.SD</code></h1>
+<p>A menudo, nos gustaría realizar alguna operación en nuestros datos <em>a nivel de grupo</em>. Cuando especificamos <code>by =</code> (o <code>keyby = </code>), el modelo mental de lo que sucede cuando <code>data.table</code> procesa <code>j</code> es pensar en su <code>data.table</code> como si estuviera dividida en muchos sub-<code>data.table</code> componentes, cada uno de los cuales corresponde a un único valor de su(s) variable(s) <code>by</code>:</p>
+<p><img src="data:image/png;base64,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" alt="Agrupamiento, ilustrado" /></p>
+<!-- 'A visual depiction of how grouping works. On the left is a grid. The first column is titled "ID COLUMN" with values the capital letters A through G, and the rest of the data is unlabelled, but is in a darker color and simply has "Data" written to indicate that's arbitrary. A right arrow shows how this data is split into groups. Each capital letter A through G has a grid on the right-hand side; the grid on the left has been subdivided to create that on the right.' -->
+<p>En el caso de la agrupación, <code>.SD</code> es de naturaleza múltiple: se refiere a <em>cada</em> una de estas sub-<code>data.table</code>s, <em>una a la vez</em> (de manera un poco más precisa, el alcance de <code>.SD</code> es una única sub-<code>data.table</code>). Esto nos permite expresar de manera concisa una operación que nos gustaría realizar en <em>cada sub-<code>data.table</code></em> antes de que se nos devuelva el resultado reensamblado.</p>
+<p>Esto es útil en una variedad de configuraciones, las más comunes de las cuales se presentan aquí:</p>
+<h2 id="subconjunto-de-grupo"><span class="section-number">3.1</span> Subconjunto de grupo</h2>
+<p>Obtengamos la temporada más reciente de datos de cada equipo en los datos de Lahman. Esto se puede hacer de forma muy sencilla con:</p>
+<pre><code class="language-r"># the data is already sorted by year; if it weren't
+#   we could do Teams[order(yearID), .SD[.N], by = teamID]
+Teams[ , .SD[.N], by = teamID]
+#      teamID yearID   lgID franchID  divID  Rank     G Ghome     W     L DivWin  WCWin  LgWin  WSWin
+#      &lt;fctr&gt;  &lt;int&gt; &lt;char&gt;   &lt;char&gt; &lt;char&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;char&gt; &lt;char&gt; &lt;char&gt; &lt;char&gt;
+#   1:    BS1   1875     NA      BNA   &lt;NA&gt;     1    82    NA    71     8   &lt;NA&gt;   &lt;NA&gt;      Y   &lt;NA&gt;
+#   2:    CH1   1871     NA      CNA   &lt;NA&gt;     2    28    NA    19     9   &lt;NA&gt;   &lt;NA&gt;      N   &lt;NA&gt;
+#   3:    CL1   1872     NA      CFC   &lt;NA&gt;     7    22    NA     6    16   &lt;NA&gt;   &lt;NA&gt;      N   &lt;NA&gt;
+#   4:    FW1   1871     NA      KEK   &lt;NA&gt;     7    19    NA     7    12   &lt;NA&gt;   &lt;NA&gt;      N   &lt;NA&gt;
+#   5:    NY2   1875     NA      NNA   &lt;NA&gt;     6    71    NA    30    38   &lt;NA&gt;   &lt;NA&gt;      N   &lt;NA&gt;
+#  ---                                                                                               
+# 145:    ANA   2004     AL      ANA      W     1   162    81    92    70      Y      N      N      N
+# 146:    ARI   2018     NL      ARI      W     3   162    81    82    80      N      N      N      N
+# 147:    MIL   2018     NL      MIL      C     1   163    81    96    67      Y      N      N      N
+# 148:    TBA   2018     AL      TBD      E     3   162    81    90    72      N      N      N      N
+# 149:    MIA   2018     NL      FLA      E     5   161    81    63    98      N      N      N      N
+#          R    AB     H   X2B   X3B    HR    BB    SO    SB    CS   HBP    SF    RA    ER   ERA
+#      &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;num&gt; &lt;int&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;num&gt;
+#   1:   831  3515  1128   167    51    15    33    52    93    37    NA    NA   343   152  1.87
+#   2:   302  1196   323    52    21    10    60    22    69    21    NA    NA   241    77  2.76
+#   3:   174   943   272    28     5     0    17    13    12     3    NA    NA   254   126  5.70
+#   4:   137   746   178    19     8     2    33     9    16     4    NA    NA   243    97  5.17
+#   5:   328  2685   633    82    21     7    19    47    20    24    NA    NA   425   174  2.46
+#  ---                                                                                          
+# 145:   836  5675  1603   272    37   162   450   942   143    46    73    41   734   692  4.28
+# 146:   693  5460  1283   259    50   176   560  1460    79    25    52    45   644   605  3.72
+# 147:   754  5542  1398   252    24   218   537  1458   124    32    58    41   659   606  3.73
+# 148:   716  5475  1415   274    43   150   540  1388   128    51   101    50   646   602  3.74
+# 149:   589  5488  1303   222    24   128   455  1384    45    31    73    31   809   762  4.76
+#         CG   SHO    SV IPouts    HA   HRA   BBA   SOA     E    DP    FP                    name
+#      &lt;int&gt; &lt;int&gt; &lt;int&gt;  &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;num&gt;                  &lt;char&gt;
+#   1:    60    10    17   2196   751     2    33   110   483    56 0.870    Boston Red Stockings
+#   2:    25     0     1    753   308     6    28    22   229    16 0.829 Chicago White Stockings
+#   3:    15     0     0    597   285     6    24    11   184    17 0.816  Cleveland Forest Citys
+#   4:    19     1     0    507   261     5    21    17   163     8 0.803    Fort Wayne Kekiongas
+#   5:    70     3     0   1910   718     4    21    77   526    30 0.838        New York Mutuals
+#  ---                                                                                           
+# 145:     2    11    50   4363  1476   170   502  1164    90   126 0.985          Anaheim Angels
+# 146:     2     9    39   4389  1313   174   522  1448    75   152 0.988    Arizona Diamondbacks
+# 147:     0    14    49   4383  1259   173   553  1428   108   141 0.982       Milwaukee Brewers
+# 148:     0    14    52   4345  1236   164   501  1421    85   136 0.986          Tampa Bay Rays
+# 149:     1    12    30   4326  1388   192   605  1249    83   133 0.986           Miami Marlins
+#                              park attendance   BPF   PPF teamIDBR teamIDlahman45 teamIDretro
+#                            &lt;char&gt;      &lt;int&gt; &lt;int&gt; &lt;int&gt;   &lt;fctr&gt;         &lt;fctr&gt;      &lt;fctr&gt;
+#   1:          South End Grounds I         NA   103    96      BOS            BS1         BS1
+#   2:      Union Base-Ball Grounds         NA   104   102      CHI            CH1         CH1
+#   3: National Association Grounds         NA    96   100      CLE            CL1         CL1
+#   4:               Hamilton Field         NA   101   107      KEK            FW1         FW1
+#   5:     Union Grounds (Brooklyn)         NA    99   100      NYU            NY2         NY2
+#  ---                                                                                        
+# 145:    Angels Stadium of Anaheim    3375677    97    97      ANA            ANA         ANA
+# 146:                  Chase Field    2242695   108   107      ARI            ARI         ARI
+# 147:                  Miller Park    2850875   102   101      MIL            ML4         MIL
+# 148:              Tropicana Field    1154973    97    97      TBR            TBA         TBA
+# 149:                 Marlins Park     811104    89    90      MIA            FLO         MIA
+</code></pre>
+<p>Recuerde que <code>.SD</code> es en sí mismo una <code>data.table</code>, y que <code>.N</code> se refiere al número total de filas en un grupo (es igual a <code>nrow(.SD)</code> dentro de cada grupo), por lo que <code>.SD[.N]</code> devuelve la <em>totalidad de <code>.SD</code></em> para la fila final asociada con cada <code>teamID</code>.</p>
+<p>Otra versión común de esto es utilizar <code>.SD[1L]</code> para obtener la <em>primera</em> observación para cada grupo, o <code>.SD[sample(.N, 1L)]</code> para devolver una fila <em>aleatoria</em> para cada grupo.</p>
+<h2 id="grupo-optima"><span class="section-number">3.2</span> Grupo Optima</h2>
+<p>Supongamos que queremos obtener el <em>mejor</em> año de cada equipo, medido por la cantidad total de carreras anotadas (<code>R</code>; podríamos ajustar esto fácilmente para hacer referencia a otras métricas, por supuesto). En lugar de tomar un elemento <em>fijo</em> de cada sub-<code>data.table</code>, ahora definimos el índice deseado <em>dinámicamente</em> de la siguiente manera:</p>
+<pre><code class="language-r">Teams[ , .SD[which.max(R)], by = teamID]
+#      teamID yearID   lgID franchID  divID  Rank     G Ghome     W     L DivWin  WCWin  LgWin  WSWin
+#      &lt;fctr&gt;  &lt;int&gt; &lt;char&gt;   &lt;char&gt; &lt;char&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;char&gt; &lt;char&gt; &lt;char&gt; &lt;char&gt;
+#   1:    BS1   1875     NA      BNA   &lt;NA&gt;     1    82    NA    71     8   &lt;NA&gt;   &lt;NA&gt;      Y   &lt;NA&gt;
+#   2:    CH1   1871     NA      CNA   &lt;NA&gt;     2    28    NA    19     9   &lt;NA&gt;   &lt;NA&gt;      N   &lt;NA&gt;
+#   3:    CL1   1871     NA      CFC   &lt;NA&gt;     8    29    NA    10    19   &lt;NA&gt;   &lt;NA&gt;      N   &lt;NA&gt;
+#   4:    FW1   1871     NA      KEK   &lt;NA&gt;     7    19    NA     7    12   &lt;NA&gt;   &lt;NA&gt;      N   &lt;NA&gt;
+#   5:    NY2   1872     NA      NNA   &lt;NA&gt;     3    56    NA    34    20   &lt;NA&gt;   &lt;NA&gt;      N   &lt;NA&gt;
+#  ---                                                                                               
+# 145:    ANA   2000     AL      ANA      W     3   162    81    82    80      N      N      N      N
+# 146:    ARI   1999     NL      ARI      W     1   162    81   100    62      Y      N      N      N
+# 147:    MIL   1999     NL      MIL      C     5   161    80    74    87      N      N      N      N
+# 148:    TBA   2009     AL      TBD      E     3   162    81    84    78      N      N      N      N
+# 149:    MIA   2017     NL      FLA      E     2   162    78    77    85      N      N      N      N
+#          R    AB     H   X2B   X3B    HR    BB    SO    SB    CS   HBP    SF    RA    ER   ERA
+#      &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;num&gt; &lt;int&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;num&gt;
+#   1:   831  3515  1128   167    51    15    33    52    93    37    NA    NA   343   152  1.87
+#   2:   302  1196   323    52    21    10    60    22    69    21    NA    NA   241    77  2.76
+#   3:   249  1186   328    35    40     7    26    25    18     8    NA    NA   341   116  4.11
+#   4:   137   746   178    19     8     2    33     9    16     4    NA    NA   243    97  5.17
+#   5:   523  2426   670    87    14     4    58    52    59    22    NA    NA   362   172  3.02
+#  ---                                                                                          
+# 145:   864  5628  1574   309    34   236   608  1024    93    52    47    43   869   805  5.00
+# 146:   908  5658  1566   289    46   216   588  1045   137    39    48    60   676   615  3.77
+# 147:   815  5582  1524   299    30   165   658  1065    81    33    55    51   886   813  5.07
+# 148:   803  5462  1434   297    36   199   642  1229   194    61    49    45   754   686  4.33
+# 149:   778  5602  1497   271    31   194   486  1282    91    30    67    41   822   772  4.82
+#         CG   SHO    SV IPouts    HA   HRA   BBA   SOA     E    DP    FP                    name
+#      &lt;int&gt; &lt;int&gt; &lt;int&gt;  &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;num&gt;                  &lt;char&gt;
+#   1:    60    10    17   2196   751     2    33   110   483    56 0.870    Boston Red Stockings
+#   2:    25     0     1    753   308     6    28    22   229    16 0.829 Chicago White Stockings
+#   3:    23     0     0    762   346    13    53    34   234    15 0.818  Cleveland Forest Citys
+#   4:    19     1     0    507   261     5    21    17   163     8 0.803    Fort Wayne Kekiongas
+#   5:    54     3     1   1536   622     2    33    46   323    33 0.868        New York Mutuals
+#  ---                                                                                           
+# 145:     5     3    46   4344  1534   228   662   846   134   182 0.978          Anaheim Angels
+# 146:    16     9    42   4402  1387   176   543  1198   104   132 0.983    Arizona Diamondbacks
+# 147:     2     5    40   4328  1618   213   616   987   127   146 0.979       Milwaukee Brewers
+# 148:     3     5    41   4282  1421   183   515  1125    98   135 0.983          Tampa Bay Rays
+# 149:     1     7    34   4328  1450   193   627  1202    73   156 0.988           Miami Marlins
+#                              park attendance   BPF   PPF teamIDBR teamIDlahman45 teamIDretro
+#                            &lt;char&gt;      &lt;int&gt; &lt;int&gt; &lt;int&gt;   &lt;fctr&gt;         &lt;fctr&gt;      &lt;fctr&gt;
+#   1:          South End Grounds I         NA   103    96      BOS            BS1         BS1
+#   2:      Union Base-Ball Grounds         NA   104   102      CHI            CH1         CH1
+#   3: National Association Grounds         NA    96   100      CLE            CL1         CL1
+#   4:               Hamilton Field         NA   101   107      KEK            FW1         FW1
+#   5:     Union Grounds (Brooklyn)         NA    93    92      NYU            NY2         NY2
+#  ---                                                                                        
+# 145:   Edison International Field    2066982   102   103      ANA            ANA         ANA
+# 146:            Bank One Ballpark    3019654   101   101      ARI            ARI         ARI
+# 147:               County Stadium    1701796    99    99      MIL            ML4         MIL
+# 148:              Tropicana Field    1874962    98    97      TBR            TBA         TBA
+# 149:                 Marlins Park    1583014    93    93      MIA            FLO         MIA
+</code></pre>
+<p>Tenga en cuenta que este enfoque, por supuesto, se puede combinar con <code>.SDcols</code> para devolver solo partes de <code>data.table</code> para cada <code>.SD</code> (con la salvedad de que <code>.SDcols</code> debe fijarse en los distintos subconjuntos).</p>
+<p><em>NB</em>: <code>.SD[1L]</code> está optimizado actualmente por <a href="https://Rdatatable.gitlab.io/data.table/library/data.table/html/datatable-optimize.html"><em><code>GForce</code></em></a> (<a href="https://stackoverflow.com/questions/22137591/about-gforce-in-data-table-1-9-2">ver también</a>), elementos internos de <code>data.table</code> que aceleran enormemente las operaciones agrupadas más comunes como <code>sum</code> o <code>mean</code> - vea <code>?GForce</code> para más detalles y esté atento/exprese al soporte para solicitudes de mejoras de características para actualizaciones en este frente: <a href="https://github.com/Rdatatable/data.table/issues/735">1</a>, <a href="https://github.com/Rdatatable/data.table/issues/2778">2</a>, <a href="https://github.com/Rdatatable/data.table/issues/523">3</a>, <a href="https://github.com/Rdatatable/data.table/issues/971">4</a>, <a href="https://github.com/Rdatatable/data.table/issues/1197">5</a>, <a href="https://github.com/Rdatatable/data.table/issues/1414">6</a></p>
+<h2 id="regresi-n-agrupada"><span class="section-number">3.3</span> Regresión agrupada</h2>
+<p>Volviendo a la pregunta anterior sobre la relación entre <code>ERA</code> y <code>W</code>, supongamos que esperamos que esta relación varíe según el equipo (es decir, hay una pendiente diferente para cada equipo). Podemos volver a ejecutar fácilmente esta regresión para explorar la heterogeneidad en esta relación de la siguiente manera (observando que los errores estándar de este enfoque son generalmente incorrectos - la especificación <code>ERA ~ W*teamID</code> será mejor - este enfoque es más fácil de leer y los <em>coeficientes</em> son correctos):</p>
+<pre><code class="language-r"># Overall coefficient for comparison
+overall_coef = Pitching[ , coef(lm(ERA ~ W))['W']]
+# use the .N &gt; 20 filter to exclude teams with few observations
+Pitching[ , if (.N &gt; 20L) .(w_coef = coef(lm(ERA ~ W))['W']), by = teamID
+          ][ , hist(w_coef, 20L, las = 1L,
+                    xlab = 'Fitted Coefficient on W',
+                    ylab = 'Number of Teams', col = 'darkgreen',
+                    main = 'Team-Level Distribution\nWin Coefficients on ERA')]
+abline(v = overall_coef, lty = 2L, col = 'red')
+</code></pre>
+<div class="figure">
+<img src="data:image/png;base64,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" alt="A histogram depicting the distribution of fitted coefficients. It is vaguely bell-shaped and concentrated around -.2" width="100%" />
+<p class="caption">A histogram depicting the distribution of fitted coefficients. It is vaguely bell-shaped and concentrated around -.2</p>
+</div>
+<p>Si bien es cierto que existe una buena cantidad de heterogeneidad, hay una clara concentración en torno al valor general observado.</p>
+<p>Lo anterior es solo una breve introducción del poder de <code>.SD</code> para facilitar un código hermoso y eficiente en <code>data.table</code>.</p>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-core.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/autoloader/prism-autoloader.min.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<title>Benchmarking data.table</title>
+<style type="text/css">
+/**
+ * Prism.s theme ported from highlight.js's xcode style
+ */
+pre code {
+  padding: 1em;
+}
+.token.comment {
+  color: #007400;
+}
+.token.punctuation {
+  color: #999;
+}
+.token.tag,
+.token.selector {
+  color: #aa0d91;
+}
+.token.boolean,
+.token.number,
+.token.constant,
+.token.symbol {
+  color: #1c00cf;
+}
+.token.property,
+.token.attr-name,
+.token.string,
+.token.char,
+.token.builtin {
+  color: #c41a16;
+}
+.token.inserted {
+  background-color: #ccffd8;
+}
+.token.deleted {
+  background-color: #ffebe9;
+}
+.token.operator,
+.token.entity,
+.token.url,
+.language-css .token.string,
+.style .token.string {
+  color: #9a6e3a;
+}
+.token.atrule,
+.token.attr-value,
+.token.keyword {
+  color: #836c28;
+}
+.token.function,
+.token.class-name {
+  color: #DD4A68;
+}
+.token.regex,
+.token.important,
+.token.variable {
+  color: #5c2699;
+}
+.token.important,
+.token.bold {
+  font-weight: bold;
+}
+.token.italic {
+  font-style: italic;
+}
+</style>
+<style type="text/css">
+body {
+  font-family: sans-serif;
+  max-width: 800px;
+  margin: auto;
+  padding: 1em;
+  line-height: 1.5;
+  box-sizing: border-box;
+}
+body, .footnotes, code { font-size: .9em; }
+li li { font-size: .95em; }
+*, *:before, *:after {
+  box-sizing: inherit;
+}
+pre, img { max-width: 100%; }
+pre, pre:hover {
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+pre code {
+  display: block;
+  overflow-x: auto;
+}
+code { font-family: 'DejaVu Sans Mono', 'Droid Sans Mono', 'Lucida Console', Consolas, Monaco, monospace; }
+:not(pre) > code, code[class] { background-color: #F8F8F8; }
+code.language-undefined, pre > code:not([class]) {
+  background-color: inherit;
+  border: 1px solid #eee;
+}
+table {
+  margin: auto;
+  border-top: 1px solid #666;
+}
+table thead th { border-bottom: 1px solid #ddd; }
+th, td { padding: 5px; }
+thead, tfoot, tr:nth-child(even) { background: #eee; }
+blockquote {
+  color: #666;
+  margin: 0;
+  padding-left: 1em;
+  border-left: 0.5em solid #eee;
+}
+hr, .footnotes::before { border: 1px dashed #ddd; }
+.frontmatter { text-align: center; }
+#TOC .numbered li { list-style: none; }
+#TOC .numbered { padding-left: 0; }
+#TOC .numbered ul { padding-left: 1em; }
+table, .body h2 { border-bottom: 1px solid #666; }
+.body .appendix, .appendix ~ h2 { border-bottom-style: dashed; }
+.footnote-ref a::before { content: "["; }
+.footnote-ref a::after { content: "]"; }
+section.footnotes::before {
+  content: "";
+  display: block;
+  max-width: 20em;
+}
+
+@media print {
+  body {
+    font-size: 12pt;
+    max-width: 100%;
+  }
+  tr, img { page-break-inside: avoid; }
+}
+@media only screen and (min-width: 992px) {
+  pre { white-space: pre; }
+}
+</style>
+<style type="text/css">
+#TOC {
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding-left: 1em;
+  background: #f6f6f6;
+}
+</style>
+</head>
+<body>
+<div class="frontmatter">
+<div class="title"><h1>Benchmarking data.table</h1></div>
+<div class="author"><h2></h2></div>
+<div class="date"><h3>2024-10-04</h3></div>
+</div>
+<div class="body">
+<div id="TOC">
+<ul class="numbered">
+<li><a href="#fread-borrar-cach-s"><span class="section-number">1.</span> fread: borrar cachés</a></li>
+<li><a href="#subconjunto-umbral-para-la-optimizaci-n-del-ndice-en-consultas-compuestas"><span class="section-number">2.</span> subconjunto: umbral para la optimización del índice en consultas compuestas</a></li>
+<li><a href="#subconjunto-evaluaci-n-comparativa-basada-en-ndices"><span class="section-number">3.</span> subconjunto: evaluación comparativa basada en índices</a></li>
+<li><a href="#operaciones-por-referencia"><span class="section-number">4.</span> Operaciones <em>por referencia</em></a></li>
+<li><a href="#intentar-comparar-los-procesos-at-micos"><span class="section-number">5.</span> Intentar comparar los procesos atómicos</a></li>
+<li><a href="#evitar-la-coerci-n-de-clase"><span class="section-number">6.</span> evitar la coerción de clase</a></li>
+<li><a href="#evitar-microbenchmark-veces-100"><span class="section-number">7.</span> evitar <code>microbenchmark(..., veces=100)</code></a></li>
+<li><a href="#procesamiento-multiproceso"><span class="section-number">8.</span> procesamiento multiproceso</a></li>
+<li><a href="#dentro-de-un-bucle-se-prefiere-set-en-lugar-de"><span class="section-number">9.</span> Dentro de un bucle se prefiere <code>set</code> en lugar de <code>:=</code></a></li>
+<li><a href="#dentro-de-un-bucle-prefiera-setdt-en-lugar-de-data-table"><span class="section-number">10.</span> Dentro de un bucle, prefiera <code>setDT</code> en lugar de <code>data.table()</code></a></li>
+</ul>
+</div>
+<style>
+h2 {
+    font-size: 20px;
+}
+</style>
+<p>Este documento tiene como objetivo orientar sobre cómo medir el rendimiento de <code>data.table</code>. Un único lugar para documentar las mejores prácticas y las trampas que se deben evitar.</p>
+<h1 id="fread-borrar-cach-s"><span class="section-number">1.</span> fread: borrar cachés</h1>
+<p>Lo ideal sería que cada llamada <code>fread</code> se ejecute en una sesión nueva con los siguientes comandos antes de la ejecución de R. Esto borra el archivo de caché del sistema operativo en la RAM y la caché del disco duro.</p>
+<pre><code class="language-sh">free -g
+sudo sh -c 'echo 3 &gt;/proc/sys/vm/drop_caches'
+sudo lshw -class disk
+sudo hdparm -t /dev/sda
+</code></pre>
+<p>Al comparar <code>fread</code> con soluciones que no sean de R, tenga en cuenta que R requiere que los valores de las columnas de caracteres se agreguen a la <em>caché de cadenas global de R</em>. Esto lleva tiempo al leer datos, pero las operaciones posteriores se benefician porque las cadenas de caracteres ya se han almacenado en caché. En consecuencia, además de cronometrar tareas aisladas (como <code>fread</code> solo), es una buena idea comparar el tiempo total de una secuencia de tareas de extremo a extremo, como leer datos, manipularlos y producir el resultado final.</p>
+<h1 id="subconjunto-umbral-para-la-optimizaci-n-del-ndice-en-consultas-compuestas"><span class="section-number">2.</span> subconjunto: umbral para la optimización del índice en consultas compuestas</h1>
+<p>La optimización de índice para consultas de filtros compuestos no se utilizará cuando el producto cruzado de los elementos proporcionados para filtrar exceda 1e4 elementos.</p>
+<pre><code class="language-r">DT = data.table(V1=1:10, V2=1:10, V3=1:10, V4=1:10)
+setindex(DT)
+v = c(1L, rep(11L, 9))
+length(v)^4               # cross product of elements in filter
+#[1] 10000                # &lt;= 10000
+DT[V1 %in% v &amp; V2 %in% v &amp; V3 %in% v &amp; V4 %in% v, verbose=TRUE]
+#Optimized subsetting with index 'V1__V2__V3__V4'
+#on= matches existing index, using index
+#Starting bmerge ...done in 0.000sec
+#...
+v = c(1L, rep(11L, 10))
+length(v)^4               # cross product of elements in filter
+#[1] 14641                # &gt; 10000
+DT[V1 %in% v &amp; V2 %in% v &amp; V3 %in% v &amp; V4 %in% v, verbose=TRUE]
+#Subsetting optimization disabled because the cross-product of RHS values exceeds 1e4, causing memory problems.
+#...
+</code></pre>
+<h1 id="subconjunto-evaluaci-n-comparativa-basada-en-ndices"><span class="section-number">3.</span> subconjunto: evaluación comparativa basada en índices</h1>
+<p>Para mayor comodidad, <code>data.table</code> crea automáticamente un índice en los campos que utiliza para crear subconjuntos de datos. Esto agregará algo de sobrecarga al primer subconjunto en campos específicos, pero reduce en gran medida el tiempo para consultar esas columnas en ejecuciones posteriores. Al medir la velocidad, la mejor manera es medir la creación de índices y la consulta utilizando un índice por separado. Con estos tiempos, es fácil decidir cuál es la estrategia óptima para su caso de uso. Para controlar el uso del índice, utilice las siguientes opciones:</p>
+<pre><code class="language-r">options(datatable.auto.index=TRUE)
+options(datatable.use.index=TRUE)
+</code></pre>
+<ul>
+<li><code>use.index=FALSE</code> forzará la consulta a no usar índices incluso si existen, pero las claves existentes aún se usan para la optimización.</li>
+<li><code>auto.index=FALSE</code> deshabilita la creación automática de índices al hacer un subconjunto en datos no indexados, pero si los índices se crearon antes de que se estableciera esta opción, o explícitamente al llamar a <code>setindex</code>, aún se usarán para la optimización.</li>
+</ul>
+<p>Otras dos opciones controlan la optimización globalmente, incluido el uso de índices:</p>
+<pre><code class="language-r">options(datatable.optimize=2L)
+options(datatable.optimize=3L)
+</code></pre>
+<p><code>options(datatable.optimize=2L)</code> desactivará por completo la optimización de subconjuntos, mientras que <code>options(datatable.optimize=3L)</code> la volverá a activar. Esas opciones afectan a muchas más optimizaciones y, por lo tanto, no se deben utilizar cuando solo se necesita el control de índices. Lea más en <code>?datatable.optimize</code>.</p>
+<h1 id="operaciones-por-referencia"><span class="section-number">4.</span> Operaciones <em>por referencia</em></h1>
+<p>Al evaluar las funciones <code>set*</code>, solo tiene sentido medir la primera ejecución. Estas funciones actualizan su entrada por referencia, por lo que las ejecuciones posteriores utilizarán la <code>data.table</code> ya procesada, lo que sesgará los resultados.</p>
+<p>Para proteger su tabla <code>data.table</code> de ser actualizada por operaciones de referencia, puede usar las funciones <code>copy</code> o <code>data.table:::shallow</code>. Tenga en cuenta que <code>copy</code> puede ser muy costoso, ya que necesita duplicar el objeto completo. Es poco probable que queramos incluir el tiempo de duplicación en el tiempo de la tarea real que estamos evaluando.</p>
+<h1 id="intentar-comparar-los-procesos-at-micos"><span class="section-number">5.</span> Intentar comparar los procesos atómicos</h1>
+<p>Si su evaluación comparativa está destinada a ser publicada, será mucho más esclarecedora si la divide para medir el tiempo de los procesos atómicos. De esta manera, sus lectores pueden ver cuánto tiempo se dedicó a leer los datos de la fuente, limpiarlos, transformarlos realmente y exportar los resultados. Por supuesto, si su evaluación comparativa está destinada a presentar un <em>flujo de trabajo de principio a fin</em>, entonces tiene todo el sentido presentar el tiempo general. Sin embargo, separar el tiempo de los pasos individuales es útil para comprender qué pasos son los principales cuellos de botella de un flujo de trabajo. Hay otros casos en los que la evaluación comparativa atómica puede no ser deseable, por ejemplo, cuando se <em>lee un csv</em>, seguido de <em>agrupamiento</em>. R requiere llenar <em>la caché de cadenas global de R</em>, lo que agrega una sobrecarga adicional al importar datos de caracteres a una sesión de R. Por otro lado, la <em>caché de cadenas global</em> puede acelerar procesos como <em>agrupamiento</em>. En tales casos, al comparar R con otros lenguajes, puede ser útil incluir el tiempo total.</p>
+<h1 id="evitar-la-coerci-n-de-clase"><span class="section-number">6.</span> evitar la coerción de clase</h1>
+<p>A menos que esto sea lo que realmente desea medir, debe preparar objetos de entrada de la clase esperada para cada herramienta que esté evaluando.</p>
+<h1 id="evitar-microbenchmark-veces-100"><span class="section-number">7.</span> evitar <code>microbenchmark(..., veces=100)</code></h1>
+<p>Repetir un punto de referencia muchas veces no suele ofrecer la imagen más clara para las herramientas de procesamiento de datos. Por supuesto, tiene todo el sentido para cálculos más atómicos, pero no es una buena representación de la forma más común en que se utilizarán realmente estas herramientas, es decir, para tareas de procesamiento de datos, que consisten en lotes de transformaciones proporcionadas secuencialmente, cada una de las cuales se ejecuta una vez. Matt dijo una vez:</p>
+<blockquote>
+<p>Soy muy cauteloso con los puntos de referencia medidos en cualquier valor inferior a 1 segundo. Prefiero mucho más de 10 segundos para una sola ejecución, lograda aumentando el tamaño de los datos. Un recuento de repeticiones de 500 hace sonar las alarmas. 3-5 ejecuciones deberían ser suficientes para convencer con datos más grandes. La sobrecarga de llamadas y el tiempo de recolección de basura afectan las inferencias a esta escala tan pequeña.</p>
+</blockquote>
+<p>Esto es muy válido. Cuanto menor sea la medición de tiempo, mayor será el ruido relativo. Ruido generado por el envío de métodos, la inicialización de paquetes o clases, etc. El enfoque principal del análisis comparativo debería estar en escenarios de casos de uso reales.</p>
+<h1 id="procesamiento-multiproceso"><span class="section-number">8.</span> procesamiento multiproceso</h1>
+<p>Uno de los principales factores que probablemente afecten los tiempos es la cantidad de subprocesos disponibles para su sesión R. En versiones recientes de <code>data.table</code>, algunas funciones están paralelizadas. Puede controlar la cantidad de subprocesos que desea utilizar con <code>setDTthreads</code>.</p>
+<pre><code class="language-r">setDTthreads(0)    # use all available cores (default)
+getDTthreads()     # check how many cores are currently used
+</code></pre>
+<h1 id="dentro-de-un-bucle-se-prefiere-set-en-lugar-de"><span class="section-number">9.</span> Dentro de un bucle se prefiere <code>set</code> en lugar de <code>:=</code></h1>
+<p>A menos que esté utilizando el índice al realizar una <em>subasignación por referencia</em>, debería preferir la función <code>set</code>, que no impone la sobrecarga de la llamada al método <code>[.data.table</code>.</p>
+<pre><code class="language-r">DT = data.table(a=3:1, b=letters[1:3])
+setindex(DT, a)
+
+# for (...) {                 # imagine loop here
+
+  DT[a==2L, b := &quot;z&quot;]         # sub-assign by reference, uses index
+  DT[, d := &quot;z&quot;]              # not sub-assign by reference, not uses index and adds overhead of `[.data.table`
+  set(DT, j=&quot;d&quot;, value=&quot;z&quot;)   # no `[.data.table` overhead, but no index yet, till #1196
+
+# }
+</code></pre>
+<h1 id="dentro-de-un-bucle-prefiera-setdt-en-lugar-de-data-table"><span class="section-number">10.</span> Dentro de un bucle, prefiera <code>setDT</code> en lugar de <code>data.table()</code></h1>
+<p>A partir de ahora, <code>data.table()</code> tiene una sobrecarga, por lo tanto, dentro de los bucles se prefiere utilizar <code>as.data.table()</code> o <code>setDT()</code> en una lista válida.</p>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-core.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/autoloader/prism-autoloader.min.js" defer></script>
+</body>
+</html>

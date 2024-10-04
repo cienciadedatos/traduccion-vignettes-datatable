@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<title>Efficient reshaping using data.tables</title>
+<style type="text/css">
+/**
+ * Prism.s theme ported from highlight.js's xcode style
+ */
+pre code {
+  padding: 1em;
+}
+.token.comment {
+  color: #007400;
+}
+.token.punctuation {
+  color: #999;
+}
+.token.tag,
+.token.selector {
+  color: #aa0d91;
+}
+.token.boolean,
+.token.number,
+.token.constant,
+.token.symbol {
+  color: #1c00cf;
+}
+.token.property,
+.token.attr-name,
+.token.string,
+.token.char,
+.token.builtin {
+  color: #c41a16;
+}
+.token.inserted {
+  background-color: #ccffd8;
+}
+.token.deleted {
+  background-color: #ffebe9;
+}
+.token.operator,
+.token.entity,
+.token.url,
+.language-css .token.string,
+.style .token.string {
+  color: #9a6e3a;
+}
+.token.atrule,
+.token.attr-value,
+.token.keyword {
+  color: #836c28;
+}
+.token.function,
+.token.class-name {
+  color: #DD4A68;
+}
+.token.regex,
+.token.important,
+.token.variable {
+  color: #5c2699;
+}
+.token.important,
+.token.bold {
+  font-weight: bold;
+}
+.token.italic {
+  font-style: italic;
+}
+</style>
+<style type="text/css">
+body {
+  font-family: sans-serif;
+  max-width: 800px;
+  margin: auto;
+  padding: 1em;
+  line-height: 1.5;
+  box-sizing: border-box;
+}
+body, .footnotes, code { font-size: .9em; }
+li li { font-size: .95em; }
+*, *:before, *:after {
+  box-sizing: inherit;
+}
+pre, img { max-width: 100%; }
+pre, pre:hover {
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+pre code {
+  display: block;
+  overflow-x: auto;
+}
+code { font-family: 'DejaVu Sans Mono', 'Droid Sans Mono', 'Lucida Console', Consolas, Monaco, monospace; }
+:not(pre) > code, code[class] { background-color: #F8F8F8; }
+code.language-undefined, pre > code:not([class]) {
+  background-color: inherit;
+  border: 1px solid #eee;
+}
+table {
+  margin: auto;
+  border-top: 1px solid #666;
+}
+table thead th { border-bottom: 1px solid #ddd; }
+th, td { padding: 5px; }
+thead, tfoot, tr:nth-child(even) { background: #eee; }
+blockquote {
+  color: #666;
+  margin: 0;
+  padding-left: 1em;
+  border-left: 0.5em solid #eee;
+}
+hr, .footnotes::before { border: 1px dashed #ddd; }
+.frontmatter { text-align: center; }
+#TOC .numbered li { list-style: none; }
+#TOC .numbered { padding-left: 0; }
+#TOC .numbered ul { padding-left: 1em; }
+table, .body h2 { border-bottom: 1px solid #666; }
+.body .appendix, .appendix ~ h2 { border-bottom-style: dashed; }
+.footnote-ref a::before { content: "["; }
+.footnote-ref a::after { content: "]"; }
+section.footnotes::before {
+  content: "";
+  display: block;
+  max-width: 20em;
+}
+
+@media print {
+  body {
+    font-size: 12pt;
+    max-width: 100%;
+  }
+  tr, img { page-break-inside: avoid; }
+}
+@media only screen and (min-width: 992px) {
+  pre { white-space: pre; }
+}
+</style>
+</head>
+<body>
+<div class="frontmatter">
+<div class="title"><h1>Efficient reshaping using data.tables</h1></div>
+<div class="author"><h2></h2></div>
+<div class="date"><h3>2024-10-04</h3></div>
+</div>
+<div class="body">
+<p>Esta viñeta analiza el uso predeterminado de las funciones de remodelación <code>melt</code> (de ancho a largo) y <code>dcast</code> (de largo a ancho) para <em>data.tables</em>, así como las <strong>nuevas funcionalidades extendidas</strong> de fusión y conversión en <em>múltiples columnas</em> disponibles a partir de <code>v1.9.6</code>.</p>
+<hr />
+<h2 id="datos">Datos</h2>
+<p>Cargaremos los conjuntos de datos directamente dentro de las secciones.</p>
+<h2 id="introducci-n">Introducción</h2>
+<p>Las funciones <code>melt</code> y <code>dcast</code> para <code>data.table</code>s sirven para cambiar la forma de ancho a largo y de largo a ancho, respectivamente; las implementaciones están diseñadas específicamente teniendo en mente grandes datos en memoria (por ejemplo, 10 Gb).</p>
+<p>En esta viñeta, vamos a</p>
+<ol>
+<li>
+<p>Primero, observe brevemente la conversión predeterminada de <code>melt</code> y <code>dcast</code> de <code>data.table</code> para convertirlas de formato <em>ancho</em> a <em>largo</em> y <em>viceversa</em></p>
+</li>
+<li>
+<p>Analice los escenarios en los que las funcionalidades actuales se vuelven engorrosas e ineficientes</p>
+</li>
+<li>
+<p>Por último, observe las nuevas mejoras en los métodos <code>melt</code> y <code>dcast</code> para que <code>data.table</code> pueda manejar múltiples columnas simultáneamente.</p>
+</li>
+</ol>
+<p>Las funcionalidades extendidas están en línea con la filosofía de <code>data.table</code> de realizar operaciones de manera eficiente y sencilla.</p>
+<h2 id="1-funcionalidad-predeterminada">1. Funcionalidad predeterminada</h2>
+<h3 id="a-fusi-n-de-data-table-de-ancho-a-largo">a) <code>fusión</code> de `data.table`` (de ancho a largo)</h3>
+<p>Supongamos que tenemos una <code>data.table</code> (datos artificiales) como se muestra a continuación:</p>
+<pre><code class="language-r">s1 &lt;- &quot;family_id age_mother dob_child1 dob_child2 dob_child3
+1         30 1998-11-26 2000-01-29         NA
+2         27 1996-06-22         NA         NA
+3         26 2002-07-11 2004-04-05 2007-09-02
+4         32 2004-10-10 2009-08-27 2012-07-21
+5         29 2000-12-05 2005-02-28         NA&quot;
+DT &lt;- fread(s1)
+DT
+#    family_id age_mother dob_child1 dob_child2 dob_child3
+#        &lt;int&gt;      &lt;int&gt;     &lt;IDat&gt;     &lt;IDat&gt;     &lt;IDat&gt;
+# 1:         1         30 1998-11-26 2000-01-29       &lt;NA&gt;
+# 2:         2         27 1996-06-22       &lt;NA&gt;       &lt;NA&gt;
+# 3:         3         26 2002-07-11 2004-04-05 2007-09-02
+# 4:         4         32 2004-10-10 2009-08-27 2012-07-21
+# 5:         5         29 2000-12-05 2005-02-28       &lt;NA&gt;
+## dob stands for date of birth.
+
+str(DT)
+# Classes 'data.table' and 'data.frame':	5 obs. of  5 variables:
+#  $ family_id : int  1 2 3 4 5
+#  $ age_mother: int  30 27 26 32 29
+#  $ dob_child1: IDate, format: &quot;1998-11-26&quot; &quot;1996-06-22&quot; &quot;2002-07-11&quot; ...
+#  $ dob_child2: IDate, format: &quot;2000-01-29&quot; NA &quot;2004-04-05&quot; ...
+#  $ dob_child3: IDate, format: NA NA &quot;2007-09-02&quot; ...
+#  - attr(*, &quot;.internal.selfref&quot;)=&lt;externalptr&gt;
+</code></pre>
+<h4 id="convertir-dt-a-formato-largo-donde-cada-dob-es-una-observaci-n-separada">- Convertir ‘DT’ a formato <em>largo</em> donde cada ‘dob’ es una observación separada.</h4>
+<p>Podríamos lograr esto usando <code>melt()</code> especificando los argumentos <code>id.vars</code> y <code>measure.vars</code> de la siguiente manera:</p>
+<pre><code class="language-r">DT.m1 = melt(DT, id.vars = c(&quot;family_id&quot;, &quot;age_mother&quot;),
+                measure.vars = c(&quot;dob_child1&quot;, &quot;dob_child2&quot;, &quot;dob_child3&quot;))
+DT.m1
+#     family_id age_mother   variable      value
+#         &lt;int&gt;      &lt;int&gt;     &lt;fctr&gt;     &lt;IDat&gt;
+#  1:         1         30 dob_child1 1998-11-26
+#  2:         2         27 dob_child1 1996-06-22
+#  3:         3         26 dob_child1 2002-07-11
+#  4:         4         32 dob_child1 2004-10-10
+#  5:         5         29 dob_child1 2000-12-05
+#  6:         1         30 dob_child2 2000-01-29
+#  7:         2         27 dob_child2       &lt;NA&gt;
+#  8:         3         26 dob_child2 2004-04-05
+#  9:         4         32 dob_child2 2009-08-27
+# 10:         5         29 dob_child2 2005-02-28
+# 11:         1         30 dob_child3       &lt;NA&gt;
+# 12:         2         27 dob_child3       &lt;NA&gt;
+# 13:         3         26 dob_child3 2007-09-02
+# 14:         4         32 dob_child3 2012-07-21
+# 15:         5         29 dob_child3       &lt;NA&gt;
+str(DT.m1)
+# Classes 'data.table' and 'data.frame':	15 obs. of  4 variables:
+#  $ family_id : int  1 2 3 4 5 1 2 3 4 5 ...
+#  $ age_mother: int  30 27 26 32 29 30 27 26 32 29 ...
+#  $ variable  : Factor w/ 3 levels &quot;dob_child1&quot;,&quot;dob_child2&quot;,..: 1 1 1 1 1 2 2 2 2 2 ...
+#  $ value     : IDate, format: &quot;1998-11-26&quot; &quot;1996-06-22&quot; &quot;2002-07-11&quot; ...
+#  - attr(*, &quot;.internal.selfref&quot;)=&lt;externalptr&gt;
+</code></pre>
+<ul>
+<li>
+<p><code>measure.vars</code> especifica el conjunto de columnas que nos gustaría contraer (o combinar) juntas.</p>
+</li>
+<li>
+<p>También podemos especificar <em>posiciones</em> de columnas en lugar de <em>nombres</em>.</p>
+</li>
+<li>
+<p>De manera predeterminada, la columna <code>variable</code> es del tipo <code>factor</code>. Establezca el argumento <code>variable.factor</code> en <code>FALSO</code> si desea devolver un vector de <em><code>carácter</code></em> en su lugar.</p>
+</li>
+<li>
+<p>De manera predeterminada, las columnas fundidas se denominan automáticamente <code>variable</code> y <code>valor</code>.</p>
+</li>
+<li>
+<p><code>melt</code> conserva los atributos de la columna en el resultado.</p>
+</li>
+</ul>
+<h4 id="nombra-las-columnas-variable-y-valor-como-hijo-y-dob-respectivamente">- Nombra las columnas <code>variable</code> y <code>valor</code> como <code>hijo</code> y <code>dob</code> respectivamente</h4>
+<pre><code class="language-r">DT.m1 = melt(DT, measure.vars = c(&quot;dob_child1&quot;, &quot;dob_child2&quot;, &quot;dob_child3&quot;),
+               variable.name = &quot;child&quot;, value.name = &quot;dob&quot;)
+DT.m1
+#     family_id age_mother      child        dob
+#         &lt;int&gt;      &lt;int&gt;     &lt;fctr&gt;     &lt;IDat&gt;
+#  1:         1         30 dob_child1 1998-11-26
+#  2:         2         27 dob_child1 1996-06-22
+#  3:         3         26 dob_child1 2002-07-11
+#  4:         4         32 dob_child1 2004-10-10
+#  5:         5         29 dob_child1 2000-12-05
+#  6:         1         30 dob_child2 2000-01-29
+#  7:         2         27 dob_child2       &lt;NA&gt;
+#  8:         3         26 dob_child2 2004-04-05
+#  9:         4         32 dob_child2 2009-08-27
+# 10:         5         29 dob_child2 2005-02-28
+# 11:         1         30 dob_child3       &lt;NA&gt;
+# 12:         2         27 dob_child3       &lt;NA&gt;
+# 13:         3         26 dob_child3 2007-09-02
+# 14:         4         32 dob_child3 2012-07-21
+# 15:         5         29 dob_child3       &lt;NA&gt;
+</code></pre>
+<ul>
+<li>
+<p>De manera predeterminada, cuando falta una de las <code>id.vars</code> o <code>measure.vars</code>, el resto de las columnas se <em>asigna automáticamente</em> al argumento faltante.</p>
+</li>
+<li>
+<p>Cuando no se especifican ni <code>id.vars</code> ni <code>measure.vars</code>, como se menciona en <code>?melt</code>, todas las columnas <em>no</em> <code>numéricas</code>, <code>enteras</code>, <code>lógicas</code> se asignarán a <code>id.vars</code>.</p>
+<p>In addition, a warning message is issued highlighting the columns that are automatically considered to be <code>id.vars</code>.</p>
+</li>
+</ul>
+<h3 id="b-dcast-de-data-table-de-largo-a-ancho">b) <code>dcast</code> de <code>data.table</code> (de largo a ancho)</h3>
+<p>En la sección anterior, vimos cómo pasar del formato ancho al formato largo. Veamos la operación inversa en esta sección.</p>
+<h4 id="c-mo-podemos-volver-a-la-tabla-de-datos-original-dt-desde-dt-m1">- ¿Cómo podemos volver a la tabla de datos original <code>DT</code> desde <code>DT.m1</code>?</h4>
+<p>Es decir, nos gustaría recopilar todas las observaciones de <em>child</em> correspondientes a cada <code>family_id, age_mother</code> juntas en la misma fila. Podemos lograrlo usando <code>dcast</code> de la siguiente manera:</p>
+<pre><code class="language-r">dcast(DT.m1, family_id + age_mother ~ child, value.var = &quot;dob&quot;)
+# Key: &lt;family_id, age_mother&gt;
+#    family_id age_mother dob_child1 dob_child2 dob_child3
+#        &lt;int&gt;      &lt;int&gt;     &lt;IDat&gt;     &lt;IDat&gt;     &lt;IDat&gt;
+# 1:         1         30 1998-11-26 2000-01-29       &lt;NA&gt;
+# 2:         2         27 1996-06-22       &lt;NA&gt;       &lt;NA&gt;
+# 3:         3         26 2002-07-11 2004-04-05 2007-09-02
+# 4:         4         32 2004-10-10 2009-08-27 2012-07-21
+# 5:         5         29 2000-12-05 2005-02-28       &lt;NA&gt;
+</code></pre>
+<ul>
+<li>
+<p><code>dcast</code> utiliza la interfaz <em>formula</em>. Las variables del <em>lado izquierdo</em> de la fórmula representan las variables <em>id</em> y del <em>lado derecho</em> las variables <em>measure</em>.</p>
+</li>
+<li>
+<p><code>value.var</code> indica la columna que se debe completar al convertir a formato ancho.</p>
+</li>
+<li>
+<p><code>dcast</code> también intenta preservar los atributos en el resultado siempre que sea posible.</p>
+</li>
+</ul>
+<h4 id="a-partir-de-dt-m1-c-mo-podemos-obtener-el-n-mero-de-hijos-en-cada-familia">- A partir de <code>DT.m1</code>, ¿cómo podemos obtener el número de hijos en cada familia?</h4>
+<p>También puede pasar una función para agregar en <code>dcast</code> con el argumento <code>fun.agregate</code>. Esto es particularmente esencial cuando la fórmula proporcionada no identifica una sola observación para cada celda.</p>
+<pre><code class="language-r">dcast(DT.m1, family_id ~ ., fun.agg = function(x) sum(!is.na(x)), value.var = &quot;dob&quot;)
+# Key: &lt;family_id&gt;
+#    family_id     .
+#        &lt;int&gt; &lt;int&gt;
+# 1:         1     2
+# 2:         2     1
+# 3:         3     3
+# 4:         4     3
+# 5:         5     2
+</code></pre>
+<p>Consulte <code>?dcast</code> para obtener otros argumentos útiles y ejemplos adicionales.</p>
+<h2 id="2-limitaciones-de-los-m-todos-actuales-de-fusi-n-desintegraci-n">2. Limitaciones de los métodos actuales de «fusión/desintegración»</h2>
+<p>Hasta ahora hemos visto características de <code>melt</code> y <code>dcast</code> que se implementan de manera eficiente para <code>data.table</code>s, utilizando la maquinaria interna de <code>data.table</code> (<em>ordenamiento rápido de radix</em>, <em>búsqueda binaria</em>, etc.).</p>
+<p>Sin embargo, existen situaciones en las que podemos encontrarnos con la operación deseada que no se expresa de manera sencilla. Por ejemplo, considere la tabla <code>data.table</code> que se muestra a continuación:</p>
+<pre><code class="language-r">s2 &lt;- &quot;family_id age_mother dob_child1 dob_child2 dob_child3 gender_child1 gender_child2 gender_child3
+1         30 1998-11-26 2000-01-29         NA             1             2            NA
+2         27 1996-06-22         NA         NA             2            NA            NA
+3         26 2002-07-11 2004-04-05 2007-09-02             2             2             1
+4         32 2004-10-10 2009-08-27 2012-07-21             1             1             1
+5         29 2000-12-05 2005-02-28         NA             2             1            NA&quot;
+DT &lt;- fread(s2)
+DT
+#    family_id age_mother dob_child1 dob_child2 dob_child3 gender_child1 gender_child2 gender_child3
+#        &lt;int&gt;      &lt;int&gt;     &lt;IDat&gt;     &lt;IDat&gt;     &lt;IDat&gt;         &lt;int&gt;         &lt;int&gt;         &lt;int&gt;
+# 1:         1         30 1998-11-26 2000-01-29       &lt;NA&gt;             1             2            NA
+# 2:         2         27 1996-06-22       &lt;NA&gt;       &lt;NA&gt;             2            NA            NA
+# 3:         3         26 2002-07-11 2004-04-05 2007-09-02             2             2             1
+# 4:         4         32 2004-10-10 2009-08-27 2012-07-21             1             1             1
+# 5:         5         29 2000-12-05 2005-02-28       &lt;NA&gt;             2             1            NA
+## 1 = female, 2 = male
+</code></pre>
+<p>Y desea combinar (<code>melt</code>) todas las columnas <code>dob</code> y <code>gender</code>. Con la funcionalidad actual, podemos hacer algo como esto:</p>
+<pre><code class="language-r">DT.m1 = melt(DT, id = c(&quot;family_id&quot;, &quot;age_mother&quot;))
+DT.m1[, c(&quot;variable&quot;, &quot;child&quot;) := tstrsplit(variable, &quot;_&quot;, fixed = TRUE)]
+#     family_id age_mother variable      value  child
+#         &lt;int&gt;      &lt;int&gt;   &lt;char&gt;     &lt;IDat&gt; &lt;char&gt;
+#  1:         1         30      dob 1998-11-26 child1
+#  2:         2         27      dob 1996-06-22 child1
+#  3:         3         26      dob 2002-07-11 child1
+#  4:         4         32      dob 2004-10-10 child1
+#  5:         5         29      dob 2000-12-05 child1
+#  6:         1         30      dob 2000-01-29 child2
+#  7:         2         27      dob       &lt;NA&gt; child2
+#  8:         3         26      dob 2004-04-05 child2
+#  9:         4         32      dob 2009-08-27 child2
+# 10:         5         29      dob 2005-02-28 child2
+# 11:         1         30      dob       &lt;NA&gt; child3
+# 12:         2         27      dob       &lt;NA&gt; child3
+# 13:         3         26      dob 2007-09-02 child3
+# 14:         4         32      dob 2012-07-21 child3
+# 15:         5         29      dob       &lt;NA&gt; child3
+# 16:         1         30   gender 1970-01-02 child1
+# 17:         2         27   gender 1970-01-03 child1
+# 18:         3         26   gender 1970-01-03 child1
+# 19:         4         32   gender 1970-01-02 child1
+# 20:         5         29   gender 1970-01-03 child1
+# 21:         1         30   gender 1970-01-03 child2
+# 22:         2         27   gender       &lt;NA&gt; child2
+# 23:         3         26   gender 1970-01-03 child2
+# 24:         4         32   gender 1970-01-02 child2
+# 25:         5         29   gender 1970-01-02 child2
+# 26:         1         30   gender       &lt;NA&gt; child3
+# 27:         2         27   gender       &lt;NA&gt; child3
+# 28:         3         26   gender 1970-01-02 child3
+# 29:         4         32   gender 1970-01-02 child3
+# 30:         5         29   gender       &lt;NA&gt; child3
+#     family_id age_mother variable      value  child
+DT.c1 = dcast(DT.m1, family_id + age_mother + child ~ variable, value.var = &quot;value&quot;)
+DT.c1
+# Key: &lt;family_id, age_mother, child&gt;
+#     family_id age_mother  child        dob     gender
+#         &lt;int&gt;      &lt;int&gt; &lt;char&gt;     &lt;IDat&gt;     &lt;IDat&gt;
+#  1:         1         30 child1 1998-11-26 1970-01-02
+#  2:         1         30 child2 2000-01-29 1970-01-03
+#  3:         1         30 child3       &lt;NA&gt;       &lt;NA&gt;
+#  4:         2         27 child1 1996-06-22 1970-01-03
+#  5:         2         27 child2       &lt;NA&gt;       &lt;NA&gt;
+#  6:         2         27 child3       &lt;NA&gt;       &lt;NA&gt;
+#  7:         3         26 child1 2002-07-11 1970-01-03
+#  8:         3         26 child2 2004-04-05 1970-01-03
+#  9:         3         26 child3 2007-09-02 1970-01-02
+# 10:         4         32 child1 2004-10-10 1970-01-02
+# 11:         4         32 child2 2009-08-27 1970-01-02
+# 12:         4         32 child3 2012-07-21 1970-01-02
+# 13:         5         29 child1 2000-12-05 1970-01-03
+# 14:         5         29 child2 2005-02-28 1970-01-02
+# 15:         5         29 child3       &lt;NA&gt;       &lt;NA&gt;
+
+str(DT.c1) ## gender column is class IDate now!
+# Classes 'data.table' and 'data.frame':	15 obs. of  5 variables:
+#  $ family_id : int  1 1 1 2 2 2 3 3 3 4 ...
+#  $ age_mother: int  30 30 30 27 27 27 26 26 26 32 ...
+#  $ child     : chr  &quot;child1&quot; &quot;child2&quot; &quot;child3&quot; &quot;child1&quot; ...
+#  $ dob       : IDate, format: &quot;1998-11-26&quot; &quot;2000-01-29&quot; NA ...
+#  $ gender    : IDate, format: &quot;1970-01-02&quot; &quot;1970-01-03&quot; NA ...
+#  - attr(*, &quot;.internal.selfref&quot;)=&lt;externalptr&gt; 
+#  - attr(*, &quot;sorted&quot;)= chr [1:3] &quot;family_id&quot; &quot;age_mother&quot; &quot;child&quot;
+</code></pre>
+<h4 id="asuntos">Asuntos</h4>
+<ol>
+<li>
+<p>Lo que queríamos hacer era combinar todas las columnas de tipo <code>dob</code> y <code>gender</code> respectivamente. En lugar de eso, estamos combinando <em>todo</em> y luego dividiendo todo. Creo que es fácil ver que es bastante indirecto (e ineficiente).</p>
+<p>As an analogy, imagine you’ve a closet with four shelves of clothes and you’d like to put together the clothes from shelves 1 and 2 together (in 1), and 3 and 4 together (in 3). What we are doing is more or less to combine all the clothes together, and then split them back on to shelves 1 and 3!</p>
+</li>
+<li>
+<p>Las columnas que se van a <code>melt</code> pueden ser de tipos diferentes, como en este caso (tipos <code>character</code> y <code>integer</code>). Al <code>melt</code> todas juntas, las columnas se convertirán en el resultado, como se explica en el mensaje de advertencia anterior y se muestra en la salida de <code>str(DT.c1)</code>, donde <code>gender</code> se ha convertido al tipo <em><code>character</code></em>.</p>
+</li>
+<li>
+<p>Estamos generando una columna adicional dividiendo la columna <code>variable</code> en dos columnas, cuyo propósito es bastante críptico. Lo hacemos porque lo necesitamos para la <em>conversión</em> en el siguiente paso.</p>
+</li>
+<li>
+<p>Finalmente, convertimos el conjunto de datos. Pero el problema es que es una operación que requiere mucho más trabajo computacional que <em>melt</em>. En concreto, requiere calcular el orden de las variables en la fórmula, y eso es costoso.</p>
+</li>
+</ol>
+<p>De hecho, <code>stats::reshape</code> es capaz de realizar esta operación de una manera muy sencilla. Es una función extremadamente útil y a menudo subestimada. ¡Definitivamente deberías probarla!</p>
+<h2 id="3-funcionalidad-mejorada-nueva">3. Funcionalidad mejorada (nueva)</h2>
+<h3 id="a-fusi-n-mejorada">a) Fusión mejorada</h3>
+<p>Como nos gustaría que <code>data.table</code> realice esta operación de manera sencilla y eficiente utilizando la misma interfaz, seguimos adelante e implementamos una <em>funcionalidad adicional</em>, donde podemos <code>fusionar</code> varias columnas <em>simultáneamente</em>.</p>
+<h4 id="fundir-m-ltiples-columnas-simult-neamente">- <code>fundir</code> múltiples columnas simultáneamente</h4>
+<p>La idea es bastante sencilla. Pasamos una lista de columnas a <code>measure.vars</code>, donde cada elemento de la lista contiene las columnas que deben combinarse.</p>
+<pre><code class="language-r">colA = paste0(&quot;dob_child&quot;, 1:3)
+colB = paste0(&quot;gender_child&quot;, 1:3)
+DT.m2 = melt(DT, measure = list(colA, colB), value.name = c(&quot;dob&quot;, &quot;gender&quot;))
+DT.m2
+#     family_id age_mother variable        dob gender
+#         &lt;int&gt;      &lt;int&gt;   &lt;fctr&gt;     &lt;IDat&gt;  &lt;int&gt;
+#  1:         1         30        1 1998-11-26      1
+#  2:         2         27        1 1996-06-22      2
+#  3:         3         26        1 2002-07-11      2
+#  4:         4         32        1 2004-10-10      1
+#  5:         5         29        1 2000-12-05      2
+#  6:         1         30        2 2000-01-29      2
+#  7:         2         27        2       &lt;NA&gt;     NA
+#  8:         3         26        2 2004-04-05      2
+#  9:         4         32        2 2009-08-27      1
+# 10:         5         29        2 2005-02-28      1
+# 11:         1         30        3       &lt;NA&gt;     NA
+# 12:         2         27        3       &lt;NA&gt;     NA
+# 13:         3         26        3 2007-09-02      1
+# 14:         4         32        3 2012-07-21      1
+# 15:         5         29        3       &lt;NA&gt;     NA
+
+str(DT.m2) ## col type is preserved
+# Classes 'data.table' and 'data.frame':	15 obs. of  5 variables:
+#  $ family_id : int  1 2 3 4 5 1 2 3 4 5 ...
+#  $ age_mother: int  30 27 26 32 29 30 27 26 32 29 ...
+#  $ variable  : Factor w/ 3 levels &quot;1&quot;,&quot;2&quot;,&quot;3&quot;: 1 1 1 1 1 2 2 2 2 2 ...
+#  $ dob       : IDate, format: &quot;1998-11-26&quot; &quot;1996-06-22&quot; &quot;2002-07-11&quot; ...
+#  $ gender    : int  1 2 2 1 2 2 NA 2 1 1 ...
+#  - attr(*, &quot;.internal.selfref&quot;)=&lt;externalptr&gt;
+</code></pre>
+<ul>
+<li>
+<p>Podemos eliminar la columna <code>variable</code> si es necesario.</p>
+</li>
+<li>
+<p>La funcionalidad está implementada completamente en C y, por lo tanto, es <em>rápida</em> y <em>eficiente en el uso de la memoria</em>, además de ser <em>sencilla</em>.</p>
+</li>
+</ul>
+<h4 id="usando-patrones">- Usando <code>patrones()</code></h4>
+<p>Por lo general, en estos problemas, las columnas que queremos fundir se pueden distinguir por un patrón común. Podemos utilizar la función <code>patterns()</code>, implementada por conveniencia, para proporcionar expresiones regulares para las columnas que se combinarán. La operación anterior se puede reescribir como:</p>
+<pre><code class="language-r">DT.m2 = melt(DT, measure = patterns(&quot;^dob&quot;, &quot;^gender&quot;), value.name = c(&quot;dob&quot;, &quot;gender&quot;))
+DT.m2
+#     family_id age_mother variable        dob gender
+#         &lt;int&gt;      &lt;int&gt;   &lt;fctr&gt;     &lt;IDat&gt;  &lt;int&gt;
+#  1:         1         30        1 1998-11-26      1
+#  2:         2         27        1 1996-06-22      2
+#  3:         3         26        1 2002-07-11      2
+#  4:         4         32        1 2004-10-10      1
+#  5:         5         29        1 2000-12-05      2
+#  6:         1         30        2 2000-01-29      2
+#  7:         2         27        2       &lt;NA&gt;     NA
+#  8:         3         26        2 2004-04-05      2
+#  9:         4         32        2 2009-08-27      1
+# 10:         5         29        2 2005-02-28      1
+# 11:         1         30        3       &lt;NA&gt;     NA
+# 12:         2         27        3       &lt;NA&gt;     NA
+# 13:         3         26        3 2007-09-02      1
+# 14:         4         32        3 2012-07-21      1
+# 15:         5         29        3       &lt;NA&gt;     NA
+</code></pre>
+<h4 id="usar-measure-para-especificar-measure-vars-a-trav-s-de-un-separador-o-patr-n">- Usar <code>measure()</code> para especificar <code>measure.vars</code> a través de un separador o patrón</h4>
+<p>Si, como en los datos anteriores, las columnas de entrada que se van a fundir tienen nombres regulares, entonces podemos usar <code>measure</code>, que permite especificar las columnas que se van a fundir mediante un separador o una expresión regular. Por ejemplo, considere los datos del iris:</p>
+<pre><code class="language-r">(two.iris = data.table(datasets::iris)[c(1,150)])
+#    Sepal.Length Sepal.Width Petal.Length Petal.Width   Species
+#           &lt;num&gt;       &lt;num&gt;        &lt;num&gt;       &lt;num&gt;    &lt;fctr&gt;
+# 1:          5.1         3.5          1.4         0.2    setosa
+# 2:          5.9         3.0          5.1         1.8 virginica
+</code></pre>
+<p>Los datos del iris tienen cuatro columnas numéricas con una estructura regular: primero la parte de la flor, luego un punto y luego la dimensión de la medida. Para especificar que queremos fusionar esas cuatro columnas, podemos usar <code>measure</code> con <code>sep=&quot;.&quot;</code>, lo que significa usar <code>strsplit</code> en todos los nombres de columna; las columnas que resulten en la cantidad máxima de grupos después de la división se usarán como <code>measure.vars</code>:</p>
+<pre><code class="language-r">melt(two.iris, measure.vars = measure(part, dim, sep=&quot;.&quot;))
+#      Species   part    dim value
+#       &lt;fctr&gt; &lt;char&gt; &lt;char&gt; &lt;num&gt;
+# 1:    setosa  Sepal Length   5.1
+# 2: virginica  Sepal Length   5.9
+# 3:    setosa  Sepal  Width   3.5
+# 4: virginica  Sepal  Width   3.0
+# 5:    setosa  Petal Length   1.4
+# 6: virginica  Petal Length   5.1
+# 7:    setosa  Petal  Width   0.2
+# 8: virginica  Petal  Width   1.8
+</code></pre>
+<p>Los primeros dos argumentos de <code>measure</code> en el código anterior (<code>part</code> y <code>dim</code>) se utilizan para nombrar las columnas de salida; la cantidad de argumentos debe ser igual a la cantidad máxima de grupos después de dividir con <code>sep</code>.</p>
+<p>Si queremos dos columnas de valores, una para cada parte, podemos usar la palabra clave especial <code>value.name</code>, lo que significa generar una columna de valores para cada nombre único encontrado en ese grupo:</p>
+<pre><code class="language-r">melt(two.iris, measure.vars = measure(value.name, dim, sep=&quot;.&quot;))
+#      Species    dim Sepal Petal
+#       &lt;fctr&gt; &lt;char&gt; &lt;num&gt; &lt;num&gt;
+# 1:    setosa Length   5.1   1.4
+# 2: virginica Length   5.9   5.1
+# 3:    setosa  Width   3.5   0.2
+# 4: virginica  Width   3.0   1.8
+</code></pre>
+<p>Con el código anterior obtenemos una columna de valores por cada parte de la flor. Si, en cambio, queremos una columna de valores para cada dimensión de medida, podemos hacer lo siguiente:</p>
+<pre><code class="language-r">melt(two.iris, measure.vars = measure(part, value.name, sep=&quot;.&quot;))
+#      Species   part Length Width
+#       &lt;fctr&gt; &lt;char&gt;  &lt;num&gt; &lt;num&gt;
+# 1:    setosa  Sepal    5.1   3.5
+# 2: virginica  Sepal    5.9   3.0
+# 3:    setosa  Petal    1.4   0.2
+# 4: virginica  Petal    5.1   1.8
+</code></pre>
+<p>Volviendo al ejemplo de los datos con familias e hijos, podemos ver un uso más complejo de <code>measure</code>, que involucra una función que se utiliza para convertir los valores de la cadena <code>child</code> en números enteros:</p>
+<pre><code class="language-r">DT.m3 = melt(DT, measure = measure(value.name, child=as.integer, sep=&quot;_child&quot;))
+DT.m3
+#     family_id age_mother child        dob gender
+#         &lt;int&gt;      &lt;int&gt; &lt;int&gt;     &lt;IDat&gt;  &lt;int&gt;
+#  1:         1         30     1 1998-11-26      1
+#  2:         2         27     1 1996-06-22      2
+#  3:         3         26     1 2002-07-11      2
+#  4:         4         32     1 2004-10-10      1
+#  5:         5         29     1 2000-12-05      2
+#  6:         1         30     2 2000-01-29      2
+#  7:         2         27     2       &lt;NA&gt;     NA
+#  8:         3         26     2 2004-04-05      2
+#  9:         4         32     2 2009-08-27      1
+# 10:         5         29     2 2005-02-28      1
+# 11:         1         30     3       &lt;NA&gt;     NA
+# 12:         2         27     3       &lt;NA&gt;     NA
+# 13:         3         26     3 2007-09-02      1
+# 14:         4         32     3 2012-07-21      1
+# 15:         5         29     3       &lt;NA&gt;     NA
+</code></pre>
+<p>En el código anterior, usamos <code>sep=&quot;_child&quot;</code>, lo que da como resultado la fusión de solo las columnas que contienen esa cadena (seis nombres de columnas divididos en dos grupos cada uno). El argumento <code>child=as.integer</code> significa que el segundo grupo dará como resultado una columna de salida llamada <code>child</code> con valores definidos al insertar las cadenas de caracteres de ese grupo en la función <code>as.integer</code>.</p>
+<p>Finalmente, consideramos un ejemplo (tomado del paquete tidyr) donde necesitamos definir los grupos usando una expresión regular en lugar de un separador.</p>
+<pre><code class="language-r">(who &lt;- data.table(id=1, new_sp_m5564=2, newrel_f65=3))
+#       id new_sp_m5564 newrel_f65
+#    &lt;num&gt;        &lt;num&gt;      &lt;num&gt;
+# 1:     1            2          3
+melt(who, measure.vars = measure(
+  diagnosis, gender, ages, pattern=&quot;new_?(.*)_(.)(.*)&quot;))
+#       id diagnosis gender   ages value
+#    &lt;num&gt;    &lt;char&gt; &lt;char&gt; &lt;char&gt; &lt;num&gt;
+# 1:     1        sp      m   5564     2
+# 2:     1       rel      f     65     3
+</code></pre>
+<p>Al utilizar el argumento <code>patrón</code>, debe ser una expresión regular compatible con Perl que contenga la misma cantidad de grupos de captura (subexpresiones entre paréntesis) que la cantidad de otros argumentos (nombres de grupos). El código siguiente muestra cómo utilizar una expresión regular más compleja con cinco grupos, dos columnas de salida numérica y una función de conversión de tipo anónima.</p>
+<pre><code class="language-r">melt(who, measure.vars = measure(
+  diagnosis, gender, ages,
+  ymin=as.numeric,
+  ymax=function(y) ifelse(nzchar(y), as.numeric(y), Inf),
+  pattern=&quot;new_?(.*)_(.)(([0-9]{2})([0-9]{0,2}))&quot;
+))
+#       id diagnosis gender   ages  ymin  ymax value
+#    &lt;num&gt;    &lt;char&gt; &lt;char&gt; &lt;char&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt;
+# 1:     1        sp      m   5564    55    64     2
+# 2:     1       rel      f     65    65   Inf     3
+</code></pre>
+<h3 id="b-dcast-mejorado">b) <code>dcast</code> mejorado</h3>
+<p>¡Genial! Ahora podemos fusionar varias columnas simultáneamente. Ahora, dado el conjunto de datos <code>DT.m2</code> como se muestra arriba, ¿cómo podemos volver al mismo formato que los datos originales con los que comenzamos?</p>
+<p>Si usamos la funcionalidad actual de <code>dcast</code>, entonces tendríamos que realizar la conversión dos veces y vincular los resultados. Pero eso es, una vez más, demasiado verboso, no es sencillo y también es ineficiente.</p>
+<h4 id="conversi-n-de-m-ltiples-value-var-simult-neamente">- Conversión de múltiples <code>value.var</code> simultáneamente</h4>
+<p>Ahora podemos proporcionar <strong>múltiples columnas <code>value.var</code></strong> a <code>dcast</code> para <code>data.table</code> directamente para que las operaciones se realicen de manera interna y eficiente.</p>
+<pre><code class="language-r">## new 'cast' functionality - multiple value.vars
+DT.c2 = dcast(DT.m2, family_id + age_mother ~ variable, value.var = c(&quot;dob&quot;, &quot;gender&quot;))
+DT.c2
+# Key: &lt;family_id, age_mother&gt;
+#    family_id age_mother      dob_1      dob_2      dob_3 gender_1 gender_2 gender_3
+#        &lt;int&gt;      &lt;int&gt;     &lt;IDat&gt;     &lt;IDat&gt;     &lt;IDat&gt;    &lt;int&gt;    &lt;int&gt;    &lt;int&gt;
+# 1:         1         30 1998-11-26 2000-01-29       &lt;NA&gt;        1        2       NA
+# 2:         2         27 1996-06-22       &lt;NA&gt;       &lt;NA&gt;        2       NA       NA
+# 3:         3         26 2002-07-11 2004-04-05 2007-09-02        2        2        1
+# 4:         4         32 2004-10-10 2009-08-27 2012-07-21        1        1        1
+# 5:         5         29 2000-12-05 2005-02-28       &lt;NA&gt;        2        1       NA
+</code></pre>
+<ul>
+<li>
+<p>Los atributos se conservan en el resultado siempre que sea posible.</p>
+</li>
+<li>
+<p>Todo se gestiona internamente y de manera eficiente. Además de ser rápido, también es muy eficiente en el uso de la memoria.</p>
+</li>
+</ul>
+<h1></h1>
+<h4 id="varias-funciones-para-fun-agregate">Varias funciones para <code>fun.agregate</code>:</h4>
+<p>También puede proporcionar <em>múltiples funciones</em> a <code>fun.agregate</code> para <code>dcast</code> para <em>data.tables</em>. Consulte los ejemplos en <code>?dcast</code> que ilustran esta funcionalidad.</p>
+<h1></h1>
+<hr />
+</div>
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-core.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/autoloader/prism-autoloader.min.js" defer></script>
+</body>
+</html>

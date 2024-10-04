@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<title>Programming on data.table</title>
+<style type="text/css">
+/**
+ * Prism.s theme ported from highlight.js's xcode style
+ */
+pre code {
+  padding: 1em;
+}
+.token.comment {
+  color: #007400;
+}
+.token.punctuation {
+  color: #999;
+}
+.token.tag,
+.token.selector {
+  color: #aa0d91;
+}
+.token.boolean,
+.token.number,
+.token.constant,
+.token.symbol {
+  color: #1c00cf;
+}
+.token.property,
+.token.attr-name,
+.token.string,
+.token.char,
+.token.builtin {
+  color: #c41a16;
+}
+.token.inserted {
+  background-color: #ccffd8;
+}
+.token.deleted {
+  background-color: #ffebe9;
+}
+.token.operator,
+.token.entity,
+.token.url,
+.language-css .token.string,
+.style .token.string {
+  color: #9a6e3a;
+}
+.token.atrule,
+.token.attr-value,
+.token.keyword {
+  color: #836c28;
+}
+.token.function,
+.token.class-name {
+  color: #DD4A68;
+}
+.token.regex,
+.token.important,
+.token.variable {
+  color: #5c2699;
+}
+.token.important,
+.token.bold {
+  font-weight: bold;
+}
+.token.italic {
+  font-style: italic;
+}
+</style>
+<style type="text/css">
+body {
+  font-family: sans-serif;
+  max-width: 800px;
+  margin: auto;
+  padding: 1em;
+  line-height: 1.5;
+  box-sizing: border-box;
+}
+body, .footnotes, code { font-size: .9em; }
+li li { font-size: .95em; }
+*, *:before, *:after {
+  box-sizing: inherit;
+}
+pre, img { max-width: 100%; }
+pre, pre:hover {
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+pre code {
+  display: block;
+  overflow-x: auto;
+}
+code { font-family: 'DejaVu Sans Mono', 'Droid Sans Mono', 'Lucida Console', Consolas, Monaco, monospace; }
+:not(pre) > code, code[class] { background-color: #F8F8F8; }
+code.language-undefined, pre > code:not([class]) {
+  background-color: inherit;
+  border: 1px solid #eee;
+}
+table {
+  margin: auto;
+  border-top: 1px solid #666;
+}
+table thead th { border-bottom: 1px solid #ddd; }
+th, td { padding: 5px; }
+thead, tfoot, tr:nth-child(even) { background: #eee; }
+blockquote {
+  color: #666;
+  margin: 0;
+  padding-left: 1em;
+  border-left: 0.5em solid #eee;
+}
+hr, .footnotes::before { border: 1px dashed #ddd; }
+.frontmatter { text-align: center; }
+#TOC .numbered li { list-style: none; }
+#TOC .numbered { padding-left: 0; }
+#TOC .numbered ul { padding-left: 1em; }
+table, .body h2 { border-bottom: 1px solid #666; }
+.body .appendix, .appendix ~ h2 { border-bottom-style: dashed; }
+.footnote-ref a::before { content: "["; }
+.footnote-ref a::after { content: "]"; }
+section.footnotes::before {
+  content: "";
+  display: block;
+  max-width: 20em;
+}
+
+@media print {
+  body {
+    font-size: 12pt;
+    max-width: 100%;
+  }
+  tr, img { page-break-inside: avoid; }
+}
+@media only screen and (min-width: 992px) {
+  pre { white-space: pre; }
+}
+</style>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css">
+</head>
+<body>
+<div class="frontmatter">
+<div class="title"><h1>Programming on data.table</h1></div>
+<div class="author"><h2></h2></div>
+<div class="date"><h3>2024-10-04</h3></div>
+</div>
+<div class="body">
+<h2 id="introducci-n">Introducción</h2>
+<p><code>data.table</code>, desde sus primeras versiones, habilitó el uso de las funciones <code>subset</code> y <code>with</code> (o <code>within</code>) al definir el método <code>[.data.table</code>. <code>subset</code> y <code>with</code> son funciones básicas de R que son útiles para reducir la repetición en el código, mejorar la legibilidad y reducir la cantidad total de caracteres que el usuario debe escribir. Esta funcionalidad es posible en R debido a una característica bastante única llamada <em>evaluación diferida</em>. Esta característica permite que una función capte sus argumentos, antes de que se evalúen, y los evalúe en un ámbito diferente de aquel en el que fueron llamados. Recapitulemos el uso de la función <code>subset</code>.</p>
+<pre><code class="language-r">subset(iris, Species == &quot;setosa&quot;)
+#   Sepal.Length Sepal.Width Petal.Length Petal.Width Species
+# 1          5.1         3.5          1.4         0.2  setosa
+# 2          4.9         3.0          1.4         0.2  setosa
+# ...
+</code></pre>
+<p>Aquí, <code>subset</code> toma el segundo argumento y lo evalúa dentro del alcance del <code>data.frame</code> dado como su primer argumento. Esto elimina la necesidad de repetir variables, lo que lo hace menos propenso a errores y hace que el código sea más legible.</p>
+<h2 id="descripci-n-del-problema">Descripción del problema</h2>
+<p>El problema con este tipo de interfaz es que no podemos parametrizar fácilmente el código que la utiliza, ya que las expresiones que se pasan a esas funciones se sustituyen antes de ser evaluadas.</p>
+<h3 id="ejemplo">Ejemplo</h3>
+<pre><code class="language-r">my_subset = function(data, col, val) {
+  subset(data, col == val)
+}
+my_subset(iris, Species, &quot;setosa&quot;)
+# Error: objeto 'Species' no encontrado
+</code></pre>
+<h3 id="aproximaciones-al-problema">Aproximaciones al problema</h3>
+<p>Hay varias formas de solucionar este problema.</p>
+<h4 id="evite-la-evaluaci-n-perezosa">Evite la <em>evaluación perezosa</em></h4>
+<p>La solución más sencilla es evitar la <em>evaluación perezosa</em> en primer lugar y recurrir a enfoques menos intuitivos y más propensos a errores, como <code>df[[&quot;variable&quot;]]</code>, etc.</p>
+<pre><code class="language-r">my_subset = function(data, col, val) {
+  data[data[[col]] == val &amp; !is.na(data[[col]]), ]
+}
+my_subset(iris, col = &quot;Species&quot;, val = &quot;setosa&quot;)
+#   Sepal.Length Sepal.Width Petal.Length Petal.Width Species
+# 1          5.1         3.5          1.4         0.2  setosa
+# 2          4.9         3.0          1.4         0.2  setosa
+# ...
+</code></pre>
+<p>Aquí, calculamos un vector lógico de longitud <code>nrow(iris)</code>, luego este vector se suministra al argumento <code>i</code> de <code>[.data.frame</code> para realizar un subconjunto ordinario basado en “vectores lógicos”. Para alinearlo con <code>subset()</code>, que también descarta NA, necesitamos incluir un uso adicional de <code>data[[col]]</code> para capturarlo. Funciona bastante bien para este ejemplo simple, pero carece de flexibilidad, introduce repetición de variables y requiere que el usuario cambie la interfaz de la función para pasar el nombre de la columna como un carácter en lugar de un símbolo sin comillas. Cuanto más compleja sea la expresión que necesitamos parametrizar, menos práctico se vuelve este enfoque.</p>
+<h4 id="uso-de-parse-eval">Uso de <code>parse</code> / <code>eval</code></h4>
+<p>Este método suele ser el preferido por los principiantes en R, ya que es, quizás, el más sencillo desde el punto de vista conceptual. Esta forma requiere generar la expresión requerida mediante concatenación de cadenas, analizarla y, luego, evaluarla.</p>
+<pre><code class="language-r">my_subset = function(data, col, val) {
+  data = deparse(substitute(data))
+  col  = deparse(substitute(col))
+  val  = paste0(&quot;'&quot;, val, &quot;'&quot;)
+  text = paste0(&quot;subset(&quot;, data, &quot;, &quot;, col, &quot; == &quot;, val, &quot;)&quot;)
+  eval(parse(text = text)[[1L]])
+}
+my_subset(iris, Species, &quot;setosa&quot;)
+#   Sepal.Length Sepal.Width Petal.Length Petal.Width Species
+# 1          5.1         3.5          1.4         0.2  setosa
+# 2          4.9         3.0          1.4         0.2  setosa
+# ...
+</code></pre>
+<p>Tenemos que usar <code>deparse(substitute(...))</code> para capturar los nombres reales de los objetos pasados a la función, de modo que podamos construir la llamada a la función <code>subset</code> usando esos nombres originales. Aunque esto proporciona una flexibilidad ilimitada con una complejidad relativamente baja, <strong>se debe evitar el uso de <code>eval(parse(...))</code></strong>. Las principales razones son:</p>
+<ul>
+<li>falta de validación de sintaxis</li>
+<li><a href="https://github.com/Rdatatable/data.table/issues/2655#issuecomment-376781159">vulnerabilidad a la inyección de código</a></li>
+<li>la existencia de mejores alternativas</li>
+</ul>
+<p>Martin Machler, desarrollador principal del proyecto R, <a href="https://stackoverflow.com/a/40164111/2490497">dijo una vez</a>:</p>
+<blockquote>
+<p>Lo siento, pero no entiendo por qué tanta gente piensa que una cadena es algo que se puede evaluar. Debes cambiar tu mentalidad, de verdad. Olvídate de todas las conexiones entre cadenas de un lado y expresiones, llamadas y evaluaciones del otro. La (posiblemente) única conexión es a través de <code>parse(text = ....)</code> y todos los buenos programadores de R deberían saber que esto rara vez es un medio eficiente o seguro para construir expresiones (o llamadas). En lugar de eso, aprende más sobre <code>substitute()</code>, <code>quote()</code> y posiblemente el poder de usar <code>do.call(substitute, ......)</code>.</p>
+</blockquote>
+<h4 id="computaci-n-sobre-el-lenguaje">Computación sobre el lenguaje</h4>
+<p>Las funciones mencionadas anteriormente, junto con algunas otras (incluidas <code>as.call</code>, <code>as.name</code>/<code>as.symbol</code>, <code>bquote</code> y <code>eval</code>), se pueden categorizar como funciones para <em>computar en el lenguaje</em>, ya que operan en objetos <em>del lenguaje</em> (por ejemplo, <code>call</code>, <code>name</code>/<code>symbol</code>).</p>
+<pre><code class="language-r">my_subset = function(data, col, val) {
+  eval(substitute(subset(data, col == val)))
+}
+my_subset(iris, Species, &quot;setosa&quot;)
+#   Sepal.Length Sepal.Width Petal.Length Petal.Width Species
+# 1          5.1         3.5          1.4         0.2  setosa
+# 2          4.9         3.0          1.4         0.2  setosa
+# ...
+</code></pre>
+<p>Aquí, usamos la función base R <code>substitute</code> para transformar la llamada <code>subset(data, col == val)</code> en <code>subset(iris, Species == &quot;setosa&quot;)</code> sustituyendo <code>data</code>, <code>col</code> y <code>val</code> con sus nombres originales (o valores) de su entorno padre. Los beneficios de este enfoque con respecto a los anteriores deberían ser claros. Tenga en cuenta que, debido a que operamos en el nivel de objetos del lenguaje y no tenemos que recurrir a la manipulación de cadenas, nos referimos a esto como <em>computación en el lenguaje</em>. Hay un capítulo dedicado a <em>Computación en el lenguaje</em> en <a href="https://cran.r-project.org/doc/manuals/r-release/R-lang.html">Manual del lenguaje R</a>. Aunque no es necesario para <em>programar en data.table</em>, alentamos a los lectores a leer este capítulo para comprender mejor esta característica poderosa y única del lenguaje R.</p>
+<h4 id="utilice-paquetes-de-terceros">Utilice paquetes de terceros</h4>
+<p>Hay paquetes de terceros que pueden lograr lo que hace la computación R basada en las rutinas del lenguaje (<code>pryr</code>, <code>lazyeval</code> y <code>rlang</code>, por nombrar algunos).</p>
+<p>Si bien esto puede ser útil, aquí analizaremos un enfoque exclusivo de <code>data.table</code>.</p>
+<h2 id="programaci-n-en-data-table">Programación en data.table</h2>
+<p>Ahora que hemos establecido la forma correcta de parametrizar el código que utiliza <em>evaluación perezosa</em>, podemos pasar al tema principal de esta viñeta, <em>programación en data.table</em>.</p>
+<p>A partir de la versión 1.15.0, data.table proporciona un mecanismo robusto para parametrizar expresiones pasadas a los argumentos <code>i</code>, <code>j</code> y <code>by</code> (o <code>keyby</code>) de <code>[.data.table</code>. Está construido sobre la función <code>substitute</code> de R base e imita su interfaz. Aquí, presentamos <code>substitute2</code> como una versión más robusta y más fácil de usar de <code>substitute</code> de R base. Para obtener una lista completa de las diferencias entre <code>base::substitute</code> y <code>data.table::substitute2</code>, lea el <a href="https://rdatatable.gitlab.io/data.table/library/data.table/html/substitute2.html">manual de <code>substitute2</code></a>.</p>
+<h3 id="sustituir-variables-y-nombres">Sustituir variables y nombres</h3>
+<p>Digamos que queremos tener una función general que aplique una función a la suma de dos argumentos a los que se les ha aplicado otra función. Como ejemplo concreto, a continuación tenemos una función para calcular la longitud de la hipotenusa en un triángulo rectángulo, conociendo la longitud de sus catetos.</p>
+<p>\({\displaystyle c = \sqrt{a^2 + b^2}}\)</p>
+<pre><code class="language-r">square = function(x) x^2
+quote(
+  sqrt(square(a) + square(b))
+)
+# sqrt(square(a) + square(b))
+</code></pre>
+<p>El objetivo es hacer que cada nombre en la llamada anterior pueda pasarse como parámetro.</p>
+<pre><code class="language-r">substitute2(
+  outer(inner(var1) + inner(var2)),
+  env = list(
+    outer = &quot;sqrt&quot;,
+    inner = &quot;square&quot;,
+    var1 = &quot;a&quot;,
+    var2 = &quot;b&quot;
+  )
+)
+# sqrt(square(a) + square(b))
+</code></pre>
+<p>Podemos ver en la salida que se han reemplazado tanto los nombres de las funciones como los nombres de las variables pasadas a esas funciones. Usamos <code>substitute2</code> por conveniencia. En este caso simple, también se podría haber usado <code>substitute</code> de R base, aunque hubiera requerido el uso de <code>lapply(env, as.name)</code>.</p>
+<p>Ahora, para usar la sustitución dentro de <code>[.data.table</code>, no necesitamos llamar a la función <code>substitute2</code>. Como ahora se está usando internamente, todo lo que tenemos que hacer es proporcionar el argumento <code>env</code>, de la misma manera que lo hemos proporcionado a la función <code>substitute2</code> en el ejemplo anterior. La sustitución se puede aplicar a los argumentos <code>i</code>, <code>j</code> y <code>by</code> (o <code>keyby</code>) del método <code>[.data.table</code>. Tenga en cuenta que configurar el argumento <code>verbose</code> en <code>TRUE</code> se puede utilizar para imprimir expresiones después de que se aplique la sustitución. Esto es muy útil para la depuración.</p>
+<p>Utilicemos el conjunto de datos <code>iris</code> como demostración. Solo como ejemplo, supongamos que queremos calcular <code>Sepal.Hypotenuse</code>, tratando el ancho y la longitud del sépalo como si fueran los catetos de un triángulo rectángulo.</p>
+<pre><code class="language-r">DT = as.data.table(iris)
+
+str(
+  DT[, outer(inner(var1) + inner(var2)),
+     env = list(
+       outer = &quot;sqrt&quot;,
+       inner = &quot;square&quot;,
+       var1 = &quot;Sepal.Length&quot;,
+       var2 = &quot;Sepal.Width&quot;
+    )]
+)
+#  num [1:150] 6.19 5.75 5.69 5.55 6.16 ...
+
+# return as a data.table
+DT[, .(Species, var1, var2, out = outer(inner(var1) + inner(var2))),
+   env = list(
+     outer = &quot;sqrt&quot;,
+     inner = &quot;square&quot;,
+     var1 = &quot;Sepal.Length&quot;,
+     var2 = &quot;Sepal.Width&quot;,
+     out = &quot;Sepal.Hypotenuse&quot;
+  )]
+#        Species Sepal.Length Sepal.Width Sepal.Hypotenuse
+#         &lt;fctr&gt;        &lt;num&gt;       &lt;num&gt;            &lt;num&gt;
+#   1:    setosa          5.1         3.5         6.185467
+#   2:    setosa          4.9         3.0         5.745433
+#  ---                                                    
+# 149: virginica          6.2         3.4         7.071068
+# 150: virginica          5.9         3.0         6.618912
+</code></pre>
+<p>En la última llamada, agregamos otro parámetro, <code>out = &quot;Sepal.Hypotenuse&quot;</code>, que transmite el nombre deseado de la columna de salida. A diferencia del <code>substitute</code> de la base R, <code>substitute2</code> también se encargará de la sustitución de los nombres de los argumentos de la llamada.</p>
+<p>La sustitución también funciona en <code>i</code> y <code>by</code> (o <code>keyby</code>).</p>
+<pre><code class="language-r">DT[filter_col %in% filter_val,
+   .(var1, var2, out = outer(inner(var1) + inner(var2))),
+   by = by_col,
+   env = list(
+     outer = &quot;sqrt&quot;,
+     inner = &quot;square&quot;,
+     var1 = &quot;Sepal.Length&quot;,
+     var2 = &quot;Sepal.Width&quot;,
+     out = &quot;Sepal.Hypotenuse&quot;,
+     filter_col = &quot;Species&quot;,
+     filter_val = I(c(&quot;versicolor&quot;, &quot;virginica&quot;)),
+     by_col =  &quot;Species&quot;
+  )]
+#         Species Sepal.Length Sepal.Width Sepal.Hypotenuse
+#          &lt;fctr&gt;        &lt;num&gt;       &lt;num&gt;            &lt;num&gt;
+#   1: versicolor          7.0         3.2         7.696753
+#   2: versicolor          6.4         3.2         7.155418
+#  ---                                                     
+#  99:  virginica          6.2         3.4         7.071068
+# 100:  virginica          5.9         3.0         6.618912
+</code></pre>
+<h3 id="sustituir-variables-y-valores-de-caracteres">Sustituir variables y valores de caracteres</h3>
+<p>En el ejemplo anterior, hemos visto una característica conveniente de <code>substitute2</code>: conversión automática de cadenas en nombres/símbolos. Surge una pregunta obvia: ¿qué pasa si realmente queremos sustituir un parámetro con un valor de <em>carácter</em>, de modo de tener un comportamiento <code>substitute</code> de R base? Proporcionamos un mecanismo para escapar de la conversión automática envolviendo los elementos en la llamada <code>I()</code> de R base. La función <code>I</code> marca un objeto como <em>AsIs</em>, evitando que sus argumentos se conviertan automáticamente de carácter a símbolo. (Lea la documentación de <code>?AsIs</code> para obtener más detalles). Si se desea un comportamiento de R base para todo el argumento <code>env</code>, entonces es mejor envolver todo el argumento en <code>I()</code>. Alternativamente, cada elemento de la lista se puede envolver en <code>I()</code> individualmente. Exploremos ambos casos a continuación.</p>
+<pre><code class="language-r">substitute(    # base R behaviour
+  rank(input, ties.method = ties),
+  env = list(input = as.name(&quot;Sepal.Width&quot;), ties = &quot;first&quot;)
+)
+# rank(Sepal.Width, ties.method = &quot;first&quot;)
+
+substitute2(   # mimicking base R's &quot;substitute&quot; using &quot;I&quot;
+  rank(input, ties.method = ties),
+  env = I(list(input = as.name(&quot;Sepal.Width&quot;), ties = &quot;first&quot;))
+)
+# rank(Sepal.Width, ties.method = &quot;first&quot;)
+
+substitute2(   # only particular elements of env are used &quot;AsIs&quot;
+  rank(input, ties.method = ties),
+  env = list(input = &quot;Sepal.Width&quot;, ties = I(&quot;first&quot;))
+)
+# rank(Sepal.Width, ties.method = &quot;first&quot;)
+</code></pre>
+<p>Tenga en cuenta que la conversión funciona de forma recursiva en cada elemento de la lista, incluido el mecanismo de escape, por supuesto.</p>
+<pre><code class="language-r">substitute2(   # all are symbols
+  f(v1, v2),
+  list(v1 = &quot;a&quot;, v2 = list(&quot;b&quot;, list(&quot;c&quot;, &quot;d&quot;)))
+)
+# f(a, list(b, list(c, d)))
+substitute2(   # 'a' and 'd' should stay as character
+  f(v1, v2),
+  list(v1 = I(&quot;a&quot;), v2 = list(&quot;b&quot;, list(&quot;c&quot;, I(&quot;d&quot;))))
+)
+# f(&quot;a&quot;, list(b, list(c, &quot;d&quot;)))
+</code></pre>
+<h3 id="sustituci-n-de-listas-de-longitud-arbitraria">Sustitución de listas de longitud arbitraria</h3>
+<p>El ejemplo presentado anteriormente ilustra una forma elegante y poderosa de hacer que su código sea más dinámico. Sin embargo, existen muchos otros casos mucho más complejos con los que un desarrollador podría tener que lidiar. Un problema común es manejar una lista de argumentos de longitud arbitraria.</p>
+<p>Un caso de uso obvio podría ser imitar la funcionalidad de <code>.SD</code> inyectando una llamada <code>list</code> en el argumento <code>j</code>.</p>
+<pre><code class="language-r">cols = c(&quot;Sepal.Length&quot;, &quot;Sepal.Width&quot;)
+DT[, .SD, .SDcols = cols]
+#      Sepal.Length Sepal.Width
+#             &lt;num&gt;       &lt;num&gt;
+#   1:          5.1         3.5
+#   2:          4.9         3.0
+#  ---                         
+# 149:          6.2         3.4
+# 150:          5.9         3.0
+</code></pre>
+<p>Teniendo el parámetro <code>cols</code>, nos gustaría unirlo en una llamada <code>list</code>, haciendo que el argumento <code>j</code> se vea como en el código a continuación.</p>
+<pre><code class="language-r">DT[, list(Sepal.Length, Sepal.Width)]
+#      Sepal.Length Sepal.Width
+#             &lt;num&gt;       &lt;num&gt;
+#   1:          5.1         3.5
+#   2:          4.9         3.0
+#  ---                         
+# 149:          6.2         3.4
+# 150:          5.9         3.0
+</code></pre>
+<p><em>Empalmar</em> es una operación en la que una lista de objetos se debe incluir en una expresión como una secuencia de argumentos para llamar. En el lenguaje R básico, empalmar <code>cols</code> en una <code>lista</code> se puede lograr usando <code>as.call(c(quote(list), lapply(cols, as.name)))</code>. Además, a partir de R 4.0.0, hay una nueva interfaz para dicha operación en la función <code>bquote</code>.</p>
+<p>En data.table, lo hacemos más fácil al incluir automáticamente una lista de objetos en una llamada de lista con esos objetos. Esto significa que cualquier objeto <code>list</code> dentro del argumento de lista <code>env</code> se convertirá en una <code>call</code> de lista, lo que hace que la API para ese caso de uso sea tan simple como se presenta a continuación.</p>
+<pre><code class="language-r"># this works
+DT[, j,
+   env = list(j = as.list(cols)),
+   verbose = TRUE]
+# Argument 'j' after substitute: list(Sepal.Length, Sepal.Width)
+# Detected that j uses these columns: [Sepal.Length, Sepal.Width]
+#      Sepal.Length Sepal.Width
+#             &lt;num&gt;       &lt;num&gt;
+#   1:          5.1         3.5
+#   2:          4.9         3.0
+#  ---                         
+# 149:          6.2         3.4
+# 150:          5.9         3.0
+
+# this will not work
+#DT[, list(cols),
+#   env = list(cols = cols)]
+</code></pre>
+<p>Es importante proporcionar una llamada a <code>as.list</code>, en lugar de simplemente una lista, dentro del argumento de lista <code>env</code>, como se muestra en el ejemplo anterior.</p>
+<p>Exploremos el <em>alistamiento</em> con más detalle.</p>
+<pre><code class="language-r">DT[, j,  # data.table automatically enlists nested lists into list calls
+   env = list(j = as.list(cols)),
+   verbose = TRUE]
+# Argument 'j' after substitute: list(Sepal.Length, Sepal.Width)
+# Detected that j uses these columns: [Sepal.Length, Sepal.Width]
+#      Sepal.Length Sepal.Width
+#             &lt;num&gt;       &lt;num&gt;
+#   1:          5.1         3.5
+#   2:          4.9         3.0
+#  ---                         
+# 149:          6.2         3.4
+# 150:          5.9         3.0
+
+DT[, j,  # turning the above 'j' list into a list call
+   env = list(j = quote(list(Sepal.Length, Sepal.Width))),
+   verbose = TRUE]
+# Argument 'j' after substitute: list(Sepal.Length, Sepal.Width)
+# Detected that j uses these columns: [Sepal.Length, Sepal.Width]
+#      Sepal.Length Sepal.Width
+#             &lt;num&gt;       &lt;num&gt;
+#   1:          5.1         3.5
+#   2:          4.9         3.0
+#  ---                         
+# 149:          6.2         3.4
+# 150:          5.9         3.0
+
+DT[, j,  # the same as above but accepts character vector
+   env = list(j = as.call(c(quote(list), lapply(cols, as.name)))),
+   verbose = TRUE]
+# Argument 'j' after substitute: list(Sepal.Length, Sepal.Width)
+# Detected that j uses these columns: [Sepal.Length, Sepal.Width]
+#      Sepal.Length Sepal.Width
+#             &lt;num&gt;       &lt;num&gt;
+#   1:          5.1         3.5
+#   2:          4.9         3.0
+#  ---                         
+# 149:          6.2         3.4
+# 150:          5.9         3.0
+</code></pre>
+<p>Ahora, en lugar de llamar a esos símbolos a través de una lista, intentaremos pasar una lista de símbolos. Usaremos <code>I()</code> para evitar la conversión automática de <em>enlist</em> pero, como esto también desactivará la conversión de caracteres a símbolos, también tenemos que usar <code>as.name</code>.</p>
+<pre><code class="language-r">DT[, j,  # list of symbols
+   env = I(list(j = lapply(cols, as.name))),
+   verbose = TRUE]
+# Argument 'j' after substitute: list(Sepal.Length, Sepal.Width)
+# Error in `[.data.table`(DT, , j, env = I(list(j = lapply(cols, as.name))), : Cuando with=FALSE, el argumento j debe ser de tipo lógico/carácter/entero indicando las columnas a seleccionar.
+
+DT[, j,  # again the proper way, enlist list to list call automatically
+   env = list(j = as.list(cols)),
+   verbose = TRUE]
+# Argument 'j' after substitute: list(Sepal.Length, Sepal.Width)
+# Detected that j uses these columns: [Sepal.Length, Sepal.Width]
+#      Sepal.Length Sepal.Width
+#             &lt;num&gt;       &lt;num&gt;
+#   1:          5.1         3.5
+#   2:          4.9         3.0
+#  ---                         
+# 149:          6.2         3.4
+# 150:          5.9         3.0
+</code></pre>
+<p>Tenga en cuenta que ambas expresiones, aunque visualmente parecen iguales, no son idénticas.</p>
+<pre><code class="language-r">str(substitute2(j, env = I(list(j = lapply(cols, as.name)))))
+# List of 2
+#  $ : symbol Sepal.Length
+#  $ : symbol Sepal.Width
+
+str(substitute2(j, env = list(j = as.list(cols))))
+#  language list(Sepal.Length, Sepal.Width)
+</code></pre>
+<p>Para obtener una explicación más detallada sobre este asunto, consulte los ejemplos en la <a href="https://rdatatable.gitlab.io/data.table/library/data.table/html/substitute2.html">documentación de<code>substitute2</code></a>.</p>
+<h3 id="sustituci-n-de-una-consulta-compleja">Sustitución de una consulta compleja</h3>
+<p>Tomemos como ejemplo de una función más compleja el cálculo del valor cuadrático medio.</p>
+<p>\({\displaystyle x_{\text{RMS}}={\sqrt{{\frac{1}{n}}\left(x_{1}^{2}+x_{2}^{2}+\cdots +x_{n}^{2}\right)}}}\)</p>
+<p>Toma una cantidad arbitraria de variables en la entrada, pero ahora no podemos simplemente <em>unir</em> una lista de argumentos en una llamada de lista porque cada uno de esos argumentos tiene que estar envuelto en una llamada <code>cuadrada</code>. En este caso, tenemos que <em>unir</em> a mano en lugar de confiar en el <em>enlist</em> automático de data.table.</p>
+<p>Primero, tenemos que construir llamadas a la función <code>square</code> para cada una de las variables (ver <code>inner_calls</code>). Luego, tenemos que reducir la lista de llamadas a una sola llamada, que tenga una secuencia anidada de llamadas <code>+</code> (ver <code>add_calls</code>). Por último, tenemos que sustituir la llamada construida en la expresión circundante (ver <code>rms</code>).</p>
+<pre><code class="language-r">outer = &quot;sqrt&quot;
+inner = &quot;square&quot;
+vars = c(&quot;Sepal.Length&quot;, &quot;Sepal.Width&quot;, &quot;Petal.Length&quot;, &quot;Petal.Width&quot;)
+
+syms = lapply(vars, as.name)
+to_inner_call = function(var, fun) call(fun, var)
+inner_calls = lapply(syms, to_inner_call, inner)
+print(inner_calls)
+# [[1]]
+# square(Sepal.Length)
+# 
+# [[2]]
+# square(Sepal.Width)
+# 
+# [[3]]
+# square(Petal.Length)
+# 
+# [[4]]
+# square(Petal.Width)
+
+to_add_call = function(x, y) call(&quot;+&quot;, x, y)
+add_calls = Reduce(to_add_call, inner_calls)
+print(add_calls)
+# square(Sepal.Length) + square(Sepal.Width) + square(Petal.Length) + 
+#     square(Petal.Width)
+
+rms = substitute2(
+  expr = outer((add_calls) / len),
+  env = list(
+    outer = outer,
+    add_calls = add_calls,
+    len = length(vars)
+  )
+)
+print(rms)
+# sqrt((square(Sepal.Length) + square(Sepal.Width) + square(Petal.Length) + 
+#     square(Petal.Width))/4L)
+
+str(
+  DT[, j, env = list(j = rms)]
+)
+#  num [1:150] 3.17 2.96 2.92 2.87 3.16 ...
+
+# same, but skipping last substitute2 call and using add_calls directly
+str(
+  DT[, outer((add_calls) / len),
+     env = list(
+       outer = outer,
+       add_calls = add_calls,
+       len = length(vars)
+    )]
+)
+#  num [1:150] 3.17 2.96 2.92 2.87 3.16 ...
+
+# return as data.table
+j = substitute2(j, list(j = as.list(setNames(nm = c(vars, &quot;Species&quot;, &quot;rms&quot;)))))
+j[[&quot;rms&quot;]] = rms
+print(j)
+# list(Sepal.Length = Sepal.Length, Sepal.Width = Sepal.Width, 
+#     Petal.Length = Petal.Length, Petal.Width = Petal.Width, Species = Species, 
+#     rms = sqrt((square(Sepal.Length) + square(Sepal.Width) + 
+#         square(Petal.Length) + square(Petal.Width))/4L))
+DT[, j, env = list(j = j)]
+#      Sepal.Length Sepal.Width Petal.Length Petal.Width   Species      rms
+#             &lt;num&gt;       &lt;num&gt;        &lt;num&gt;       &lt;num&gt;    &lt;fctr&gt;    &lt;num&gt;
+#   1:          5.1         3.5          1.4         0.2    setosa 3.172538
+#   2:          4.9         3.0          1.4         0.2    setosa 2.958462
+#  ---                                                                     
+# 149:          6.2         3.4          5.4         2.3 virginica 4.594834
+# 150:          5.9         3.0          5.1         1.8 virginica 4.273757
+
+# alternatively
+j = as.call(c(
+  quote(list),
+  lapply(setNames(nm = vars), as.name),
+  list(Species = as.name(&quot;Species&quot;)),
+  list(rms = rms)
+))
+print(j)
+# list(Sepal.Length = Sepal.Length, Sepal.Width = Sepal.Width, 
+#     Petal.Length = Petal.Length, Petal.Width = Petal.Width, Species = Species, 
+#     rms = sqrt((square(Sepal.Length) + square(Sepal.Width) + 
+#         square(Petal.Length) + square(Petal.Width))/4L))
+DT[, j, env = list(j = j)]
+#      Sepal.Length Sepal.Width Petal.Length Petal.Width   Species      rms
+#             &lt;num&gt;       &lt;num&gt;        &lt;num&gt;       &lt;num&gt;    &lt;fctr&gt;    &lt;num&gt;
+#   1:          5.1         3.5          1.4         0.2    setosa 3.172538
+#   2:          4.9         3.0          1.4         0.2    setosa 2.958462
+#  ---                                                                     
+# 149:          6.2         3.4          5.4         2.3 virginica 4.594834
+# 150:          5.9         3.0          5.1         1.8 virginica 4.273757
+</code></pre>
+<h2 id="interfaces-retiradas">Interfaces retiradas</h2>
+<p>En <code>[.data.table</code>, también es posible utilizar otros mecanismos para la sustitución de variables o para pasar expresiones entre comillas. Estos incluyen <code>get</code> y <code>mget</code> para la inyección en línea de variables proporcionando sus nombres como cadenas, y <code>eval</code> que le dice a <code>[.data.table</code> que la expresión que pasamos a un argumento es una expresión entre comillas y que debe manejarse de manera diferente. Esas interfaces ahora deben considerarse retiradas y recomendamos utilizar el nuevo argumento <code>env</code> en su lugar.</p>
+<h3 id="obtener_1"><code>obtener</code></h3>
+<pre><code class="language-r">v1 = &quot;Petal.Width&quot;
+v2 = &quot;Sepal.Width&quot;
+
+DT[, .(total = sum(get(v1), get(v2)))]
+#    total
+#    &lt;num&gt;
+# 1: 638.5
+
+DT[, .(total = sum(v1, v2)),
+   env = list(v1 = v1, v2 = v2)]
+#    total
+#    &lt;num&gt;
+# 1: 638.5
+</code></pre>
+<h3 id="obtener_2"><code>Obtener</code></h3>
+<pre><code class="language-r">v = c(&quot;Petal.Width&quot;, &quot;Sepal.Width&quot;)
+
+DT[, lapply(mget(v), mean)]
+#    Petal.Width Sepal.Width
+#          &lt;num&gt;       &lt;num&gt;
+# 1:    1.199333    3.057333
+
+DT[, lapply(v, mean),
+   env = list(v = as.list(v))]
+#          V1       V2
+#       &lt;num&gt;    &lt;num&gt;
+# 1: 1.199333 3.057333
+
+DT[, lapply(v, mean),
+   env = list(v = as.list(setNames(nm = v)))]
+#    Petal.Width Sepal.Width
+#          &lt;num&gt;       &lt;num&gt;
+# 1:    1.199333    3.057333
+</code></pre>
+<h3 id="evaluar"><code>evaluar</code></h3>
+<p>En lugar de utilizar la función <code>eval</code>, podemos proporcionar una expresión entre comillas en el elemento del argumento <code>env</code>, por lo que no se necesita una llamada <code>eval</code> adicional.</p>
+<pre><code class="language-r">cl = quote(
+  .(Petal.Width = mean(Petal.Width), Sepal.Width = mean(Sepal.Width))
+)
+
+DT[, eval(cl)]
+#    Petal.Width Sepal.Width
+#          &lt;num&gt;       &lt;num&gt;
+# 1:    1.199333    3.057333
+
+DT[, cl, env = list(cl = cl)]
+#    Petal.Width Sepal.Width
+#          &lt;num&gt;       &lt;num&gt;
+# 1:    1.199333    3.057333
+</code></pre>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-core.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/autoloader/prism-autoloader.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/combine/npm/katex/dist/katex.min.js,npm/katex/dist/contrib/auto-render.min.js,npm/@xiee/utils/js/render-katex.js" defer></script>
+</body>
+</html>

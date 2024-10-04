@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<title>Reference semantics</title>
+<style type="text/css">
+/**
+ * Prism.s theme ported from highlight.js's xcode style
+ */
+pre code {
+  padding: 1em;
+}
+.token.comment {
+  color: #007400;
+}
+.token.punctuation {
+  color: #999;
+}
+.token.tag,
+.token.selector {
+  color: #aa0d91;
+}
+.token.boolean,
+.token.number,
+.token.constant,
+.token.symbol {
+  color: #1c00cf;
+}
+.token.property,
+.token.attr-name,
+.token.string,
+.token.char,
+.token.builtin {
+  color: #c41a16;
+}
+.token.inserted {
+  background-color: #ccffd8;
+}
+.token.deleted {
+  background-color: #ffebe9;
+}
+.token.operator,
+.token.entity,
+.token.url,
+.language-css .token.string,
+.style .token.string {
+  color: #9a6e3a;
+}
+.token.atrule,
+.token.attr-value,
+.token.keyword {
+  color: #836c28;
+}
+.token.function,
+.token.class-name {
+  color: #DD4A68;
+}
+.token.regex,
+.token.important,
+.token.variable {
+  color: #5c2699;
+}
+.token.important,
+.token.bold {
+  font-weight: bold;
+}
+.token.italic {
+  font-style: italic;
+}
+</style>
+<style type="text/css">
+body {
+  font-family: sans-serif;
+  max-width: 800px;
+  margin: auto;
+  padding: 1em;
+  line-height: 1.5;
+  box-sizing: border-box;
+}
+body, .footnotes, code { font-size: .9em; }
+li li { font-size: .95em; }
+*, *:before, *:after {
+  box-sizing: inherit;
+}
+pre, img { max-width: 100%; }
+pre, pre:hover {
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+pre code {
+  display: block;
+  overflow-x: auto;
+}
+code { font-family: 'DejaVu Sans Mono', 'Droid Sans Mono', 'Lucida Console', Consolas, Monaco, monospace; }
+:not(pre) > code, code[class] { background-color: #F8F8F8; }
+code.language-undefined, pre > code:not([class]) {
+  background-color: inherit;
+  border: 1px solid #eee;
+}
+table {
+  margin: auto;
+  border-top: 1px solid #666;
+}
+table thead th { border-bottom: 1px solid #ddd; }
+th, td { padding: 5px; }
+thead, tfoot, tr:nth-child(even) { background: #eee; }
+blockquote {
+  color: #666;
+  margin: 0;
+  padding-left: 1em;
+  border-left: 0.5em solid #eee;
+}
+hr, .footnotes::before { border: 1px dashed #ddd; }
+.frontmatter { text-align: center; }
+#TOC .numbered li { list-style: none; }
+#TOC .numbered { padding-left: 0; }
+#TOC .numbered ul { padding-left: 1em; }
+table, .body h2 { border-bottom: 1px solid #666; }
+.body .appendix, .appendix ~ h2 { border-bottom-style: dashed; }
+.footnote-ref a::before { content: "["; }
+.footnote-ref a::after { content: "]"; }
+section.footnotes::before {
+  content: "";
+  display: block;
+  max-width: 20em;
+}
+
+@media print {
+  body {
+    font-size: 12pt;
+    max-width: 100%;
+  }
+  tr, img { page-break-inside: avoid; }
+}
+@media only screen and (min-width: 992px) {
+  pre { white-space: pre; }
+}
+</style>
+</head>
+<body>
+<div class="frontmatter">
+<div class="title"><h1>Reference semantics</h1></div>
+<div class="author"><h2></h2></div>
+<div class="date"><h3>2024-10-04</h3></div>
+</div>
+<div class="body">
+<p>Esta viñeta analiza la semántica de referencia de <em>data.table</em>, que permite <em>agregar/actualizar/eliminar</em> columnas de una <em>data.table por referencia</em>, y también combinarlas con <code>i</code> y <code>by</code>. Está dirigida a aquellos que ya están familiarizados con la sintaxis de <em>data.table</em>, su forma general, cómo crear subconjuntos de filas en <code>i</code>, seleccionar y calcular columnas, y realizar agregaciones por grupo. Si no está familiarizado con estos conceptos, lea primero la viñeta <em>“Introducción a data.table”</em>.</p>
+<hr />
+<h2 id="data">Datos</h2>
+<p>Utilizaremos los mismos datos de “vuelos” que en la viñeta <em>“Introducción a data.table”</em>.</p>
+<pre><code class="language-r">flights &lt;- fread(&quot;flights14.csv&quot;)
+flights
+#          year month   day dep_delay arr_delay carrier origin   dest air_time distance  hour
+#         &lt;int&gt; &lt;int&gt; &lt;int&gt;     &lt;int&gt;     &lt;int&gt;  &lt;char&gt; &lt;char&gt; &lt;char&gt;    &lt;int&gt;    &lt;int&gt; &lt;int&gt;
+#      1:  2014     1     1        14        13      AA    JFK    LAX      359     2475     9
+#      2:  2014     1     1        -3        13      AA    JFK    LAX      363     2475    11
+#      3:  2014     1     1         2         9      AA    JFK    LAX      351     2475    19
+#      4:  2014     1     1        -8       -26      AA    LGA    PBI      157     1035     7
+#      5:  2014     1     1         2         1      AA    JFK    LAX      350     2475    13
+#     ---                                                                                    
+# 253312:  2014    10    31         1       -30      UA    LGA    IAH      201     1416    14
+# 253313:  2014    10    31        -5       -14      UA    EWR    IAH      189     1400     8
+# 253314:  2014    10    31        -8        16      MQ    LGA    RDU       83      431    11
+# 253315:  2014    10    31        -4        15      MQ    LGA    DTW       75      502    11
+# 253316:  2014    10    31        -5         1      MQ    LGA    SDF      110      659     8
+dim(flights)
+# [1] 253316     11
+</code></pre>
+<h2 id="introducci-n">Introducción</h2>
+<p>En esta viñeta, vamos a</p>
+<ol>
+<li>
+<p>Primero analicemos brevemente la semántica de referencia y observemos las dos formas diferentes en las que se puede utilizar el operador <code>:=</code></p>
+</li>
+<li>
+<p>Luego veamos cómo podemos <em>agregar/actualizar/eliminar</em> columnas <em>por referencia</em> en <code>j</code> usando el operador <code>:=</code> y cómo combinarlo con <code>i</code> y <code>by</code>.</p>
+</li>
+<li>
+<p>y finalmente veremos el uso de <code>:=</code> por sus <em>efectos secundarios</em> y cómo podemos evitar los efectos secundarios usando <code>copy()</code>.</p>
+</li>
+</ol>
+<h2 id="1-sem-ntica-de-referencia">1. Semántica de referencia</h2>
+<p>Todas las operaciones que hemos visto hasta ahora en la viñeta anterior dieron como resultado un nuevo conjunto de datos. Veremos cómo <em>agregar</em> nuevas columnas, <em>actualizar</em> o <em>eliminar</em> columnas existentes en los datos originales.</p>
+<h3 id="a-antecedentes">a) Antecedentes</h3>
+<p>Antes de analizar la <em>semántica de referencia</em>, considere el <em>data.frame</em> que se muestra a continuación:</p>
+<pre><code class="language-r">DF = data.frame(ID = c(&quot;b&quot;,&quot;b&quot;,&quot;b&quot;,&quot;a&quot;,&quot;a&quot;,&quot;c&quot;), a = 1:6, b = 7:12, c = 13:18)
+DF
+#   ID a  b  c
+# 1  b 1  7 13
+# 2  b 2  8 14
+# 3  b 3  9 15
+# 4  a 4 10 16
+# 5  a 5 11 17
+# 6  c 6 12 18
+</code></pre>
+<p>Cuando lo hicimos:</p>
+<pre><code class="language-r">DF$c &lt;- 18:13               # (1) -- replace entire column
+# or
+DF$c[DF$ID == &quot;b&quot;] &lt;- 15:13 # (2) -- subassign in column 'c'
+</code></pre>
+<p>Tanto (1) como (2) dieron como resultado una copia profunda de todo el data.frame en las versiones de <code>R &lt; 3.1</code>. <a href="https://stackoverflow.com/q/23898969/559784">Se copió más de una vez</a>. Para mejorar el rendimiento evitando estas copias redundantes, <em>data.table</em> utilizó el <a href="https://stackoverflow.com/q/7033106/559784">operador <code>:=</code> disponible pero no utilizado en R</a>.</p>
+<p>Se realizaron grandes mejoras de rendimiento en <code>R v3.1</code>, como resultado de lo cual solo se realiza una copia <em>superficial</em> para (1) y no una copia <em>profunda</em>. Sin embargo, para (2), todavía se realiza una copia <em>profunda</em> de toda la columna incluso en <code>R v3.1+</code>. Esto significa que cuantas más columnas se subasignan en la <em>misma consulta</em>, más copias <em>profundas</em> realiza R.</p>
+<h4 id="copia-superficial-vs-copia-profunda">Copia <em>superficial</em> vs. copia <em>profunda</em></h4>
+<p>Una copia <em>superficial</em> es simplemente una copia del vector de punteros de columna (que corresponden a las columnas en un <em>data.frame</em> o <em>data.table</em>). Los datos reales no se copian físicamente en la memoria.</p>
+<p>Una copia <em>profunda</em>, por otro lado, copia todos los datos a otra ubicación en la memoria.</p>
+<p>Al crear un subconjunto de una <em>data.table</em> utilizando <code>i</code> (por ejemplo, <code>DT[1:10]</code>), se realiza una copia <em>profunda</em>. Sin embargo, cuando no se proporciona <code>i</code> o es igual a <code>TRUE</code>, se realiza una copia <em>superficial</em>.</p>
+<h1></h1>
+<p>Con el operador <code>:=</code> de <em>data.table</em>, no se realizan copias en <em>ambos</em> (1) y (2), independientemente de la versión de R que esté utilizando. Esto se debe a que el operador <code>:=</code> actualiza las columnas de <em>data.table</em> <em>en el lugar</em> (por referencia).</p>
+<h3 id="b-el-operador">b) El operador <code>:=</code></h3>
+<p>Se puede utilizar en <code>j</code> de dos maneras:</p>
+<p>(a) La forma <code>LHS := RHS</code></p>
+<pre><code class="language-r">DT[, c(&quot;colA&quot;, &quot;colB&quot;, ...) := list(valA, valB, ...)]
+
+# when you have only one column to assign to you
+# can drop the quotes and list(), for convenience
+DT[, colA := valA]
+</code></pre>
+<p>(b) La forma funcional</p>
+<pre><code class="language-r">DT[, `:=`(colA = valA, # valA is assigned to colA
+          colB = valB, # valB is assigned to colB
+          ...
+)]
+</code></pre>
+<p>Tenga en cuenta que el código anterior explica cómo se puede utilizar <code>:=</code>. No son ejemplos prácticos. Comenzaremos a utilizarlos en la tabla de datos <code>flights</code> a partir de la siguiente sección.</p>
+<h1></h1>
+<ul>
+<li>
+<p>En (a), <code>LHS</code> toma un vector de caracteres de nombres de columnas y <code>RHS</code> una <em>lista de valores</em>. <code>RHS</code> solo necesita ser una <code>lista</code>, independientemente de cómo se genere (por ejemplo, utilizando <code>lapply()</code>, <code>list()</code>, <code>mget()</code>, <code>mapply()</code>, etc.). Esta forma suele ser fácil de programar y es particularmente útil cuando no se conocen de antemano las columnas a las que se deben asignar valores.</p>
+</li>
+<li>
+<p>Por otro lado, (b) es útil si quieres anotar algunos comentarios para más tarde.</p>
+</li>
+<li>
+<p>El resultado se devuelve de forma <em>invisible</em>.</p>
+</li>
+<li>
+<p>Dado que <code>:=</code> está disponible en <code>j</code>, podemos combinarlo con las operaciones <code>i</code> y <code>by</code> tal como las operaciones de agregación que vimos en la viñeta anterior.</p>
+</li>
+</ul>
+<h1></h1>
+<p>En las dos formas de <code>:=</code> que se muestran arriba, tenga en cuenta que no asignamos el resultado a una variable, porque no es necesario. La entrada <em>data.table</em> se modifica por referencia. Veamos algunos ejemplos para entender lo que queremos decir con esto.</p>
+<p>Para el resto de la viñeta, trabajaremos con la tabla de datos <em>flights</em>.</p>
+<h2 id="2-agregar-actualizar-eliminar-columnas-por-referencia">2. Agregar/actualizar/eliminar columnas <em>por referencia</em></h2>
+<h3 id="ref-j">a) Agregar columnas por referencia</h3>
+<h4 id="c-mo-podemos-agregar-las-columnas-velocidad-y-demora-total-de-cada-vuelo-a-la-tabla-de-datos-vuelos">– ¿Cómo podemos agregar las columnas <em>velocidad</em> y <em>demora total</em> de cada vuelo a la <em>tabla de datos</em> <code>vuelos</code>?</h4>
+<pre><code class="language-r">flights[, `:=`(speed = distance / (air_time/60), # speed in mph (mi/h)
+               delay = arr_delay + dep_delay)]   # delay in minutes
+#          year month   day dep_delay arr_delay carrier origin   dest air_time distance  hour
+#         &lt;int&gt; &lt;int&gt; &lt;int&gt;     &lt;int&gt;     &lt;int&gt;  &lt;char&gt; &lt;char&gt; &lt;char&gt;    &lt;int&gt;    &lt;int&gt; &lt;int&gt;
+#      1:  2014     1     1        14        13      AA    JFK    LAX      359     2475     9
+#      2:  2014     1     1        -3        13      AA    JFK    LAX      363     2475    11
+#      3:  2014     1     1         2         9      AA    JFK    LAX      351     2475    19
+#      4:  2014     1     1        -8       -26      AA    LGA    PBI      157     1035     7
+#      5:  2014     1     1         2         1      AA    JFK    LAX      350     2475    13
+#     ---                                                                                    
+# 253312:  2014    10    31         1       -30      UA    LGA    IAH      201     1416    14
+# 253313:  2014    10    31        -5       -14      UA    EWR    IAH      189     1400     8
+# 253314:  2014    10    31        -8        16      MQ    LGA    RDU       83      431    11
+# 253315:  2014    10    31        -4        15      MQ    LGA    DTW       75      502    11
+# 253316:  2014    10    31        -5         1      MQ    LGA    SDF      110      659     8
+#            speed delay
+#            &lt;num&gt; &lt;int&gt;
+#      1: 413.6490    27
+#      2: 409.0909    10
+#      3: 423.0769    11
+#      4: 395.5414   -34
+#      5: 424.2857     3
+#     ---               
+# 253312: 422.6866   -29
+# 253313: 444.4444   -19
+# 253314: 311.5663     8
+# 253315: 401.6000    11
+# 253316: 359.4545    -4
+head(flights)
+#     year month   day dep_delay arr_delay carrier origin   dest air_time distance  hour    speed
+#    &lt;int&gt; &lt;int&gt; &lt;int&gt;     &lt;int&gt;     &lt;int&gt;  &lt;char&gt; &lt;char&gt; &lt;char&gt;    &lt;int&gt;    &lt;int&gt; &lt;int&gt;    &lt;num&gt;
+# 1:  2014     1     1        14        13      AA    JFK    LAX      359     2475     9 413.6490
+# 2:  2014     1     1        -3        13      AA    JFK    LAX      363     2475    11 409.0909
+# 3:  2014     1     1         2         9      AA    JFK    LAX      351     2475    19 423.0769
+# 4:  2014     1     1        -8       -26      AA    LGA    PBI      157     1035     7 395.5414
+# 5:  2014     1     1         2         1      AA    JFK    LAX      350     2475    13 424.2857
+# 6:  2014     1     1         4         0      AA    EWR    LAX      339     2454    18 434.3363
+#    delay
+#    &lt;int&gt;
+# 1:    27
+# 2:    10
+# 3:    11
+# 4:   -34
+# 5:     3
+# 6:     4
+
+## alternatively, using the 'LHS := RHS' form
+# flights[, c(&quot;speed&quot;, &quot;delay&quot;) := list(distance/(air_time/60), arr_delay + dep_delay)]
+</code></pre>
+<h4 id="tenga-en-cuenta-que">Tenga en cuenta que</h4>
+<ul>
+<li>
+<p>No tuvimos que volver a asignar el resultado a <code>vuelos</code>.</p>
+</li>
+<li>
+<p>La tabla de datos <code>flights</code> ahora contiene las dos columnas recién agregadas. Esto es lo que queremos decir con <em>agregado por referencia</em>.</p>
+</li>
+<li>
+<p>Usamos la forma funcional para poder agregar comentarios al costado para explicar lo que hace el cálculo. También puedes ver la forma <code>LHS := RHS</code> (comentada).</p>
+</li>
+</ul>
+<h3 id="ref-ij">b) Actualizar algunas filas de columnas por referencia - <em>sub-asignar</em> por referencia</h3>
+<p>Echemos un vistazo a todas las «horas» disponibles en la tabla de datos «vuelos»:</p>
+<pre><code class="language-r"># get all 'hours' in flights
+flights[, sort(unique(hour))]
+#  [1]  0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24
+</code></pre>
+<p>Vemos que hay un total de <code>25</code> valores únicos en los datos. Parece que hay tanto <em>0</em> como <em>24</em> horas. Reemplacemos <em>24</em> por <em>0</em>.</p>
+<h4 id="reemplace-aquellas-filas-donde-hora-24-con-el-valor-0">– Reemplace aquellas filas donde <code>hora == 24</code> con el valor <code>0</code></h4>
+<pre><code class="language-r"># subassign by reference
+flights[hour == 24L, hour := 0L]
+#          year month   day dep_delay arr_delay carrier origin   dest air_time distance  hour
+#         &lt;int&gt; &lt;int&gt; &lt;int&gt;     &lt;int&gt;     &lt;int&gt;  &lt;char&gt; &lt;char&gt; &lt;char&gt;    &lt;int&gt;    &lt;int&gt; &lt;int&gt;
+#      1:  2014     1     1        14        13      AA    JFK    LAX      359     2475     9
+#      2:  2014     1     1        -3        13      AA    JFK    LAX      363     2475    11
+#      3:  2014     1     1         2         9      AA    JFK    LAX      351     2475    19
+#      4:  2014     1     1        -8       -26      AA    LGA    PBI      157     1035     7
+#      5:  2014     1     1         2         1      AA    JFK    LAX      350     2475    13
+#     ---                                                                                    
+# 253312:  2014    10    31         1       -30      UA    LGA    IAH      201     1416    14
+# 253313:  2014    10    31        -5       -14      UA    EWR    IAH      189     1400     8
+# 253314:  2014    10    31        -8        16      MQ    LGA    RDU       83      431    11
+# 253315:  2014    10    31        -4        15      MQ    LGA    DTW       75      502    11
+# 253316:  2014    10    31        -5         1      MQ    LGA    SDF      110      659     8
+#            speed delay
+#            &lt;num&gt; &lt;int&gt;
+#      1: 413.6490    27
+#      2: 409.0909    10
+#      3: 423.0769    11
+#      4: 395.5414   -34
+#      5: 424.2857     3
+#     ---               
+# 253312: 422.6866   -29
+# 253313: 444.4444   -19
+# 253314: 311.5663     8
+# 253315: 401.6000    11
+# 253316: 359.4545    -4
+</code></pre>
+<ul>
+<li>
+<p>Podemos usar <code>i</code> junto con <code>:=</code> en <code>j</code> de la misma manera que ya hemos visto en la viñeta <em>“Introducción a data.table”</em>.</p>
+</li>
+<li>
+<p>La columna <code>hora</code> se reemplaza con <code>0</code> solo en aquellos <em>índices de fila</em> donde la condición <code>hora == 24L</code> especificada en <code>i</code> se evalúa como <code>VERDADERO</code>.</p>
+</li>
+<li>
+<p><code>:=</code> devuelve el resultado de forma invisible. A veces puede ser necesario ver el resultado después de la asignación. Podemos lograrlo agregando un <code>[]</code> vacío al final de la consulta como se muestra a continuación:</p>
+<pre><code class="language-r">flights[hour == 24L, hour := 0L][]
+# Índice: &lt;hour&gt;
+#          year month   day dep_delay arr_delay carrier origin   dest air_time distance  hour
+#         &lt;int&gt; &lt;int&gt; &lt;int&gt;     &lt;int&gt;     &lt;int&gt;  &lt;char&gt; &lt;char&gt; &lt;char&gt;    &lt;int&gt;    &lt;int&gt; &lt;int&gt;
+#      1:  2014     1     1        14        13      AA    JFK    LAX      359     2475     9
+#      2:  2014     1     1        -3        13      AA    JFK    LAX      363     2475    11
+#      3:  2014     1     1         2         9      AA    JFK    LAX      351     2475    19
+#      4:  2014     1     1        -8       -26      AA    LGA    PBI      157     1035     7
+#      5:  2014     1     1         2         1      AA    JFK    LAX      350     2475    13
+#     ---                                                                                    
+# 253312:  2014    10    31         1       -30      UA    LGA    IAH      201     1416    14
+# 253313:  2014    10    31        -5       -14      UA    EWR    IAH      189     1400     8
+# 253314:  2014    10    31        -8        16      MQ    LGA    RDU       83      431    11
+# 253315:  2014    10    31        -4        15      MQ    LGA    DTW       75      502    11
+# 253316:  2014    10    31        -5         1      MQ    LGA    SDF      110      659     8
+#            speed delay
+#            &lt;num&gt; &lt;int&gt;
+#      1: 413.6490    27
+#      2: 409.0909    10
+#      3: 423.0769    11
+#      4: 395.5414   -34
+#      5: 424.2857     3
+#     ---               
+# 253312: 422.6866   -29
+# 253313: 444.4444   -19
+# 253314: 311.5663     8
+# 253315: 401.6000    11
+# 253316: 359.4545    -4
+</code></pre>
+</li>
+</ul>
+<h1></h1>
+<p>Veamos todas las “horas” para verificar.</p>
+<pre><code class="language-r"># check again for '24'
+flights[, sort(unique(hour))]
+#  [1]  0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23
+</code></pre>
+<h4 id="update-by-reference-question">Ejercicio:</h4>
+<p>¿Cuál es la diferencia entre <code>vuelos[hora == 24L, hora := 0L]</code> y <code>vuelos[hora == 24L][, hora := 0L]</code>? Sugerencia: El último necesita una asignación (<code>&lt;-</code>) si desea utilizar el resultado más adelante.</p>
+<p>Si no puedes resolverlo, echa un vistazo a la sección <code>Nota</code> de <code>?&quot;:=&quot;</code>.</p>
+<h3 id="c-eliminar-columna-por-referencia">c) Eliminar columna por referencia</h3>
+<h4 id="eliminar-la-columna-delay">– Eliminar la columna <code>delay</code></h4>
+<pre><code class="language-r">flights[, c(&quot;delay&quot;) := NULL]
+# Índice: &lt;hour&gt;
+#          year month   day dep_delay arr_delay carrier origin   dest air_time distance  hour
+#         &lt;int&gt; &lt;int&gt; &lt;int&gt;     &lt;int&gt;     &lt;int&gt;  &lt;char&gt; &lt;char&gt; &lt;char&gt;    &lt;int&gt;    &lt;int&gt; &lt;int&gt;
+#      1:  2014     1     1        14        13      AA    JFK    LAX      359     2475     9
+#      2:  2014     1     1        -3        13      AA    JFK    LAX      363     2475    11
+#      3:  2014     1     1         2         9      AA    JFK    LAX      351     2475    19
+#      4:  2014     1     1        -8       -26      AA    LGA    PBI      157     1035     7
+#      5:  2014     1     1         2         1      AA    JFK    LAX      350     2475    13
+#     ---                                                                                    
+# 253312:  2014    10    31         1       -30      UA    LGA    IAH      201     1416    14
+# 253313:  2014    10    31        -5       -14      UA    EWR    IAH      189     1400     8
+# 253314:  2014    10    31        -8        16      MQ    LGA    RDU       83      431    11
+# 253315:  2014    10    31        -4        15      MQ    LGA    DTW       75      502    11
+# 253316:  2014    10    31        -5         1      MQ    LGA    SDF      110      659     8
+#            speed
+#            &lt;num&gt;
+#      1: 413.6490
+#      2: 409.0909
+#      3: 423.0769
+#      4: 395.5414
+#      5: 424.2857
+#     ---         
+# 253312: 422.6866
+# 253313: 444.4444
+# 253314: 311.5663
+# 253315: 401.6000
+# 253316: 359.4545
+head(flights)
+#     year month   day dep_delay arr_delay carrier origin   dest air_time distance  hour    speed
+#    &lt;int&gt; &lt;int&gt; &lt;int&gt;     &lt;int&gt;     &lt;int&gt;  &lt;char&gt; &lt;char&gt; &lt;char&gt;    &lt;int&gt;    &lt;int&gt; &lt;int&gt;    &lt;num&gt;
+# 1:  2014     1     1        14        13      AA    JFK    LAX      359     2475     9 413.6490
+# 2:  2014     1     1        -3        13      AA    JFK    LAX      363     2475    11 409.0909
+# 3:  2014     1     1         2         9      AA    JFK    LAX      351     2475    19 423.0769
+# 4:  2014     1     1        -8       -26      AA    LGA    PBI      157     1035     7 395.5414
+# 5:  2014     1     1         2         1      AA    JFK    LAX      350     2475    13 424.2857
+# 6:  2014     1     1         4         0      AA    EWR    LAX      339     2454    18 434.3363
+
+## or using the functional form
+# flights[, `:=`(delay = NULL)]
+</code></pre>
+<h4 id="eliminar-conveniencia">{#eliminar-conveniencia}</h4>
+<ul>
+<li>
+<p>Al asignar <code>NULL</code> a una columna, <em>se elimina</em> esa columna. Y esto sucede <em>instantáneamente</em>.</p>
+</li>
+<li>
+<p>También podemos pasar números de columnas en lugar de nombres en el <code>LHS</code>, aunque es una buena práctica de programación utilizar nombres de columnas.</p>
+</li>
+<li>
+<p>Cuando solo hay una columna para eliminar, podemos omitir el <code>c()</code> y las comillas dobles y simplemente usar el nombre de la columna <em>sin comillas</em>, para mayor comodidad. Es decir:</p>
+<pre><code class="language-r">flights[, delay := NULL]
+</code></pre>
+<p>is equivalent to the code above.</p>
+</li>
+</ul>
+<h3 id="ref-j-by">d) <code>:=</code> junto con la agrupación usando <code>by</code></h3>
+<p>Ya hemos visto el uso de <code>i</code> junto con <code>:=</code> en la <a href="#ref-i-j">Sección 2b</a>. Veamos ahora cómo podemos usar <code>:=</code> junto con <code>by</code>.</p>
+<h4 id="c-mo-podemos-agregar-una-nueva-columna-que-contenga-para-cada-par-orig-dest-la-velocidad-m-xima">– ¿Cómo podemos agregar una nueva columna que contenga para cada par <code>orig,dest</code> la velocidad máxima?</h4>
+<pre><code class="language-r">flights[, max_speed := max(speed), by = .(origin, dest)]
+# Índice: &lt;hour&gt;
+#          year month   day dep_delay arr_delay carrier origin   dest air_time distance  hour
+#         &lt;int&gt; &lt;int&gt; &lt;int&gt;     &lt;int&gt;     &lt;int&gt;  &lt;char&gt; &lt;char&gt; &lt;char&gt;    &lt;int&gt;    &lt;int&gt; &lt;int&gt;
+#      1:  2014     1     1        14        13      AA    JFK    LAX      359     2475     9
+#      2:  2014     1     1        -3        13      AA    JFK    LAX      363     2475    11
+#      3:  2014     1     1         2         9      AA    JFK    LAX      351     2475    19
+#      4:  2014     1     1        -8       -26      AA    LGA    PBI      157     1035     7
+#      5:  2014     1     1         2         1      AA    JFK    LAX      350     2475    13
+#     ---                                                                                    
+# 253312:  2014    10    31         1       -30      UA    LGA    IAH      201     1416    14
+# 253313:  2014    10    31        -5       -14      UA    EWR    IAH      189     1400     8
+# 253314:  2014    10    31        -8        16      MQ    LGA    RDU       83      431    11
+# 253315:  2014    10    31        -4        15      MQ    LGA    DTW       75      502    11
+# 253316:  2014    10    31        -5         1      MQ    LGA    SDF      110      659     8
+#            speed max_speed
+#            &lt;num&gt;     &lt;num&gt;
+#      1: 413.6490  526.5957
+#      2: 409.0909  526.5957
+#      3: 423.0769  526.5957
+#      4: 395.5414  517.5000
+#      5: 424.2857  526.5957
+#     ---                   
+# 253312: 422.6866  508.7425
+# 253313: 444.4444  538.4615
+# 253314: 311.5663  445.8621
+# 253315: 401.6000  456.3636
+# 253316: 359.4545  434.5055
+head(flights)
+#     year month   day dep_delay arr_delay carrier origin   dest air_time distance  hour    speed
+#    &lt;int&gt; &lt;int&gt; &lt;int&gt;     &lt;int&gt;     &lt;int&gt;  &lt;char&gt; &lt;char&gt; &lt;char&gt;    &lt;int&gt;    &lt;int&gt; &lt;int&gt;    &lt;num&gt;
+# 1:  2014     1     1        14        13      AA    JFK    LAX      359     2475     9 413.6490
+# 2:  2014     1     1        -3        13      AA    JFK    LAX      363     2475    11 409.0909
+# 3:  2014     1     1         2         9      AA    JFK    LAX      351     2475    19 423.0769
+# 4:  2014     1     1        -8       -26      AA    LGA    PBI      157     1035     7 395.5414
+# 5:  2014     1     1         2         1      AA    JFK    LAX      350     2475    13 424.2857
+# 6:  2014     1     1         4         0      AA    EWR    LAX      339     2454    18 434.3363
+#    max_speed
+#        &lt;num&gt;
+# 1:  526.5957
+# 2:  526.5957
+# 3:  526.5957
+# 4:  517.5000
+# 5:  526.5957
+# 6:  518.4507
+</code></pre>
+<ul>
+<li>
+<p>Agregamos una nueva columna <code>max_speed</code> usando el operador <code>:=</code> por referencia.</p>
+</li>
+<li>
+<p>Proporcionamos las columnas para agrupar de la misma manera que se muestra en la viñeta <em>Introducción a data.table</em>. Para cada grupo, se calcula <code>max(speed)</code>, que devuelve un único valor. Ese valor se recicla para ajustarse a la longitud del grupo. Una vez más, no se realizan copias en absoluto. La tabla <em>data.table</em> <code>flights</code> se modifica <em>in situ</em>.</p>
+</li>
+<li>
+<p>También podríamos haber proporcionado <code>by</code> con un <em>vector de caracteres</em> como vimos en la viñeta <em>Introducción a data.table</em>, por ejemplo, <code>by = c(&quot;origin&quot;, &quot;dest&quot;)</code>.</p>
+</li>
+</ul>
+<h1></h1>
+<h3 id="e-varias-columnas-y">e) Varias columnas y <code>:=</code></h3>
+<h4 id="c-mo-podemos-agregar-dos-columnas-m-s-calculando-max-de-dep-delay-y-arr-delay-para-cada-mes-usando-sd">– ¿Cómo podemos agregar dos columnas más calculando <code>max()</code> de <code>dep_delay</code> y <code>arr_delay</code> para cada mes, usando <code>.SD</code>?</h4>
+<pre><code class="language-r">in_cols  = c(&quot;dep_delay&quot;, &quot;arr_delay&quot;)
+out_cols = c(&quot;max_dep_delay&quot;, &quot;max_arr_delay&quot;)
+flights[, c(out_cols) := lapply(.SD, max), by = month, .SDcols = in_cols]
+# Índice: &lt;hour&gt;
+#          year month   day dep_delay arr_delay carrier origin   dest air_time distance  hour
+#         &lt;int&gt; &lt;int&gt; &lt;int&gt;     &lt;int&gt;     &lt;int&gt;  &lt;char&gt; &lt;char&gt; &lt;char&gt;    &lt;int&gt;    &lt;int&gt; &lt;int&gt;
+#      1:  2014     1     1        14        13      AA    JFK    LAX      359     2475     9
+#      2:  2014     1     1        -3        13      AA    JFK    LAX      363     2475    11
+#      3:  2014     1     1         2         9      AA    JFK    LAX      351     2475    19
+#      4:  2014     1     1        -8       -26      AA    LGA    PBI      157     1035     7
+#      5:  2014     1     1         2         1      AA    JFK    LAX      350     2475    13
+#     ---                                                                                    
+# 253312:  2014    10    31         1       -30      UA    LGA    IAH      201     1416    14
+# 253313:  2014    10    31        -5       -14      UA    EWR    IAH      189     1400     8
+# 253314:  2014    10    31        -8        16      MQ    LGA    RDU       83      431    11
+# 253315:  2014    10    31        -4        15      MQ    LGA    DTW       75      502    11
+# 253316:  2014    10    31        -5         1      MQ    LGA    SDF      110      659     8
+#            speed max_speed max_dep_delay max_arr_delay
+#            &lt;num&gt;     &lt;num&gt;         &lt;int&gt;         &lt;int&gt;
+#      1: 413.6490  526.5957           973           996
+#      2: 409.0909  526.5957           973           996
+#      3: 423.0769  526.5957           973           996
+#      4: 395.5414  517.5000           973           996
+#      5: 424.2857  526.5957           973           996
+#     ---                                               
+# 253312: 422.6866  508.7425          1498          1494
+# 253313: 444.4444  538.4615          1498          1494
+# 253314: 311.5663  445.8621          1498          1494
+# 253315: 401.6000  456.3636          1498          1494
+# 253316: 359.4545  434.5055          1498          1494
+head(flights)
+#     year month   day dep_delay arr_delay carrier origin   dest air_time distance  hour    speed
+#    &lt;int&gt; &lt;int&gt; &lt;int&gt;     &lt;int&gt;     &lt;int&gt;  &lt;char&gt; &lt;char&gt; &lt;char&gt;    &lt;int&gt;    &lt;int&gt; &lt;int&gt;    &lt;num&gt;
+# 1:  2014     1     1        14        13      AA    JFK    LAX      359     2475     9 413.6490
+# 2:  2014     1     1        -3        13      AA    JFK    LAX      363     2475    11 409.0909
+# 3:  2014     1     1         2         9      AA    JFK    LAX      351     2475    19 423.0769
+# 4:  2014     1     1        -8       -26      AA    LGA    PBI      157     1035     7 395.5414
+# 5:  2014     1     1         2         1      AA    JFK    LAX      350     2475    13 424.2857
+# 6:  2014     1     1         4         0      AA    EWR    LAX      339     2454    18 434.3363
+#    max_speed max_dep_delay max_arr_delay
+#        &lt;num&gt;         &lt;int&gt;         &lt;int&gt;
+# 1:  526.5957           973           996
+# 2:  526.5957           973           996
+# 3:  526.5957           973           996
+# 4:  517.5000           973           996
+# 5:  526.5957           973           996
+# 6:  518.4507           973           996
+</code></pre>
+<ul>
+<li>
+<p>Usamos el formato <code>LHS := RHS</code>. Almacenamos los nombres de las columnas de entrada y las nuevas columnas que se agregarán en variables separadas y las proporcionamos a <code>.SDcols</code> y a <code>LHS</code> (para una mejor legibilidad).</p>
+</li>
+<li>
+<p>Tenga en cuenta que, dado que permitimos la asignación por referencia sin citar los nombres de las columnas cuando solo hay una columna, como se explica en la <a href="#delete-convenience">Sección 2c</a>, no podemos hacer <code>out_cols := lapply(.SD, max)</code>. Eso daría como resultado la adición de una nueva columna llamada <code>out_cols</code>. En su lugar, deberíamos hacer <code>c(out_cols)</code> o simplemente <code>(out_cols)</code>. Envolver el nombre de la variable con <code>(</code> es suficiente para diferenciar entre los dos casos.</p>
+</li>
+<li>
+<p>La forma <code>LHS := RHS</code> nos permite operar en múltiples columnas. En la forma RHS, para calcular el <code>max</code> en las columnas especificadas en <code>.SDcols</code>, utilizamos la función base <code>lapply()</code> junto con <code>.SD</code> de la misma manera que hemos visto antes en la viñeta <em>“Introducción a data.table”</em>. Devuelve una lista de dos elementos, que contiene el valor máximo correspondiente a <code>dep_delay</code> y <code>arr_delay</code> para cada grupo.</p>
+</li>
+</ul>
+<h1></h1>
+<p>Antes de pasar a la siguiente sección, limpiemos las columnas recién creadas <code>speed</code>, <code>max_speed</code>, <code>max_dep_delay</code> y <code>max_arr_delay</code>.</p>
+<pre><code class="language-r"># RHS gets automatically recycled to length of LHS
+flights[, c(&quot;speed&quot;, &quot;max_speed&quot;, &quot;max_dep_delay&quot;, &quot;max_arr_delay&quot;) := NULL]
+# Índice: &lt;hour&gt;
+#          year month   day dep_delay arr_delay carrier origin   dest air_time distance  hour
+#         &lt;int&gt; &lt;int&gt; &lt;int&gt;     &lt;int&gt;     &lt;int&gt;  &lt;char&gt; &lt;char&gt; &lt;char&gt;    &lt;int&gt;    &lt;int&gt; &lt;int&gt;
+#      1:  2014     1     1        14        13      AA    JFK    LAX      359     2475     9
+#      2:  2014     1     1        -3        13      AA    JFK    LAX      363     2475    11
+#      3:  2014     1     1         2         9      AA    JFK    LAX      351     2475    19
+#      4:  2014     1     1        -8       -26      AA    LGA    PBI      157     1035     7
+#      5:  2014     1     1         2         1      AA    JFK    LAX      350     2475    13
+#     ---                                                                                    
+# 253312:  2014    10    31         1       -30      UA    LGA    IAH      201     1416    14
+# 253313:  2014    10    31        -5       -14      UA    EWR    IAH      189     1400     8
+# 253314:  2014    10    31        -8        16      MQ    LGA    RDU       83      431    11
+# 253315:  2014    10    31        -4        15      MQ    LGA    DTW       75      502    11
+# 253316:  2014    10    31        -5         1      MQ    LGA    SDF      110      659     8
+head(flights)
+#     year month   day dep_delay arr_delay carrier origin   dest air_time distance  hour
+#    &lt;int&gt; &lt;int&gt; &lt;int&gt;     &lt;int&gt;     &lt;int&gt;  &lt;char&gt; &lt;char&gt; &lt;char&gt;    &lt;int&gt;    &lt;int&gt; &lt;int&gt;
+# 1:  2014     1     1        14        13      AA    JFK    LAX      359     2475     9
+# 2:  2014     1     1        -3        13      AA    JFK    LAX      363     2475    11
+# 3:  2014     1     1         2         9      AA    JFK    LAX      351     2475    19
+# 4:  2014     1     1        -8       -26      AA    LGA    PBI      157     1035     7
+# 5:  2014     1     1         2         1      AA    JFK    LAX      350     2475    13
+# 6:  2014     1     1         4         0      AA    EWR    LAX      339     2454    18
+</code></pre>
+<h4 id="c-mo-podemos-actualizar-varias-columnas-existentes-utilizando-sd">– ¿Cómo podemos actualizar varias columnas existentes utilizando <code>.SD</code>?</h4>
+<pre><code class="language-r">flights[, names(.SD) := lapply(.SD, as.factor), .SDcols = is.character]
+# Índice: &lt;hour&gt;
+#          year month   day dep_delay arr_delay carrier origin   dest air_time distance  hour
+#         &lt;int&gt; &lt;int&gt; &lt;int&gt;     &lt;int&gt;     &lt;int&gt;  &lt;fctr&gt; &lt;fctr&gt; &lt;fctr&gt;    &lt;int&gt;    &lt;int&gt; &lt;int&gt;
+#      1:  2014     1     1        14        13      AA    JFK    LAX      359     2475     9
+#      2:  2014     1     1        -3        13      AA    JFK    LAX      363     2475    11
+#      3:  2014     1     1         2         9      AA    JFK    LAX      351     2475    19
+#      4:  2014     1     1        -8       -26      AA    LGA    PBI      157     1035     7
+#      5:  2014     1     1         2         1      AA    JFK    LAX      350     2475    13
+#     ---                                                                                    
+# 253312:  2014    10    31         1       -30      UA    LGA    IAH      201     1416    14
+# 253313:  2014    10    31        -5       -14      UA    EWR    IAH      189     1400     8
+# 253314:  2014    10    31        -8        16      MQ    LGA    RDU       83      431    11
+# 253315:  2014    10    31        -4        15      MQ    LGA    DTW       75      502    11
+# 253316:  2014    10    31        -5         1      MQ    LGA    SDF      110      659     8
+</code></pre>
+<p>Limpiemos nuevamente y convirtamos nuestras columnas de factores recién creadas nuevamente en columnas de caracteres. Esta vez, utilizaremos <code>.SDcols</code>, que acepta una función para decidir qué columnas incluir. En este caso, <code>is.factor()</code> devolverá las columnas que son factores. Para obtener más información sobre el <strong>S</strong>subconjunto de los <strong>D</strong>ata, también hay una <a href="https://cran.r-project.org/package=data.table/vignettes/datatable-sd-usage.html">viñeta de uso de SD</a>.</p>
+<p>A veces, también es bueno llevar un registro de las columnas que transformamos. De esa manera, incluso después de convertir nuestras columnas, podremos llamar a las columnas específicas que estábamos actualizando.</p>
+<pre><code class="language-r">factor_cols &lt;- sapply(flights, is.factor)
+flights[, names(.SD) := lapply(.SD, as.character), .SDcols = factor_cols]
+# Índice: &lt;hour&gt;
+#          year month   day dep_delay arr_delay carrier origin   dest air_time distance  hour
+#         &lt;int&gt; &lt;int&gt; &lt;int&gt;     &lt;int&gt;     &lt;int&gt;  &lt;char&gt; &lt;char&gt; &lt;char&gt;    &lt;int&gt;    &lt;int&gt; &lt;int&gt;
+#      1:  2014     1     1        14        13      AA    JFK    LAX      359     2475     9
+#      2:  2014     1     1        -3        13      AA    JFK    LAX      363     2475    11
+#      3:  2014     1     1         2         9      AA    JFK    LAX      351     2475    19
+#      4:  2014     1     1        -8       -26      AA    LGA    PBI      157     1035     7
+#      5:  2014     1     1         2         1      AA    JFK    LAX      350     2475    13
+#     ---                                                                                    
+# 253312:  2014    10    31         1       -30      UA    LGA    IAH      201     1416    14
+# 253313:  2014    10    31        -5       -14      UA    EWR    IAH      189     1400     8
+# 253314:  2014    10    31        -8        16      MQ    LGA    RDU       83      431    11
+# 253315:  2014    10    31        -4        15      MQ    LGA    DTW       75      502    11
+# 253316:  2014    10    31        -5         1      MQ    LGA    SDF      110      659     8
+str(flights[, ..factor_cols])
+# Classes 'data.table' and 'data.frame':	253316 obs. of  3 variables:
+#  $ carrier: chr  &quot;AA&quot; &quot;AA&quot; &quot;AA&quot; &quot;AA&quot; ...
+#  $ origin : chr  &quot;JFK&quot; &quot;JFK&quot; &quot;JFK&quot; &quot;LGA&quot; ...
+#  $ dest   : chr  &quot;LAX&quot; &quot;LAX&quot; &quot;LAX&quot; &quot;PBI&quot; ...
+#  - attr(*, &quot;.internal.selfref&quot;)=&lt;externalptr&gt;
+</code></pre>
+<h4 id="bs-callout-bs-callout-info">{.bs-callout.bs-callout-info}</h4>
+<ul>
+<li>También podríamos haber usado <code>(factor_cols)</code> en el <code>LHS</code> en lugar de <code>names(.SD)</code>.</li>
+</ul>
+<h2 id="3-y-copy">3. <code>:=</code> y <code>copy()</code></h2>
+<p><code>:=</code> modifica el objeto de entrada por referencia. Aparte de las características que ya hemos comentado, a veces podríamos querer utilizar la función de actualización por referencia por su efecto secundario. Y en otras ocasiones puede que no sea deseable modificar el objeto original, en cuyo caso podemos utilizar la función <code>copy()</code>, como veremos en un momento.</p>
+<h3 id="a-por-su-efecto-secundario">a) <code>:=</code> por su efecto secundario</h3>
+<p>Digamos que queremos crear una función que devuelva la <em>velocidad máxima</em> de cada mes, pero al mismo tiempo también queremos añadir la columna <code>velocidad</code> a <em>vuelos</em>. Podríamos escribir una función sencilla de la siguiente manera:</p>
+<pre><code class="language-r">foo &lt;- function(DT) {
+  DT[, speed := distance / (air_time/60)]
+  DT[, .(max_speed = max(speed)), by = month]
+}
+ans = foo(flights)
+head(flights)
+#     year month   day dep_delay arr_delay carrier origin   dest air_time distance  hour    speed
+#    &lt;int&gt; &lt;int&gt; &lt;int&gt;     &lt;int&gt;     &lt;int&gt;  &lt;char&gt; &lt;char&gt; &lt;char&gt;    &lt;int&gt;    &lt;int&gt; &lt;int&gt;    &lt;num&gt;
+# 1:  2014     1     1        14        13      AA    JFK    LAX      359     2475     9 413.6490
+# 2:  2014     1     1        -3        13      AA    JFK    LAX      363     2475    11 409.0909
+# 3:  2014     1     1         2         9      AA    JFK    LAX      351     2475    19 423.0769
+# 4:  2014     1     1        -8       -26      AA    LGA    PBI      157     1035     7 395.5414
+# 5:  2014     1     1         2         1      AA    JFK    LAX      350     2475    13 424.2857
+# 6:  2014     1     1         4         0      AA    EWR    LAX      339     2454    18 434.3363
+head(ans)
+#    month max_speed
+#    &lt;int&gt;     &lt;num&gt;
+# 1:     1  535.6425
+# 2:     2  535.6425
+# 3:     3  549.0756
+# 4:     4  585.6000
+# 5:     5  544.2857
+# 6:     6  608.5714
+</code></pre>
+<ul>
+<li>
+<p>Tenga en cuenta que se ha añadido la nueva columna <code>speed</code> a la tabla de datos <code>flights</code>. Esto se debe a que <code>:=</code> realiza operaciones por referencia. Dado que <code>DT</code> (el argumento de la función) y <code>flights</code> hacen referencia al mismo objeto en la memoria, la modificación de <code>DT</code> también se refleja en <code>flights</code>.</p>
+</li>
+<li>
+<p>Y <code>ans</code> contiene la velocidad máxima para cada mes.</p>
+</li>
+</ul>
+<h3 id="b-la-funci-n-copy">b) La función <code>copy()</code></h3>
+<p>En la sección anterior, usamos <code>:=</code> por su efecto secundario. Pero, por supuesto, esto puede no ser siempre deseable. A veces, nos gustaría pasar un objeto <em>data.table</em> a una función y podríamos querer usar el operador <code>:=</code>, pero <em>no</em> querríamos actualizar el objeto original. Podemos lograr esto usando la función <code>copy()</code>.</p>
+<p>La función <code>copy()</code> copia <em>deep</em> el objeto de entrada y, por lo tanto, cualquier operación de actualización por referencia posterior realizada en el objeto copiado no afectará al objeto original.</p>
+<h1></h1>
+<p>Hay dos lugares particulares donde la función <code>copy()</code> es esencial:</p>
+<ol>
+<li>
+<p>Contrariamente a la situación que hemos visto en el punto anterior, es posible que no queramos que la tabla de datos de entrada de una función se modifique <em>por referencia</em>. Como ejemplo, consideremos la tarea de la sección anterior, excepto que no queremos modificar <code>vuelos</code> por referencia.</p>
+<p>Let’s first delete the <code>speed</code> column we generated in the previous section.</p>
+<pre><code class="language-r">flights[, speed := NULL]
+# Índice: &lt;hour&gt;
+#          year month   day dep_delay arr_delay carrier origin   dest air_time distance  hour
+#         &lt;int&gt; &lt;int&gt; &lt;int&gt;     &lt;int&gt;     &lt;int&gt;  &lt;char&gt; &lt;char&gt; &lt;char&gt;    &lt;int&gt;    &lt;int&gt; &lt;int&gt;
+#      1:  2014     1     1        14        13      AA    JFK    LAX      359     2475     9
+#      2:  2014     1     1        -3        13      AA    JFK    LAX      363     2475    11
+#      3:  2014     1     1         2         9      AA    JFK    LAX      351     2475    19
+#      4:  2014     1     1        -8       -26      AA    LGA    PBI      157     1035     7
+#      5:  2014     1     1         2         1      AA    JFK    LAX      350     2475    13
+#     ---                                                                                    
+# 253312:  2014    10    31         1       -30      UA    LGA    IAH      201     1416    14
+# 253313:  2014    10    31        -5       -14      UA    EWR    IAH      189     1400     8
+# 253314:  2014    10    31        -8        16      MQ    LGA    RDU       83      431    11
+# 253315:  2014    10    31        -4        15      MQ    LGA    DTW       75      502    11
+# 253316:  2014    10    31        -5         1      MQ    LGA    SDF      110      659     8
+</code></pre>
+<p>Now, we could accomplish the task as follows:</p>
+<pre><code class="language-r">foo &lt;- function(DT) {
+  DT &lt;- copy(DT)                              ## deep copy
+  DT[, speed := distance / (air_time/60)]     ## doesn't affect 'flights'
+  DT[, .(max_speed = max(speed)), by = month]
+}
+ans &lt;- foo(flights)
+head(flights)
+#     year month   day dep_delay arr_delay carrier origin   dest air_time distance  hour
+#    &lt;int&gt; &lt;int&gt; &lt;int&gt;     &lt;int&gt;     &lt;int&gt;  &lt;char&gt; &lt;char&gt; &lt;char&gt;    &lt;int&gt;    &lt;int&gt; &lt;int&gt;
+# 1:  2014     1     1        14        13      AA    JFK    LAX      359     2475     9
+# 2:  2014     1     1        -3        13      AA    JFK    LAX      363     2475    11
+# 3:  2014     1     1         2         9      AA    JFK    LAX      351     2475    19
+# 4:  2014     1     1        -8       -26      AA    LGA    PBI      157     1035     7
+# 5:  2014     1     1         2         1      AA    JFK    LAX      350     2475    13
+# 6:  2014     1     1         4         0      AA    EWR    LAX      339     2454    18
+head(ans)
+#    month max_speed
+#    &lt;int&gt;     &lt;num&gt;
+# 1:     1  535.6425
+# 2:     2  535.6425
+# 3:     3  549.0756
+# 4:     4  585.6000
+# 5:     5  544.2857
+# 6:     6  608.5714
+</code></pre>
+</li>
+</ol>
+<ul>
+<li>
+<p>El uso de la función <code>copy()</code> no actualizó la tabla de datos <code>flights</code> por referencia. No contiene la columna <code>speed</code>.</p>
+</li>
+<li>
+<p>Y <code>ans</code> contiene la velocidad máxima correspondiente a cada mes.</p>
+</li>
+</ul>
+<p>Sin embargo, podríamos mejorar aún más esta funcionalidad mediante una copia <em>superficial</em> en lugar de una copia <em>profunda</em>. De hecho, nos gustaría mucho <a href="https://github.com/Rdatatable/data.table/issues/617">ofrecer esta funcionalidad para <code>v1.9.8</code></a>. Volveremos a abordar este tema en la viñeta <em>diseño de data.table</em>.</p>
+<h1></h1>
+<ol start="2">
+<li>
+<p>Cuando almacenamos los nombres de las columnas en una variable, por ejemplo, <code>DT_n = names(DT)</code>, y luego <em>agregamos/actualizamos/eliminamos</em> columnas <em>por referencia</em>, también modificaría <code>DT_n</code>, a menos que hagamos <code>copy(names(DT))</code>.</p>
+<pre><code class="language-r">DT = data.table(x = 1L, y = 2L)
+DT_n = names(DT)
+DT_n
+# [1] &quot;x&quot; &quot;y&quot;
+
+## add a new column by reference
+DT[, z := 3L]
+#        x     y     z
+#    &lt;int&gt; &lt;int&gt; &lt;int&gt;
+# 1:     1     2     3
+
+## DT_n also gets updated
+DT_n
+# [1] &quot;x&quot; &quot;y&quot; &quot;z&quot;
+
+## use `copy()`
+DT_n = copy(names(DT))
+DT[, w := 4L]
+#        x     y     z     w
+#    &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt;
+# 1:     1     2     3     4
+
+## DT_n doesn't get updated
+DT_n
+# [1] &quot;x&quot; &quot;y&quot; &quot;z&quot;
+</code></pre>
+</li>
+</ol>
+<h2 id="resumen">Resumen</h2>
+<h4 id="el-operador">El operador <code>:=</code></h4>
+<ul>
+<li>
+<p>Se utiliza para <em>agregar/actualizar/eliminar</em> columnas por referencia.</p>
+</li>
+<li>
+<p>También hemos visto cómo utilizar <code>:=</code> junto con <code>i</code> y <code>by</code> de la misma forma que hemos visto en la viñeta <em>Introducción a data.table</em>. De la misma forma, podemos utilizar <code>keyby</code>, encadenar operaciones y pasar expresiones a <code>by</code> también de la misma forma. La sintaxis es <em>consistente</em>.</p>
+</li>
+<li>
+<p>Podemos usar <code>:=</code> por su efecto secundario o usar <code>copy()</code> para no modificar el objeto original mientras actualizamos por referencia.</p>
+</li>
+</ul>
+<h1></h1>
+<p>Hasta ahora hemos visto mucho sobre <code>j</code>, y cómo combinarlo con <code>by</code> y un poco de <code>i</code>. Volvamos nuestra atención a <code>i</code> en la siguiente viñeta <em>“Subconjunto basado en claves y búsqueda binaria rápida”</em> para realizar <em>subconjuntos ultrarrápidos</em> mediante <em>claves data.tables</em>.</p>
+<hr />
+</div>
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-core.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/autoloader/prism-autoloader.min.js" defer></script>
+</body>
+</html>

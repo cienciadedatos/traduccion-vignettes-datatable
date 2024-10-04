@@ -1,0 +1,1001 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<title>Introduction to data.table</title>
+<style type="text/css">
+/**
+ * Prism.s theme ported from highlight.js's xcode style
+ */
+pre code {
+  padding: 1em;
+}
+.token.comment {
+  color: #007400;
+}
+.token.punctuation {
+  color: #999;
+}
+.token.tag,
+.token.selector {
+  color: #aa0d91;
+}
+.token.boolean,
+.token.number,
+.token.constant,
+.token.symbol {
+  color: #1c00cf;
+}
+.token.property,
+.token.attr-name,
+.token.string,
+.token.char,
+.token.builtin {
+  color: #c41a16;
+}
+.token.inserted {
+  background-color: #ccffd8;
+}
+.token.deleted {
+  background-color: #ffebe9;
+}
+.token.operator,
+.token.entity,
+.token.url,
+.language-css .token.string,
+.style .token.string {
+  color: #9a6e3a;
+}
+.token.atrule,
+.token.attr-value,
+.token.keyword {
+  color: #836c28;
+}
+.token.function,
+.token.class-name {
+  color: #DD4A68;
+}
+.token.regex,
+.token.important,
+.token.variable {
+  color: #5c2699;
+}
+.token.important,
+.token.bold {
+  font-weight: bold;
+}
+.token.italic {
+  font-style: italic;
+}
+</style>
+<style type="text/css">
+body {
+  font-family: sans-serif;
+  max-width: 800px;
+  margin: auto;
+  padding: 1em;
+  line-height: 1.5;
+  box-sizing: border-box;
+}
+body, .footnotes, code { font-size: .9em; }
+li li { font-size: .95em; }
+*, *:before, *:after {
+  box-sizing: inherit;
+}
+pre, img { max-width: 100%; }
+pre, pre:hover {
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+pre code {
+  display: block;
+  overflow-x: auto;
+}
+code { font-family: 'DejaVu Sans Mono', 'Droid Sans Mono', 'Lucida Console', Consolas, Monaco, monospace; }
+:not(pre) > code, code[class] { background-color: #F8F8F8; }
+code.language-undefined, pre > code:not([class]) {
+  background-color: inherit;
+  border: 1px solid #eee;
+}
+table {
+  margin: auto;
+  border-top: 1px solid #666;
+}
+table thead th { border-bottom: 1px solid #ddd; }
+th, td { padding: 5px; }
+thead, tfoot, tr:nth-child(even) { background: #eee; }
+blockquote {
+  color: #666;
+  margin: 0;
+  padding-left: 1em;
+  border-left: 0.5em solid #eee;
+}
+hr, .footnotes::before { border: 1px dashed #ddd; }
+.frontmatter { text-align: center; }
+#TOC .numbered li { list-style: none; }
+#TOC .numbered { padding-left: 0; }
+#TOC .numbered ul { padding-left: 1em; }
+table, .body h2 { border-bottom: 1px solid #666; }
+.body .appendix, .appendix ~ h2 { border-bottom-style: dashed; }
+.footnote-ref a::before { content: "["; }
+.footnote-ref a::after { content: "]"; }
+section.footnotes::before {
+  content: "";
+  display: block;
+  max-width: 20em;
+}
+
+@media print {
+  body {
+    font-size: 12pt;
+    max-width: 100%;
+  }
+  tr, img { page-break-inside: avoid; }
+}
+@media only screen and (min-width: 992px) {
+  pre { white-space: pre; }
+}
+</style>
+</head>
+<body>
+<div class="frontmatter">
+<div class="title"><h1>Introduction to data.table</h1></div>
+<div class="author"><h2></h2></div>
+<div class="date"><h3>2024-10-04</h3></div>
+</div>
+<div class="body">
+<p>Esta viñeta presenta la sintaxis de <code>data.table</code>, su forma general, cómo crear <em>subconjuntos</em> de filas, <em>seleccionar y calcular</em> columnas y realizar agregaciones <em>por grupo</em>. Es útil estar familiarizado con la estructura de datos <code>data.frame</code> de R básico, pero no es esencial para seguir esta viñeta.</p>
+<hr />
+<h2 id="an-lisis-de-datos-utilizando-data-table">Análisis de datos utilizando <code>data.table</code></h2>
+<p>Las operaciones de manipulación de datos como <em>subconjunto</em>, <em>grupo</em>, <em>actualización</em>, <em>unión</em>, etc. están todas relacionadas de manera inherente. Mantener juntas estas <em>operaciones relacionadas</em> permite:</p>
+<ul>
+<li>
+<p>Sintaxis <em>concisa</em> y <em>consistente</em> independientemente del conjunto de operaciones que desee realizar para lograr su objetivo final.</p>
+</li>
+<li>
+<p>realizar análisis <em>de manera fluida</em> sin la carga cognitiva de tener que asignar cada operación a una función particular de un conjunto potencialmente enorme de funciones disponibles antes de realizar el análisis.</p>
+</li>
+<li>
+<p>optimizar <em>automáticamente</em> las operaciones internamente y de manera muy efectiva al conocer con precisión los datos necesarios para cada operación, lo que genera un código muy rápido y con uso eficiente de la memoria.</p>
+</li>
+</ul>
+<p>En resumen, si está interesado en reducir enormemente el tiempo de <em>programación</em> y <em>computación</em>, este paquete es para usted. La filosofía a la que se adhiere <code>data.table</code> lo hace posible. Nuestro objetivo es ilustrarlo a través de esta serie de viñetas.</p>
+<h2 id="data">Datos</h2>
+<p>En esta viñeta, utilizaremos los datos de <a href="https://raw.githubusercontent.com/Rdatatable/data.table/master/vignettes/flights14.csv">NYC-flights14</a> obtenidos del paquete <a href="https://github.com/arunsrinivasan/flights">flights</a> (disponible solo en GitHub). Contiene datos de vuelos puntuales de la Oficina de Estadísticas de Transporte para todos los vuelos que partieron de los aeropuertos de la ciudad de Nueva York en 2014 (inspirados en <a href="https://github.com/tidyverse/nycflights13">nycflights13</a>). Los datos están disponibles solo para enero-octubre de 2014.</p>
+<p>Podemos usar el lector de archivos rápido y amigable <code>fread</code> de <code>data.table</code> para cargar <code>flights</code> directamente de la siguiente manera:</p>
+<pre><code class="language-r">input &lt;- if (file.exists(&quot;flights14.csv&quot;)) {
+   &quot;flights14.csv&quot;
+} else {
+  &quot;https://raw.githubusercontent.com/Rdatatable/data.table/master/vignettes/flights14.csv&quot;
+}
+flights &lt;- fread(input)
+flights
+#          year month   day dep_delay arr_delay carrier origin   dest air_time distance  hour
+#         &lt;int&gt; &lt;int&gt; &lt;int&gt;     &lt;int&gt;     &lt;int&gt;  &lt;char&gt; &lt;char&gt; &lt;char&gt;    &lt;int&gt;    &lt;int&gt; &lt;int&gt;
+#      1:  2014     1     1        14        13      AA    JFK    LAX      359     2475     9
+#      2:  2014     1     1        -3        13      AA    JFK    LAX      363     2475    11
+#      3:  2014     1     1         2         9      AA    JFK    LAX      351     2475    19
+#      4:  2014     1     1        -8       -26      AA    LGA    PBI      157     1035     7
+#      5:  2014     1     1         2         1      AA    JFK    LAX      350     2475    13
+#     ---                                                                                    
+# 253312:  2014    10    31         1       -30      UA    LGA    IAH      201     1416    14
+# 253313:  2014    10    31        -5       -14      UA    EWR    IAH      189     1400     8
+# 253314:  2014    10    31        -8        16      MQ    LGA    RDU       83      431    11
+# 253315:  2014    10    31        -4        15      MQ    LGA    DTW       75      502    11
+# 253316:  2014    10    31        -5         1      MQ    LGA    SDF      110      659     8
+dim(flights)
+# [1] 253316     11
+</code></pre>
+<p>Nota: <code>fread</code> acepta URL <code>http</code> y <code>https</code> directamente, así como comandos del sistema operativo como <code>sed</code> y <code>awk</code>. Consulta <code>?fread</code> para ver ejemplos.</p>
+<h2 id="introducci-n">Introducción</h2>
+<p>En esta viñeta, vamos a</p>
+<ol>
+<li>
+<p>Comience con lo básico: qué es una <code>data.table</code>, su forma general, cómo crear <em>subconjuntos</em> de filas, cómo <em>seleccionar y calcular</em> columnas;</p>
+</li>
+<li>
+<p>Luego veremos cómo realizar agregaciones de datos por grupo</p>
+</li>
+</ol>
+<h2 id="basics-1">1. Conceptos básicos</h2>
+<h3 id="what-is-datatable-1a">a) ¿Qué es <code>data.table</code>?</h3>
+<p><code>data.table</code> es un paquete R que proporciona <strong>una versión mejorada</strong> de un <code>data.frame</code>, la estructura de datos estándar para almacenar datos en <code>base</code> R. En la sección <a href="#data">Data</a> anterior, vimos cómo crear un <code>data.table</code> usando <code>fread()</code>, pero también podemos crear uno usando la función <code>data.table()</code>. Aquí hay un ejemplo:</p>
+<pre><code class="language-r">DT = data.table(
+  ID = c(&quot;b&quot;,&quot;b&quot;,&quot;b&quot;,&quot;a&quot;,&quot;a&quot;,&quot;c&quot;),
+  a = 1:6,
+  b = 7:12,
+  c = 13:18
+)
+DT
+#        ID     a     b     c
+#    &lt;char&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt;
+# 1:      b     1     7    13
+# 2:      b     2     8    14
+# 3:      b     3     9    15
+# 4:      a     4    10    16
+# 5:      a     5    11    17
+# 6:      c     6    12    18
+class(DT$ID)
+# [1] &quot;character&quot;
+</code></pre>
+<p>También puede convertir objetos existentes en una tabla <code>data.table</code> utilizando <code>setDT()</code> (para estructuras <code>data.frame</code> y <code>list</code>) o <code>as.data.table()</code> (para otras estructuras). Para obtener más detalles sobre la diferencia (que va más allá del alcance de esta viñeta), consulte <code>?setDT</code> y <code>?as.data.table</code>.</p>
+<h4 id="tenga-en-cuenta-que">Tenga en cuenta que:</h4>
+<ul>
+<li>
+<p>Los números de fila se imprimen con un <code>:</code> para separar visualmente el número de fila de la primera columna.</p>
+</li>
+<li>
+<p>Cuando el número de filas a imprimir excede la opción global <code>datatable.print.nrows</code> (predeterminado = 100), imprime automáticamente solo las primeras 5 y las últimas 5 filas (como se puede ver en la sección <a href="#data">Data</a>). Para un <code>data.frame</code> grande, es posible que se haya encontrado esperando mientras se imprimen y paginan tablas más grandes, a veces aparentemente sin fin. Esta restricción ayuda con eso, y puede consultar el número predeterminado de la siguiente manera:</p>
+<pre><code class="language-r">getOption(&quot;datatable.print.nrows&quot;)
+</code></pre>
+</li>
+<li>
+<p><code>data.table</code> nunca establece ni utiliza <em>nombres de fila</em>. Veremos por qué en la viñeta <em>“Subconjunto basado en claves y búsqueda binaria rápida”</em>.</p>
+</li>
+</ul>
+<h3 id="enhanced-1b">b) Forma general: ¿de qué manera se <em>mejora</em> una tabla <code>data.table</code>?</h3>
+<p>A diferencia de un <code>data.frame</code>, puedes hacer <em>mucho más</em> que simplemente crear subconjuntos de filas y seleccionar columnas dentro del marco de un <code>data.table</code>, es decir, dentro de <code>[...]</code> (NB: también podríamos referirnos a escribir cosas dentro de <code>DT[...]</code> como “consultar <code>DT</code>”, como una analogía o en relación con SQL). Para entenderlo, primero tendremos que mirar la <em>forma general</em> de la sintaxis de <code>data.table</code>, como se muestra a continuación:</p>
+<pre><code class="language-r">DT[i, j, by]
+
+##   R:                 i                 j        by
+## SQL:  where | order by   select | update  group by
+</code></pre>
+<p>Los usuarios con conocimientos de SQL quizás se sientan inmediatamente identificados con esta sintaxis.</p>
+<h4 id="la-forma-de-leerlo-en-voz-alta-es">La forma de leerlo (en voz alta) es:</h4>
+<p>Tome <code>DT</code>, subconjunto/reordene filas usando <code>i</code>, luego calcule <code>j</code>, agrupado por <code>by</code>.</p>
+<p>Comencemos mirando primero <code>i</code> y <code>j</code>: subconjuntando filas y operando en columnas.</p>
+<h3 id="subset-i-1c">c) Subconjunto de filas en <code>i</code></h3>
+<h4 id="obtenga-todos-los-vuelos-con-jfk-como-aeropuerto-de-origen-en-el-mes-de-junio">– Obtenga todos los vuelos con “JFK” como aeropuerto de origen en el mes de junio.</h4>
+<pre><code class="language-r">ans &lt;- flights[origin == &quot;JFK&quot; &amp; month == 6L]
+head(ans)
+#     year month   day dep_delay arr_delay carrier origin   dest air_time distance  hour
+#    &lt;int&gt; &lt;int&gt; &lt;int&gt;     &lt;int&gt;     &lt;int&gt;  &lt;char&gt; &lt;char&gt; &lt;char&gt;    &lt;int&gt;    &lt;int&gt; &lt;int&gt;
+# 1:  2014     6     1        -9        -5      AA    JFK    LAX      324     2475     8
+# 2:  2014     6     1       -10       -13      AA    JFK    LAX      329     2475    12
+# 3:  2014     6     1        18        -1      AA    JFK    LAX      326     2475     7
+# 4:  2014     6     1        -6       -16      AA    JFK    LAX      320     2475    10
+# 5:  2014     6     1        -4       -45      AA    JFK    LAX      326     2475    18
+# 6:  2014     6     1        -6       -23      AA    JFK    LAX      329     2475    14
+</code></pre>
+<ul>
+<li>
+<p>Dentro del marco de una <code>data.table</code>, se puede hacer referencia a las columnas <em>como si fueran variables</em>, de forma muy similar a SQL o Stata. Por lo tanto, simplemente nos referimos a <code>origin</code> y <code>month</code> como si fueran variables. No necesitamos agregar el prefijo <code>flights$</code> cada vez. Sin embargo, usar <code>flights$origin</code> y <code>flights$month</code> funcionaría perfectamente.</p>
+</li>
+<li>
+<p>Se calculan los <em>índices de fila</em> que satisfacen la condición <code>origin == &quot;JFK&quot; &amp; month == 6L</code> y, dado que no hay nada más que hacer, todas las columnas de <code>flights</code> en las filas correspondientes a esos <em>índices de fila</em> simplemente se devuelven como una <code>data.table</code>.</p>
+</li>
+<li>
+<p>No es necesario incluir una coma después de la condición en <code>i</code>. Pero <code>flights[origin == &quot;JFK&quot; &amp; month == 6L, ]</code> funcionaría perfectamente. Sin embargo, en un <code>data.frame</code>, la coma es necesaria.</p>
+</li>
+</ul>
+<h4 id="subset-rows-integer">– Obtener las dos primeras filas de <code>vuelos</code>.</h4>
+<pre><code class="language-r">ans &lt;- flights[1:2]
+ans
+#     year month   day dep_delay arr_delay carrier origin   dest air_time distance  hour
+#    &lt;int&gt; &lt;int&gt; &lt;int&gt;     &lt;int&gt;     &lt;int&gt;  &lt;char&gt; &lt;char&gt; &lt;char&gt;    &lt;int&gt;    &lt;int&gt; &lt;int&gt;
+# 1:  2014     1     1        14        13      AA    JFK    LAX      359     2475     9
+# 2:  2014     1     1        -3        13      AA    JFK    LAX      363     2475    11
+</code></pre>
+<ul>
+<li>En este caso, no hay ninguna condición. Los índices de fila ya se proporcionan en <code>i</code>. Por lo tanto, devolvemos una <code>data.table</code> con todas las columnas de <code>flights</code> en las filas para esos <em>índices de fila</em>.</li>
+</ul>
+<h4 id="ordena-vuelos-primero-por-la-columna-origen-en-orden-ascendente-y-luego-por-destino-en-orden-descendente">– Ordena <code>vuelos</code> primero por la columna <code>origen</code> en orden <em>ascendente</em>, y luego por <code>destino</code> en orden <em>descendente</em>:</h4>
+<p>Podemos utilizar la función R <code>order()</code> para lograr esto.</p>
+<pre><code class="language-r">ans &lt;- flights[order(origin, -dest)]
+head(ans)
+#     year month   day dep_delay arr_delay carrier origin   dest air_time distance  hour
+#    &lt;int&gt; &lt;int&gt; &lt;int&gt;     &lt;int&gt;     &lt;int&gt;  &lt;char&gt; &lt;char&gt; &lt;char&gt;    &lt;int&gt;    &lt;int&gt; &lt;int&gt;
+# 1:  2014     1     5         6        49      EV    EWR    XNA      195     1131     8
+# 2:  2014     1     6         7        13      EV    EWR    XNA      190     1131     8
+# 3:  2014     1     7        -6       -13      EV    EWR    XNA      179     1131     8
+# 4:  2014     1     8        -7       -12      EV    EWR    XNA      184     1131     8
+# 5:  2014     1     9        16         7      EV    EWR    XNA      181     1131     8
+# 6:  2014     1    13        66        66      EV    EWR    XNA      188     1131     9
+</code></pre>
+<h4 id="order-est-optimizado-internamente"><code>order()</code> está optimizado internamente</h4>
+<ul>
+<li>
+<p>Podemos usar “-” en columnas de <code>caracteres</code> dentro del marco de una <code>tabla de datos</code> para ordenar en orden decreciente.</p>
+</li>
+<li>
+<p>Además, <code>order(...)</code> dentro del marco de una <code>data.table</code> utiliza el ordenamiento rápido interno de <code>data.table</code> <code>forder()</code>. Esta clasificación proporcionó una mejora tan convincente con respecto a <code>base::order</code> de R que el proyecto R adoptó el algoritmo <code>data.table</code> como su clasificación predeterminada en 2016 para R 3.3.0 (para referencia, consulte <code>?sort</code> y <a href="https://cran.r-project.org/doc/manuals/r-release/NEWS.pdf">R Release NEWS</a>).</p>
+</li>
+</ul>
+<p>Discutiremos el orden rápido de <code>data.table</code> con más detalle en la viñeta <em>Aspectos internos de <code>data.table</code></em>.</p>
+<h3 id="select-j-1d">d) Seleccione la(s) columna(s) en <code>j</code></h3>
+<h4 id="selecciona-la-columna-arr-delay-pero-devu-lvela-como-un-vector">– Selecciona la columna <code>arr_delay</code>, pero devuélvela como un <em>vector</em>.</h4>
+<pre><code class="language-r">ans &lt;- flights[, arr_delay]
+head(ans)
+# [1]  13  13   9 -26   1   0
+</code></pre>
+<ul>
+<li>
+<p>Dado que se puede hacer referencia a las columnas como si fueran variables dentro del marco de una <code>data.table</code>, hacemos referencia directamente a la <em>variable</em> que queremos subconjunto. Como queremos <em>todas las filas</em>, simplemente omitimos <code>i</code>.</p>
+</li>
+<li>
+<p>Devuelve <em>todas</em> las filas de la columna <code>arr_delay</code>.</p>
+</li>
+</ul>
+<h4 id="seleccione-la-columna-arr-delay-pero-devu-lvala-como-data-table-en-su-lugar">– Seleccione la columna <code>arr_delay</code>, pero devuélvala como <code>data.table</code> en su lugar.</h4>
+<pre><code class="language-r">ans &lt;- flights[, list(arr_delay)]
+head(ans)
+#    arr_delay
+#        &lt;int&gt;
+# 1:        13
+# 2:        13
+# 3:         9
+# 4:       -26
+# 5:         1
+# 6:         0
+</code></pre>
+<ul>
+<li>
+<p>Envolvemos las <em>variables</em> (nombres de columnas) dentro de <code>list()</code>, lo que garantiza que se devuelva una <code>data.table</code>. En el caso de un solo nombre de columna, no envolver con <code>list()</code> devuelve un vector en su lugar, como se ve en el <a href="#select-j-1d">ejemplo anterior</a>.</p>
+</li>
+<li>
+<p><code>data.table</code> también permite encapsular columnas con <code>.()</code> en lugar de <code>list()</code>. Es un <em>alias</em> de <code>list()</code>; ambos significan lo mismo. Siéntete libre de usar el que prefieras; hemos notado que la mayoría de los usuarios parecen preferir <code>.()</code> por concisión, por lo que continuaremos usando <code>.()</code> de aquí en adelante.</p>
+</li>
+</ul>
+<p>Una tabla <code>data.table</code> (y también un <code>data.frame</code>) es internamente una <code>lista</code> también, con la condición de que cada elemento tenga la misma longitud y la <code>lista</code> tenga un atributo <code>class</code>. Permitir que <code>j</code> devuelva una <code>lista</code> permite convertir y devolver <code>data.table</code> de manera muy eficiente.</p>
+<h4 id="tip-1">Consejo:</h4>
+<p>Mientras <code>j-expression</code> devuelva una <code>lista</code>, cada elemento de la lista se convertirá en una columna en la <code>data.table</code> resultante. Esto hace que <code>j</code> sea bastante potente, como veremos en breve. ¡También es muy importante comprender esto para cuando desee realizar consultas más complicadas!</p>
+<h4 id="seleccione-las-columnas-arr-delay-y-dep-delay">– Seleccione las columnas <code>arr_delay</code> y <code>dep_delay</code>.</h4>
+<pre><code class="language-r">ans &lt;- flights[, .(arr_delay, dep_delay)]
+head(ans)
+#    arr_delay dep_delay
+#        &lt;int&gt;     &lt;int&gt;
+# 1:        13        14
+# 2:        13        -3
+# 3:         9         2
+# 4:       -26        -8
+# 5:         1         2
+# 6:         0         4
+
+## alternatively
+# ans &lt;- flights[, list(arr_delay, dep_delay)]
+</code></pre>
+<ul>
+<li>Envuelve ambas columnas dentro de <code>.()</code> o <code>list()</code>. Eso es todo.</li>
+</ul>
+<h4 id="seleccione-las-columnas-arr-delay-y-dep-delay-y-c-mbieles-el-nombre-a-delay-arr-y-delay-dep">– Seleccione las columnas <code>arr_delay</code> y <code>dep_delay</code> <em>y</em> cámbieles el nombre a <code>delay_arr</code> y <code>delay_dep</code>.</h4>
+<p>Dado que <code>.()</code> es solo un alias de <code>list()</code>, podemos nombrar las columnas como lo haríamos al crear una <code>lista</code>.</p>
+<pre><code class="language-r">ans &lt;- flights[, .(delay_arr = arr_delay, delay_dep = dep_delay)]
+head(ans)
+#    delay_arr delay_dep
+#        &lt;int&gt;     &lt;int&gt;
+# 1:        13        14
+# 2:        13        -3
+# 3:         9         2
+# 4:       -26        -8
+# 5:         1         2
+# 6:         0         4
+</code></pre>
+<h3 id="e-calcular-o-hacer-en-j">e) Calcular o <em>hacer</em> en <code>j</code></h3>
+<h4 id="cu-ntos-viajes-han-tenido-un-retraso-total-lt-0">–¿Cuántos viajes han tenido un retraso total &lt; 0?</h4>
+<pre><code class="language-r">ans &lt;- flights[, sum( (arr_delay + dep_delay) &lt; 0 )]
+ans
+# [1] 141814
+</code></pre>
+<h4 id="que-est-pasando-aqu">¿Que está pasando aquí?</h4>
+<ul>
+<li>La función <code>j</code> de <code>data.table</code> puede manejar más que simplemente <em>seleccionar columnas</em> - puede manejar <em>expresiones</em>, es decir, <em>hacer cálculos sobre columnas</em>. Esto no debería sorprender, ya que se puede hacer referencia a las columnas como si fueran variables. Entonces deberíamos poder <em>hacer cálculos</em> llamando a funciones sobre esas variables. Y eso es precisamente lo que sucede aquí.</li>
+</ul>
+<h3 id="f-subconjunto-en-i-y-hacer-en-j">f) Subconjunto en <code>i</code> <em>y</em> hacer en <code>j</code></h3>
+<h4 id="calcular-el-retraso-medio-de-llegada-y-salida-para-todos-los-vuelos-con-aeropuerto-de-origen-jfk-en-el-mes-de-junio">– Calcular el retraso medio de llegada y salida para todos los vuelos con aeropuerto de origen “JFK” en el mes de junio.</h4>
+<pre><code class="language-r">ans &lt;- flights[origin == &quot;JFK&quot; &amp; month == 6L,
+               .(m_arr = mean(arr_delay), m_dep = mean(dep_delay))]
+ans
+#       m_arr    m_dep
+#       &lt;num&gt;    &lt;num&gt;
+# 1: 5.839349 9.807884
+</code></pre>
+<ul>
+<li>
+<p>Primero creamos un subconjunto en <code>i</code> para encontrar los <em>índices de fila</em> coincidentes donde <code>origin</code> aeropuerto es igual a <code>&quot;JFK&quot;</code>, y <code>month</code> es igual a <code>6L</code>. <em>Todavía</em> no creamos un subconjunto de la <code>data.table</code> <em>completa</em> correspondiente a esas filas.</p>
+</li>
+<li>
+<p>Ahora, observamos <code>j</code> y descubrimos que utiliza solo <em>dos columnas</em>. Y lo que tenemos que hacer es calcular su <code>media()</code>. Por lo tanto, creamos un subconjunto de las columnas que corresponden a las filas coincidentes y calculamos su <code>media()</code>.</p>
+</li>
+</ul>
+<p>Debido a que los tres componentes principales de la consulta (<code>i</code>, <code>j</code> y <code>by</code>) están <em>juntos</em> dentro de <code>[...]</code>, <code>data.table</code> puede ver los tres y optimizar la consulta en conjunto <em>antes de la evaluación</em>, en lugar de optimizar cada uno por separado. Por lo tanto, podemos evitar todo el subconjunto (es decir, crear subconjuntos de las columnas <em>además de</em> <code>arr_delay</code> y <code>dep_delay</code>), tanto por velocidad como por eficiencia de memoria.</p>
+<h4 id="cu-ntos-viajes-se-han-realizado-en-el-a-o-2014-desde-el-aeropuerto-jfk-en-el-mes-de-junio">–¿Cuántos viajes se han realizado en el año 2014 desde el aeropuerto “JFK” en el mes de junio?</h4>
+<pre><code class="language-r">ans &lt;- flights[origin == &quot;JFK&quot; &amp; month == 6L, length(dest)]
+ans
+# [1] 8422
+</code></pre>
+<p>La función length() requiere un argumento de entrada. Solo necesitamos calcular la cantidad de filas en el subconjunto. Podríamos haber usado cualquier otra columna como argumento de entrada para length(). Este enfoque recuerda a SELECT COUNT(dest) FROM flights WHERE origin = ‘JFK’ AND month = 6 en SQL.</p>
+<p>Este tipo de operación ocurre con bastante frecuencia, especialmente durante la agrupación (como veremos en la siguiente sección), hasta el punto donde <code>data.table</code> proporciona un <em>símbolo especial</em> <code>.N</code> para ello.</p>
+<h3 id="g-manejar-elementos-inexistentes-en-i">g) Manejar elementos inexistentes en <code>i</code></h3>
+<h4 id="qu-sucede-cuando-se-consultan-elementos-no-existentes">–¿Qué sucede cuando se consultan elementos no existentes?</h4>
+<p>Al consultar una <code>data.table</code> en busca de elementos que no existen, el comportamiento difiere según el método utilizado.</p>
+<pre><code class="language-r">setkeyv(flights, &quot;origin&quot;)
+</code></pre>
+<ul>
+<li><strong>Subconjunto basado en clave: <code>dt[&quot;d&quot;]</code></strong></li>
+</ul>
+<p>Esto realiza una unión a la derecha en la columna de clave <code>x</code>, lo que da como resultado una fila con <code>d</code> y <code>NA</code> para las columnas que no se encuentran. Al utilizar <code>setkeyv</code>, la tabla se ordena por las claves especificadas y se crea un índice interno, lo que permite la búsqueda binaria para una subdivisión eficiente.</p>
+<pre><code class="language-r">flights[&quot;XYZ&quot;]
+# Returns:
+#    origin year month day dep_time sched_dep_time dep_delay arr_time sched_arr_time arr_delay carrier flight tailnum ...
+# 1:    XYZ   NA    NA  NA       NA             NA        NA       NA             NA        NA      NA     NA      NA ...
+</code></pre>
+<ul>
+<li><strong>Subconjunto lógico: <code>dt[x == &quot;d&quot;]</code></strong></li>
+</ul>
+<p>Esto realiza una operación de subconjunto estándar que no encuentra ninguna fila coincidente y, por lo tanto, devuelve una <code>data.table</code> vacía.</p>
+<pre><code class="language-r">  flights[origin == &quot;XYZ&quot;]
+# Returns:
+# Empty data.table (0 rows and 19 cols): year,month,day,dep_time,sched_dep_time,dep_delay,arr_time,sched_arr_time,arr_delay,...
+</code></pre>
+<ul>
+<li><strong>Coincidencia exacta usando <code>nomatch=NULL</code></strong></li>
+</ul>
+<p>Para coincidencias exactas sin <code>NA</code> para elementos inexistentes, utilice <code>nomatch=NULL</code>:</p>
+<pre><code class="language-r">flights[&quot;XYZ&quot;, nomatch=NULL]
+# Returns:
+# Empty data.table (0 rows and 19 cols): year,month,day,dep_time,sched_dep_time,dep_delay,arr_time,sched_arr_time,arr_delay,...
+</code></pre>
+<p>Comprender estos comportamientos puede ayudar a evitar confusiones al tratar con elementos inexistentes en sus datos.</p>
+<h4 id="special-N">Símbolo especial <code>.N</code>:</h4>
+<p><code>.N</code> es una variable incorporada especial que contiene la cantidad de observaciones <em>en el grupo actual</em>. Es particularmente útil cuando se combina con <code>by</code> como veremos en la siguiente sección. En ausencia de operaciones de agrupamiento por, simplemente devuelve la cantidad de filas en el subconjunto.</p>
+<p>Ahora que lo sabemos, podemos realizar la misma tarea utilizando <code>.N</code> de la siguiente manera:</p>
+<pre><code class="language-r">ans &lt;- flights[origin == &quot;JFK&quot; &amp; month == 6L, .N]
+ans
+# [1] 8422
+</code></pre>
+<ul>
+<li>
+<p>Una vez más, subconjunto en <code>i</code> para obtener los <em>índices de fila</em> donde el aeropuerto <code>origen</code> es igual a <em>“JFK”</em>, y el mes es igual a <em>6</em>.</p>
+</li>
+<li>
+<p>Vemos que <code>j</code> utiliza solo <code>.N</code> y ninguna otra columna. Por lo tanto, no se materializa el subconjunto completo. Simplemente devolvemos la cantidad de filas en el subconjunto (que es solo la longitud de los índices de fila).</p>
+</li>
+<li>
+<p>Tenga en cuenta que no hemos incluido <code>.N</code> en <code>list()</code> o <code>.()</code>. Por lo tanto, se devuelve un vector.</p>
+</li>
+</ul>
+<p>Podríamos haber realizado la misma operación haciendo <code>nrow(flights[origin == &quot;JFK&quot; &amp; month == 6L])</code>. Sin embargo, tendríamos que crear primero un subconjunto de toda la <code>data.table</code> correspondiente a los <em>índices de fila</em> en <code>i</code> <em>y luego</em> devolver las filas usando <code>nrow()</code>, lo cual es innecesario e ineficiente. Trataremos este y otros aspectos de optimización en detalle en la viñeta de <em>diseño de <code>data.table</code></em>.</p>
+<h3 id="h-genial-pero-c-mo-puedo-hacer-referencia-a-las-columnas-por-nombres-en-j-como-en-un-data-frame" #refer_j>h) ¡Genial! Pero, ¿cómo puedo hacer referencia a las columnas por nombres en <code>j</code> (como en un <code>data.frame</code>)?</h3>
+<p>Si escribe los nombres de las columnas explícitamente, no hay diferencia en comparación con un <code>data.frame</code> (desde v1.9.8).</p>
+<h4 id="seleccione-las-columnas-arr-delay-y-dep-delay-mediante-el-m-todo-data-frame">– Seleccione las columnas <code>arr_delay</code> y <code>dep_delay</code> mediante el método <code>data.frame</code>.</h4>
+<pre><code class="language-r">ans &lt;- flights[, c(&quot;arr_delay&quot;, &quot;dep_delay&quot;)]
+head(ans)
+#    arr_delay dep_delay
+#        &lt;int&gt;     &lt;int&gt;
+# 1:        13        14
+# 2:        13        -3
+# 3:         9         2
+# 4:       -26        -8
+# 5:         1         2
+# 6:         0         4
+</code></pre>
+<p>Si ha almacenado las columnas deseadas en un vector de caracteres, hay dos opciones: utilizar el prefijo <code>..</code> o utilizar el argumento <code>with</code>.</p>
+<h4 id="seleccionar-columnas-nombradas-en-una-variable-usando-el-prefijo">– Seleccionar columnas nombradas en una variable usando el prefijo <code>..</code></h4>
+<pre><code class="language-r">select_cols = c(&quot;arr_delay&quot;, &quot;dep_delay&quot;)
+flights[ , ..select_cols]
+#         arr_delay dep_delay
+#             &lt;int&gt;     &lt;int&gt;
+#      1:        13        14
+#      2:        13        -3
+#      3:         9         2
+#      4:       -26        -8
+#      5:         1         2
+#     ---                    
+# 253312:       -30         1
+# 253313:       -14        -5
+# 253314:        16        -8
+# 253315:        15        -4
+# 253316:         1        -5
+</code></pre>
+<p>Para aquellos familiarizados con la terminal Unix, el prefijo <code>..</code> debería recordar al comando “up-one-level”, que es análogo a lo que sucede aquí: <code>..</code> indica a <code>data.table</code> que busque la variable <code>select_cols</code> “up-one-level”, es decir, dentro del entorno global en este caso.</p>
+<h4 id="seleccionar-columnas-nombradas-en-una-variable-usando-with-false">– Seleccionar columnas nombradas en una variable usando <code>with = FALSE</code></h4>
+<pre><code class="language-r">flights[ , select_cols, with = FALSE]
+#         arr_delay dep_delay
+#             &lt;int&gt;     &lt;int&gt;
+#      1:        13        14
+#      2:        13        -3
+#      3:         9         2
+#      4:       -26        -8
+#      5:         1         2
+#     ---                    
+# 253312:       -30         1
+# 253313:       -14        -5
+# 253314:        16        -8
+# 253315:        15        -4
+# 253316:         1        -5
+</code></pre>
+<p>El argumento se llama <code>with</code> en honor a la función R <code>with()</code> debido a que tiene una funcionalidad similar. Supongamos que tiene un <code>data.frame</code> <code>DF</code> y desea crear un subconjunto de todas las filas donde <code>x &gt; 1</code>. En <code>base</code> R puede hacer lo siguiente:</p>
+<pre><code class="language-r">DF = data.frame(x = c(1,1,1,2,2,3,3,3), y = 1:8)
+
+## (1) normal way
+DF[DF$x &gt; 1, ] # data.frame needs that ',' as well
+#   x y
+# 4 2 4
+# 5 2 5
+# 6 3 6
+# 7 3 7
+# 8 3 8
+
+## (2) using with
+DF[with(DF, x &gt; 1), ]
+#   x y
+# 4 2 4
+# 5 2 5
+# 6 3 6
+# 7 3 7
+# 8 3 8
+</code></pre>
+<ul>
+<li>
+<p>El uso de <code>with()</code> en (2) permite usar la columna <code>x</code> de <code>DF</code> como si fuera una variable.</p>
+<p>Hence, the argument name <code>with</code> in <code>data.table</code>. Setting <code>with = FALSE</code> disables the ability to refer to columns as if they are variables, thereby restoring the “<code>data.frame</code> mode”.</p>
+</li>
+<li>
+<p>También podemos <em>deseleccionar</em> columnas usando <code>-</code> o <code>!</code>. Por ejemplo:</p>
+<pre><code class="language-r">## not run
+
+# returns all columns except arr_delay and dep_delay
+ans &lt;- flights[, !c(&quot;arr_delay&quot;, &quot;dep_delay&quot;)]
+# or
+ans &lt;- flights[, -c(&quot;arr_delay&quot;, &quot;dep_delay&quot;)]
+</code></pre>
+</li>
+<li>
+<p>Desde <code>v1.9.5+</code>, también podemos seleccionar especificando los nombres de las columnas de inicio y fin, por ejemplo, <code>año:día</code> para seleccionar las primeras tres columnas.</p>
+<pre><code class="language-r">## not run
+
+# returns year,month and day
+ans &lt;- flights[, year:day]
+# returns day, month and year
+ans &lt;- flights[, day:year]
+# returns all columns except year, month and day
+ans &lt;- flights[, -(year:day)]
+ans &lt;- flights[, !(year:day)]
+</code></pre>
+<p>This is particularly handy while working interactively.</p>
+</li>
+</ul>
+<p><code>with = TRUE</code> es el valor predeterminado en <code>data.table</code> porque podemos hacer mucho más al permitir que <code>j</code> maneje expresiones, especialmente cuando se combina con <code>by</code>, como veremos en un momento.</p>
+<h2 id="2-agregaciones">2. Agregaciones</h2>
+<p>Ya hemos visto <code>i</code> y <code>j</code> de la forma general de <code>data.table</code> en la sección anterior. En esta sección, veremos cómo se pueden combinar con <code>by</code> para realizar operaciones <em>por grupo</em>. Veamos algunos ejemplos.</p>
+<h3 id="a-agrupaci-n-mediante-by">a) Agrupación mediante <code>by</code></h3>
+<h4 id="c-mo-podemos-obtener-el-n-mero-de-viajes-correspondientes-a-cada-aeropuerto-de-origen">–¿Cómo podemos obtener el número de viajes correspondientes a cada aeropuerto de origen?</h4>
+<pre><code class="language-r">ans &lt;- flights[, .(.N), by = .(origin)]
+ans
+#    origin     N
+#    &lt;char&gt; &lt;int&gt;
+# 1:    JFK 81483
+# 2:    LGA 84433
+# 3:    EWR 87400
+
+## or equivalently using a character vector in 'by'
+# ans &lt;- flights[, .(.N), by = &quot;origin&quot;]
+</code></pre>
+<ul>
+<li>
+<p>Sabemos que <code>.N</code> <a href="#special-N">es una variable especial</a> que contiene la cantidad de filas en el grupo actual. Al agrupar por <code>origen</code> se obtiene la cantidad de filas, <code>.N</code>, para cada grupo.</p>
+</li>
+<li>
+<p>Al ejecutar <code>head(flights)</code>, puede ver que los aeropuertos de origen aparecen en el orden <em>“JFK”</em>, <em>“LGA”</em> y <em>“EWR”</em>. El orden original de agrupación de las variables se conserva en el resultado. ¡Es importante tener esto en cuenta!_</p>
+</li>
+<li>
+<p>Dado que no proporcionamos un nombre para la columna devuelta en <code>j</code>, se la denominó <code>N</code> automáticamente al reconocer el símbolo especial <code>.N</code>.</p>
+</li>
+<li>
+<p><code>by</code> también acepta un vector de caracteres de nombres de columnas. Esto es particularmente útil para la codificación programática, por ejemplo, para diseñar una función con las columnas de agrupación (en forma de un vector de <code>carácter</code>) como argumento de función.</p>
+</li>
+<li>
+<p>Cuando solo hay una columna o expresión a la que hacer referencia en <code>j</code> y <code>by</code>, podemos omitir la notación <code>.()</code>. Esto es puramente por conveniencia. En su lugar, podríamos hacer lo siguiente:</p>
+<pre><code class="language-r">ans &lt;- flights[, .N, by = origin]
+ans
+#    origin     N
+#    &lt;char&gt; &lt;int&gt;
+# 1:    JFK 81483
+# 2:    LGA 84433
+# 3:    EWR 87400
+</code></pre>
+<p>We’ll use this convenient form wherever applicable hereafter.</p>
+</li>
+</ul>
+<h4 id="c-mo-podemos-calcular-el-n-mero-de-viajes-para-cada-aeropuerto-de-origen-para-el-c-digo-de-aerol-nea-quot-aa-quot" #origin-.N>– ¿Cómo podemos calcular el número de viajes para cada aeropuerto de origen para el código de aerolínea <code>&quot;AA&quot;</code>?</h4>
+<p>El código único de aerolínea <code>&quot;AA&quot;</code> corresponde a <em>American Airlines Inc.</em></p>
+<pre><code class="language-r">ans &lt;- flights[carrier == &quot;AA&quot;, .N, by = origin]
+ans
+#    origin     N
+#    &lt;char&gt; &lt;int&gt;
+# 1:    JFK 11923
+# 2:    LGA 11730
+# 3:    EWR  2649
+</code></pre>
+<ul>
+<li>
+<p>Primero obtenemos los índices de fila para la expresión <code>carrier == &quot;AA&quot;</code> de <code>i</code>.</p>
+</li>
+<li>
+<p>Al utilizar esos <em>índices de fila</em>, obtenemos la cantidad de filas agrupadas por <code>origen</code>. Una vez más, aquí no se materializan columnas, ya que la <code>j-expression</code> no requiere que se creen subconjuntos de ninguna columna y, por lo tanto, es rápida y eficiente en el uso de la memoria.</p>
+</li>
+</ul>
+<h4 id="c-mo-podemos-obtener-el-n-mero-total-de-viajes-para-cada-par-origen-destino-para-el-c-digo-de-transportista-quot-aa-quot" #origin-dest-.N>– ¿Cómo podemos obtener el número total de viajes para cada par <code>origen, destino</code> para el código de transportista <code>&quot;AA&quot;</code>?</h4>
+<pre><code class="language-r">ans &lt;- flights[carrier == &quot;AA&quot;, .N, by = .(origin, dest)]
+head(ans)
+#    origin   dest     N
+#    &lt;char&gt; &lt;char&gt; &lt;int&gt;
+# 1:    JFK    LAX  3387
+# 2:    LGA    PBI   245
+# 3:    EWR    LAX    62
+# 4:    JFK    MIA  1876
+# 5:    JFK    SEA   298
+# 6:    EWR    MIA   848
+
+## or equivalently using a character vector in 'by'
+# ans &lt;- flights[carrier == &quot;AA&quot;, .N, by = c(&quot;origin&quot;, &quot;dest&quot;)]
+</code></pre>
+<ul>
+<li><code>by</code> acepta múltiples columnas. Simplemente proporcionamos todas las columnas por las que se agrupará. Observe el uso de <code>.()</code> nuevamente en <code>by</code>; nuevamente, esto es solo una forma abreviada de <code>list()</code>, y <code>list()</code> también se puede usar aquí. Nuevamente, nos quedaremos con <code>.()</code> en esta viñeta.</li>
+</ul>
+<h4 id="origin-dest-month">– ¿Cómo podemos obtener el retraso promedio de llegada y salida para cada par <code>orig,dest</code> para cada mes para el código de operador <code>&quot;AA&quot;</code>?</h4>
+<pre><code class="language-r">ans &lt;- flights[carrier == &quot;AA&quot;,
+        .(mean(arr_delay), mean(dep_delay)),
+        by = .(origin, dest, month)]
+ans
+#      origin   dest month         V1         V2
+#      &lt;char&gt; &lt;char&gt; &lt;int&gt;      &lt;num&gt;      &lt;num&gt;
+#   1:    JFK    LAX     1   6.590361 14.2289157
+#   2:    LGA    PBI     1  -7.758621  0.3103448
+#   3:    EWR    LAX     1   1.366667  7.5000000
+#   4:    JFK    MIA     1  15.720670 18.7430168
+#   5:    JFK    SEA     1  14.357143 30.7500000
+#  ---                                          
+# 196:    LGA    MIA    10  -6.251799 -1.4208633
+# 197:    JFK    MIA    10  -1.880184  6.6774194
+# 198:    EWR    PHX    10  -3.032258 -4.2903226
+# 199:    JFK    MCO    10 -10.048387 -1.6129032
+# 200:    JFK    DCA    10  16.483871 15.5161290
+</code></pre>
+<ul>
+<li>
+<p>Dado que no proporcionamos nombres de columnas para las expresiones en <code>j</code>, se generaron automáticamente como <code>V1</code> y <code>V2</code>.</p>
+</li>
+<li>
+<p>Una vez más, tenga en cuenta que el orden de entrada de las columnas de agrupación se conserva en el resultado.</p>
+</li>
+</ul>
+<p>¿Y ahora qué pasa si queremos ordenar el resultado por las columnas de agrupación «origen», «destino» y «mes»?</p>
+<h3 id="b-ordenado-por-keyby">b) Ordenado <code>por</code>: <code>keyby</code></h3>
+<p>El hecho de que <code>data.table</code> conserve el orden original de los grupos es intencional y está diseñado de esa manera. Hay casos en los que es esencial conservar el orden original, pero en ocasiones nos gustaría ordenar automáticamente por variables en nuestra agrupación.</p>
+<h4 id="entonces-c-mo-podemos-ordenar-directamente-por-todas-las-variables-de-agrupaci-n">–Entonces, ¿cómo podemos ordenar directamente por todas las variables de agrupación?</h4>
+<pre><code class="language-r">ans &lt;- flights[carrier == &quot;AA&quot;,
+        .(mean(arr_delay), mean(dep_delay)),
+        keyby = .(origin, dest, month)]
+ans
+# Key: &lt;origin, dest, month&gt;
+#      origin   dest month         V1         V2
+#      &lt;char&gt; &lt;char&gt; &lt;int&gt;      &lt;num&gt;      &lt;num&gt;
+#   1:    EWR    DFW     1   6.427673 10.0125786
+#   2:    EWR    DFW     2  10.536765 11.3455882
+#   3:    EWR    DFW     3  12.865031  8.0797546
+#   4:    EWR    DFW     4  17.792683 12.9207317
+#   5:    EWR    DFW     5  18.487805 18.6829268
+#  ---                                          
+# 196:    LGA    PBI     1  -7.758621  0.3103448
+# 197:    LGA    PBI     2  -7.865385  2.4038462
+# 198:    LGA    PBI     3  -5.754098  3.0327869
+# 199:    LGA    PBI     4 -13.966667 -4.7333333
+# 200:    LGA    PBI     5 -10.357143 -6.8571429
+</code></pre>
+<ul>
+<li>Todo lo que hicimos fue cambiar <code>by</code> por <code>keyby</code>. Esto ordena automáticamente el resultado por las variables de agrupación en orden creciente. De hecho, debido a que la implementación interna de <code>by</code> requiere primero una clasificación antes de recuperar el orden de la tabla original, <code>keyby</code> es típicamente más rápido que <code>by</code> porque no requiere este segundo paso.</li>
+</ul>
+<p><strong>Claves:</strong> En realidad, <code>keyby</code> hace un poco más que <em>simplemente ordenar</em>. También <em>establece una clave</em> después de ordenar, estableciendo un <code>atributo</code> llamado <code>sorted</code>.</p>
+<p>Aprenderemos más sobre <code>claves</code> en la viñeta <em>Subconjunto basado en claves y búsqueda binaria rápida</em>; por ahora, todo lo que tiene que saber es que puede usar <code>keyby</code> para ordenar automáticamente el resultado por las columnas especificadas en <code>by</code>.</p>
+<h3 id="c-encadenamiento">c) Encadenamiento</h3>
+<p>Reconsideremos la tarea de <a href="#origin-dest-.N">obtener el número total de viajes para cada par <code>origen, destino</code> para el transportista <em>“AA”</em></a>.</p>
+<pre><code class="language-r">ans &lt;- flights[carrier == &quot;AA&quot;, .N, by = .(origin, dest)]
+</code></pre>
+<h4 id="c-mo-podemos-ordenar-ans-utilizando-las-columnas-origin-en-orden-ascendente-y-dest-en-orden-descendente">– ¿Cómo podemos ordenar <code>ans</code> utilizando las columnas <code>origin</code> en orden ascendente y <code>dest</code> en orden descendente?</h4>
+<p>Podemos almacenar el resultado intermedio en una variable y luego usar <code>order(origin, -dest)</code> en esa variable. Parece bastante sencillo.</p>
+<pre><code class="language-r">ans &lt;- ans[order(origin, -dest)]
+head(ans)
+#    origin   dest     N
+#    &lt;char&gt; &lt;char&gt; &lt;int&gt;
+# 1:    EWR    PHX   121
+# 2:    EWR    MIA   848
+# 3:    EWR    LAX    62
+# 4:    EWR    DFW  1618
+# 5:    JFK    STT   229
+# 6:    JFK    SJU   690
+</code></pre>
+<ul>
+<li>
+<p>Recordemos que podemos usar <code>-</code> en una columna <code>character</code> en <code>order()</code> dentro del marco de un <code>data.table</code>. Esto es posible gracias a la optimización de consultas internas de <code>data.table</code>.</p>
+</li>
+<li>
+<p>Recuerde también que <code>order(...)</code> con el marco de una <code>data.table</code> se <em>optimiza automáticamente</em> para usar el orden de base rápido interno de <code>data.table</code> <code>forder()</code> para mayor velocidad.</p>
+</li>
+</ul>
+<p>Pero esto requiere tener que asignar el resultado intermedio y luego sobrescribirlo. Podemos hacer algo mejor y evitar por completo esta asignación intermedia a una variable temporal <em>encadenando</em> expresiones.</p>
+<pre><code class="language-r">ans &lt;- flights[carrier == &quot;AA&quot;, .N, by = .(origin, dest)][order(origin, -dest)]
+head(ans, 10)
+#     origin   dest     N
+#     &lt;char&gt; &lt;char&gt; &lt;int&gt;
+#  1:    EWR    PHX   121
+#  2:    EWR    MIA   848
+#  3:    EWR    LAX    62
+#  4:    EWR    DFW  1618
+#  5:    JFK    STT   229
+#  6:    JFK    SJU   690
+#  7:    JFK    SFO  1312
+#  8:    JFK    SEA   298
+#  9:    JFK    SAN   299
+# 10:    JFK    ORD   432
+</code></pre>
+<ul>
+<li>
+<p>Podemos unir expresiones una tras otra, <em>formando una cadena</em> de operaciones, es decir, <code>DT[ ... ][ ... ][ ... ]</code>.</p>
+</li>
+<li>
+<p>O también puedes encadenarlos verticalmente:</p>
+<pre><code class="language-r">DT[ ...
+   ][ ...
+     ][ ...
+       ]
+</code></pre>
+</li>
+</ul>
+<h3 id="d-expresiones-en-by">d) Expresiones en <code>by</code></h3>
+<h4 id="puede-by-tambi-n-aceptar-expresiones-o-s-lo-toma-columnas">– ¿Puede <code>by</code> también aceptar <em>expresiones</em> o sólo toma columnas?</h4>
+<p>Sí, lo hace. Por ejemplo, si queremos saber cuántos vuelos empezaron con retraso pero llegaron antes (o a tiempo), empezaron y llegaron con retraso, etc.</p>
+<pre><code class="language-r">ans &lt;- flights[, .N, .(dep_delay&gt;0, arr_delay&gt;0)]
+ans
+#    dep_delay arr_delay      N
+#       &lt;lgcl&gt;    &lt;lgcl&gt;  &lt;int&gt;
+# 1:      TRUE      TRUE  72836
+# 2:     FALSE      TRUE  34583
+# 3:     FALSE     FALSE 119304
+# 4:      TRUE     FALSE  26593
+</code></pre>
+<ul>
+<li>
+<p>La última fila corresponde a <code>dep_delay &gt; 0 = TRUE</code> y <code>arr_delay &gt; 0 = FALSE</code>. Podemos ver que 26593 los vuelos partieron tarde pero llegaron temprano (o a tiempo).</p>
+</li>
+<li>
+<p>Tenga en cuenta que no proporcionamos ningún nombre a <code>by-expression</code>. Por lo tanto, los nombres se han asignado automáticamente en el resultado. Al igual que con <code>j</code>, puede nombrar estas expresiones como lo haría para los elementos de cualquier <code>lista</code>, como por ejemplo <code>DT[, .N, .(dep_delayed = dep_delay&gt;0, arr_delayed = arr_delay&gt;0)]</code>.</p>
+</li>
+<li>
+<p>Puede proporcionar otras columnas junto con expresiones, por ejemplo: <code>DT[, .N, by = .(a, b&gt;0)]</code>.</p>
+</li>
+</ul>
+<h3 id="e-varias-columnas-en-j-sd">e) Varias columnas en <code>j</code> - <code>.SD</code></h3>
+<h4 id="tenemos-que-calcular-mean-para-cada-columna-individualmente">– ¿Tenemos que calcular <code>mean()</code> para cada columna individualmente?</h4>
+<p>Por supuesto, no es práctico tener que escribir <code>mean(myCol)</code> para cada columna una por una. ¿Qué sucedería si tuviera 100 columnas para calcular el promedio de <code>mean()</code>?</p>
+<p>¿Cómo podemos hacer esto de manera eficiente y concisa? Para lograrlo, repasemos <a href="#tip-1">este consejo</a>: <em>“Siempre que la expresión <code>j</code> devuelva una <code>lista</code>, cada elemento de la <code>lista</code> se convertirá en una columna en la <code>tabla de datos</code> resultante”</em>. Si podemos hacer referencia al <em>subconjunto de datos de cada grupo</em> como una variable <em>mientras agrupamos</em>, podemos recorrer todas las columnas de esa variable utilizando la función base <code>lapply()</code>, que ya nos resulta familiar o que pronto nos resultará familiar. No hay que aprender nuevos nombres específicos de <code>data.table</code>.</p>
+<h4 id="special-SD">Símbolo especial <code>.SD</code>:</h4>
+<p><code>data.table</code> proporciona un símbolo <em>especial</em> llamado <code>.SD</code>. Significa <strong>S</strong>subset of <strong>D</strong>ata. Es en sí mismo una <code>data.table</code> que contiene los datos para <em>el grupo actual</em> definido usando <code>by</code>.</p>
+<p>Recuerde que una <code>data.table</code> es internamente también una <code>lista</code> con todas sus columnas de igual longitud.</p>
+<p>Utilicemos la <a href="#what-is-datatable-1a"><code>data.table</code> <code>DT</code> de antes</a> para tener una idea de cómo se ve <code>.SD</code>.</p>
+<pre><code class="language-r">DT
+#        ID     a     b     c
+#    &lt;char&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt;
+# 1:      b     1     7    13
+# 2:      b     2     8    14
+# 3:      b     3     9    15
+# 4:      a     4    10    16
+# 5:      a     5    11    17
+# 6:      c     6    12    18
+
+DT[, print(.SD), by = ID]
+#        a     b     c
+#    &lt;int&gt; &lt;int&gt; &lt;int&gt;
+# 1:     1     7    13
+# 2:     2     8    14
+# 3:     3     9    15
+#        a     b     c
+#    &lt;int&gt; &lt;int&gt; &lt;int&gt;
+# 1:     4    10    16
+# 2:     5    11    17
+#        a     b     c
+#    &lt;int&gt; &lt;int&gt; &lt;int&gt;
+# 1:     6    12    18
+# Empty data.table (0 rows and 1 cols): ID
+</code></pre>
+<ul>
+<li>
+<p><code>.SD</code> contiene todas las columnas <em>excepto las columnas de agrupación</em> de forma predeterminada.</p>
+</li>
+<li>
+<p>También se genera conservando el orden original: datos correspondientes a <code>ID = &quot;b&quot;</code>, luego <code>ID = &quot;a&quot;</code>, y luego <code>ID = &quot;c&quot;</code>.</p>
+</li>
+</ul>
+<p>Para calcular en (múltiples) columnas, podemos simplemente usar la función base R <code>lapply()</code>.</p>
+<pre><code class="language-r">DT[, lapply(.SD, mean), by = ID]
+#        ID     a     b     c
+#    &lt;char&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt;
+# 1:      b   2.0   8.0  14.0
+# 2:      a   4.5  10.5  16.5
+# 3:      c   6.0  12.0  18.0
+</code></pre>
+<ul>
+<li>
+<p><code>.SD</code> contiene las filas correspondientes a las columnas <code>a</code>, <code>b</code> y <code>c</code> de ese grupo. Calculamos la <code>media()</code> de cada una de estas columnas utilizando la función base <code>lapply()</code>, que ya conocemos.</p>
+</li>
+<li>
+<p>Cada grupo devuelve una lista de tres elementos que contienen el valor medio que se convertirán en las columnas de la tabla <code>data.table</code> resultante.</p>
+</li>
+<li>
+<p>Dado que <code>lapply()</code> devuelve una <code>lista</code>, no es necesario envolverla con un <code>.()</code> adicional (si es necesario, consulte <a href="#tip-1">este consejo</a>).</p>
+</li>
+</ul>
+<p>Ya casi estamos listos. Queda un pequeño detalle por resolver. En nuestra tabla de datos <code>flights</code>, solo queríamos calcular la <code>mean()</code> de las dos columnas <code>arr_delay</code> y <code>dep_delay</code>. Pero <code>.SD</code> contendría todas las columnas excepto las variables de agrupamiento de forma predeterminada.</p>
+<h4 id="c-mo-podemos-especificar-s-lo-las-columnas-en-las-que-nos-gustar-a-calcular-la-media">– ¿Cómo podemos especificar sólo las columnas en las que nos gustaría calcular la <code>media()</code>?</h4>
+<h4 id="sdcols">.SDcols</h4>
+<p>Utilizando el argumento <code>.SDcols</code>. Acepta nombres de columnas o índices de columnas. Por ejemplo, <code>.SDcols = c(&quot;arr_delay&quot;, &quot;dep_delay&quot;)</code> garantiza que <code>.SD</code> contenga solo estas dos columnas para cada grupo.</p>
+<p>De manera similar a <a href="#refer_j">parte g)</a>, también puede especificar las columnas que desea eliminar en lugar de las columnas que desea conservar utilizando <code>-</code> o <code>!</code>. Además, puede seleccionar columnas consecutivas como <code>colA:colB</code> y deseleccionarlas como <code>!(colA:colB)</code> o <code>-(colA:colB)</code>.</p>
+<p>Ahora intentemos usar <code>.SD</code> junto con <code>.SDcols</code> para obtener la <code>media()</code> de las columnas <code>arr_delay</code> y <code>dep_delay</code> agrupadas por <code>origen</code>, <code>dest</code> y <code>mes</code>.</p>
+<pre><code class="language-r">flights[carrier == &quot;AA&quot;,                       ## Only on trips with carrier &quot;AA&quot;
+        lapply(.SD, mean),                     ## compute the mean
+        by = .(origin, dest, month),           ## for every 'origin,dest,month'
+        .SDcols = c(&quot;arr_delay&quot;, &quot;dep_delay&quot;)] ## for just those specified in .SDcols
+#      origin   dest month  arr_delay  dep_delay
+#      &lt;char&gt; &lt;char&gt; &lt;int&gt;      &lt;num&gt;      &lt;num&gt;
+#   1:    JFK    LAX     1   6.590361 14.2289157
+#   2:    LGA    PBI     1  -7.758621  0.3103448
+#   3:    EWR    LAX     1   1.366667  7.5000000
+#   4:    JFK    MIA     1  15.720670 18.7430168
+#   5:    JFK    SEA     1  14.357143 30.7500000
+#  ---                                          
+# 196:    LGA    MIA    10  -6.251799 -1.4208633
+# 197:    JFK    MIA    10  -1.880184  6.6774194
+# 198:    EWR    PHX    10  -3.032258 -4.2903226
+# 199:    JFK    MCO    10 -10.048387 -1.6129032
+# 200:    JFK    DCA    10  16.483871 15.5161290
+</code></pre>
+<h3 id="f-subconjunto-sd-para-cada-grupo">f) Subconjunto <code>.SD</code> para cada grupo:</h3>
+<h4 id="c-mo-podemos-devolver-las-dos-primeras-filas-de-cada-mes">– ¿Cómo podemos devolver las dos primeras filas de cada “mes”?</h4>
+<pre><code class="language-r">ans &lt;- flights[, head(.SD, 2), by = month]
+head(ans)
+#    month  year   day dep_delay arr_delay carrier origin   dest air_time distance  hour
+#    &lt;int&gt; &lt;int&gt; &lt;int&gt;     &lt;int&gt;     &lt;int&gt;  &lt;char&gt; &lt;char&gt; &lt;char&gt;    &lt;int&gt;    &lt;int&gt; &lt;int&gt;
+# 1:     1  2014     1        14        13      AA    JFK    LAX      359     2475     9
+# 2:     1  2014     1        -3        13      AA    JFK    LAX      363     2475    11
+# 3:     2  2014     1        -1         1      AA    JFK    LAX      358     2475     8
+# 4:     2  2014     1        -5         3      AA    JFK    LAX      358     2475    11
+# 5:     3  2014     1       -11        36      AA    JFK    LAX      375     2475     8
+# 6:     3  2014     1        -3        14      AA    JFK    LAX      368     2475    11
+</code></pre>
+<ul>
+<li>
+<p><code>.SD</code> es una <code>data.table</code> que contiene todas las filas de <em>ese grupo</em>. Simplemente creamos un subconjunto de las dos primeras filas como ya hemos visto <a href="#subset-rows-integer">aquí</a>.</p>
+</li>
+<li>
+<p>Para cada grupo, <code>head(.SD, 2)</code> devuelve las primeras dos filas como una <code>data.table</code>, que también es una <code>lista</code>, por lo que no tenemos que envolverla con <code>.()</code>.</p>
+</li>
+</ul>
+<h3 id="g-por-qu-mantener-j-tan-flexible">g) ¿Por qué mantener <code>j</code> tan flexible?</h3>
+<p>Para que tengamos una sintaxis consistente y sigamos usando funciones base ya existentes (y conocidas) en lugar de aprender nuevas funciones, para ilustrarlo, usemos la tabla <code>data.table</code> <code>DT</code> que creamos al principio en la sección <a href="#what-is-datatable-1a">¿Qué es una tabla data.table?</a>.</p>
+<h4 id="c-mo-podemos-concatenar-las-columnas-a-y-b-para-cada-grupo-en-id">– ¿Cómo podemos concatenar las columnas <code>a</code> y <code>b</code> para cada grupo en <code>ID</code>?</h4>
+<pre><code class="language-r">DT[, .(val = c(a,b)), by = ID]
+#         ID   val
+#     &lt;char&gt; &lt;int&gt;
+#  1:      b     1
+#  2:      b     2
+#  3:      b     3
+#  4:      b     7
+#  5:      b     8
+#  6:      b     9
+#  7:      a     4
+#  8:      a     5
+#  9:      a    10
+# 10:      a    11
+# 11:      c     6
+# 12:      c    12
+</code></pre>
+<ul>
+<li>Eso es todo. No se requiere ninguna sintaxis especial. Todo lo que necesitamos saber es la función base <code>c()</code> que concatena vectores y <a href="#tip-1">el consejo de antes</a>.</li>
+</ul>
+<h4 id="qu-pasa-si-queremos-tener-todos-los-valores-de-las-columnas-a-y-b-concatenados-pero-devueltos-como-una-columna-de-lista">– ¿Qué pasa si queremos tener todos los valores de las columnas <code>a</code> y <code>b</code> concatenados, pero devueltos como una columna de lista?</h4>
+<pre><code class="language-r">DT[, .(val = list(c(a,b))), by = ID]
+#        ID         val
+#    &lt;char&gt;      &lt;list&gt;
+# 1:      b 1,2,3,7,8,9
+# 2:      a  4, 5,10,11
+# 3:      c        6,12
+</code></pre>
+<ul>
+<li>
+<p>Aquí, primero concatenamos los valores con <code>c(a,b)</code> para cada grupo y los envolvemos con <code>list()</code>. Por lo tanto, para cada grupo, devolvemos una lista de todos los valores concatenados.</p>
+</li>
+<li>
+<p>Tenga en cuenta que esas comas son solo para visualización. Una columna de lista puede contener cualquier objeto en cada celda y, en este ejemplo, cada celda es en sí misma un vector y algunas celdas contienen vectores más largos que otras.</p>
+</li>
+</ul>
+<p>Una vez que comiences a internalizar el uso de <code>j</code>, te darás cuenta de lo poderosa que puede ser la sintaxis. Una forma muy útil de entenderla es jugando con ella, con la ayuda de <code>print()</code>.</p>
+<p>Por ejemplo:</p>
+<pre><code class="language-r">## look at the difference between
+DT[, print(c(a,b)), by = ID] # (1)
+# [1] 1 2 3 7 8 9
+# [1]  4  5 10 11
+# [1]  6 12
+# Empty data.table (0 rows and 1 cols): ID
+
+## and
+DT[, print(list(c(a,b))), by = ID] # (2)
+# [[1]]
+# [1] 1 2 3 7 8 9
+# 
+# [[1]]
+# [1]  4  5 10 11
+# 
+# [[1]]
+# [1]  6 12
+# Empty data.table (0 rows and 1 cols): ID
+</code></pre>
+<p>En (1), para cada grupo, se devuelve un vector, con longitud = 6,4,2 aquí. Sin embargo, (2) devuelve una lista de longitud 1 para cada grupo, con su primer elemento que contiene vectores de longitud 6,4,2. Por lo tanto, (1) da como resultado una longitud de <code> 6+4+2 = 12</code>, mientras que (2) devuelve <code>1+1+1=3</code>.</p>
+<h2 id="resumen">Resumen</h2>
+<p>La forma general de la sintaxis de <code>data.table</code> es:</p>
+<pre><code class="language-r">DT[i, j, by]
+</code></pre>
+<p>Hemos visto hasta ahora que,</p>
+<h4 id="usando-i">Usando <code>i</code>:</h4>
+<ul>
+<li>
+<p>Podemos crear subconjuntos de filas de manera similar a un <code>data.frame</code>, excepto que no es necesario usar <code>DT$</code> repetidamente, ya que las columnas dentro del marco de un <code>data.table</code> se ven como si fueran <em>variables</em>.</p>
+</li>
+<li>
+<p>También podemos ordenar una <code>data.table</code> usando <code>order()</code>, que internamente usa el orden rápido de data.table para un mejor rendimiento.</p>
+</li>
+</ul>
+<p>Podemos hacer mucho más en <code>i</code> introduciendo claves en <code>data.table</code>, lo que permite crear subconjuntos y uniones con una velocidad increíble. Veremos esto en la viñeta <em>“Claves y subconjuntos basados en búsqueda binaria rápida”</em> y <em>“Uniones y uniones continuas”</em>.</p>
+<h4 id="usando-j">Usando <code>j</code>:</h4>
+<ol>
+<li>
+<p>Seleccione columnas con el método <code>data.table</code>: <code>DT[, .(colA, colB)]</code>.</p>
+</li>
+<li>
+<p>Seleccione columnas con el método <code>data.frame</code>: <code>DT[, c(&quot;colA&quot;, &quot;colB&quot;)]</code>.</p>
+</li>
+<li>
+<p>Calcular en las columnas: <code>DT[, .(sum(colA), mean(colB))]</code>.</p>
+</li>
+<li>
+<p>Proporcione nombres si es necesario: <code>DT[, .(sA = suma(colA), mB = media(colB))]</code>.</p>
+</li>
+<li>
+<p>Combine con <code>i</code>: <code>DT[colA &gt; valor, suma(colB)]</code>.</p>
+</li>
+</ol>
+<h4 id="usando-por">Usando <code>por</code>:</h4>
+<ul>
+<li>
+<p>Al usar <code>by</code>, podemos agrupar por columnas especificando una <em>lista de columnas</em> o un <em>vector de caracteres de nombres de columnas</em> o incluso <em>expresiones</em>. La flexibilidad de <code>j</code>, combinada con <code>by</code> e <code>i</code>, crea una sintaxis muy poderosa.</p>
+</li>
+<li>
+<p><code>by</code> puede manejar múltiples columnas y también <em>expresiones</em>.</p>
+</li>
+<li>
+<p>Podemos agrupar columnas mediante clave para ordenar automáticamente el resultado agrupado.</p>
+</li>
+<li>
+<p>Podemos usar <code>.SD</code> y <code>.SDcols</code> en <code>j</code> para operar en múltiples columnas usando funciones base que ya conocemos. A continuación se muestran algunos ejemplos:</p>
+<ol>
+<li>
+<p><code>DT[, lapply(.SD, fun), by = ..., .SDcols = ...]</code> - aplica <code>fun</code> a todas las columnas especificadas en <code>.SDcols</code> mientras agrupa por las columnas especificadas en <code>by</code>.</p>
+</li>
+<li>
+<p><code>DT[, head(.SD, 2), by = ...]</code> - devuelve las dos primeras filas de cada grupo.</p>
+</li>
+<li>
+<p><code>DT[col &gt; val, head(.SD, 1), by = ...]</code> - combina <code>i</code> junto con <code>j</code> y <code>by</code>.</p>
+</li>
+</ol>
+</li>
+</ul>
+<h4 id="y-recuerda-el-consejo">Y recuerda el consejo:</h4>
+<p>Siempre que <code>j</code> devuelva una <code>lista</code>, cada elemento de la lista se convertirá en una columna en la <code>data.table</code> resultante.</p>
+<p>Veremos cómo <em>agregar/actualizar/eliminar</em> columnas <em>por referencia</em> y cómo combinarlas con <code>i</code> y <code>by</code> en la próxima viñeta.</p>
+<hr />
+</div>
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-core.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/autoloader/prism-autoloader.min.js" defer></script>
+</body>
+</html>

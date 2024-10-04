@@ -48,33 +48,35 @@ combinar_plain_txt_en_po <- function() {
   # traduzca el link RAW
   
   pwd <- getwd()
-  on.exit(setwd(pwd))
+  on.exit({
+    message("volviendo a ", pwd)
+    setwd(pwd)
+  })
   setwd("es/po")
   
   po_files  <- dir(pattern="-es[.]po$")
-  po_txt_files <- sub("-es[.]po$", "-es.txt$", po_files)
+  po_txt_files <- sub("-es[.]po$", "-es.txt", po_files)
   stopifnot(all(file.exists(po_txt_files)))
   
-  for (f in split(data.frame(po_files, po_txt_files), po_files)) {
-    message(f$po_files)
+  for (i in seq_along(po_files)) {
+    message(po_files[i])
     
     # REQUIERE: (mingw) (usa echo -n. Yo usé el de GIT)
     # CUIDADO: Elimina toda la traducción del PO.
     stopifnot(
-      file.copy(f$po_files, paste0(f$po_files,".bak"), overwrite = F))
+      file.copy(po_files[i], paste0(po_files[i],".bak"), overwrite = F))
     
     tryCatch(
       {
-        # Modificar el .PO para que las traducciones estén en 1 sola línea
-        # (compatible con windows mingw)
-        system2("sh", c("-c", shQuote(paste0(
-          "msgfilter", "--keep-header", "--no-wrap", 
-          "-i", shQuote(f$po_files), "-o", shQuote(f$po_files), "cat"))))
+        cmd <- paste("msgcat", "-o", shQuote(po_files[i]), shQuote(po_files[i]))
+        rslt <- system(cmd)
+        if (attr(rslt, "status") %||% 0 != 0) 
+          stop(attr(rslt, "errmsg") %||% "status <> 0") 
         
-        lines_po <- readLines(f$po_files)
-        lines_txt <- readLines(f$po_txt_files)
+        lines_po <- readLines(po_files[i])
+        lines_txt <- readLines(po_txt_files[i])
         # Esta línea escapa las comillas " que pudieran haberse introducido
-        lines_txt <- gsub("(?<!\\\\)\"", "\\\\\"", lines_txt, perl = T)
+        lines_txt <- gsub("(?<!\\\\)\"", "\\\\\"", lines_txt, perl = TRUE)
         # Si la primera linea está vacía la suprime
         lines_txt <- if(!nzchar(lines_txt[1])) lines_txt[-1] else lines_txt
         # la primera línea de msgstr es el encabezado del PO
@@ -85,33 +87,35 @@ combinar_plain_txt_en_po <- function() {
                        length(msgstr_pos), length(lines_txt)))
         
         lines_po[msgstr_pos] <- paste0("msgstr \"", lines_txt, "\"")
-        writeLines(lines_po, paste0(f$po_files, ""))
-        file.remove( paste0(f$po_files,".bak"))
+        writeLines(lines_po, paste0(po_files[i], ""))
+        file.remove( paste0(po_files[i],".bak"))
       },
       error = \(e){
         message(as.character(e))
-        message(sprintf(".PO original guardado como %s", paste0(f$po_files,".bak")))
+        message(sprintf(".PO original guardado como %s", paste0(po_files[i],".bak")))
+        return()
       }
     )
   }  
 }
 
 # Actualiza la metadata en PO (fecha de revisión, Last translator...)
-.actualizar_po_metadata <- function() {
-  last_translator <- list(name = "Ricardo Villalba", mail = "rikivillalba@gmail.com")
+actualizar_po_metadata <- function(name, email) {
   pwd <- getwd()
   on.exit(setwd(pwd))
   setwd("es/po")
   po_files  <- dir(pattern=".po$")
   lapply(po_files, \(i) {
-    lines <- readLines(i) |>
+    lines <- readLines(i)
+    lines |> 
       regex_sub("\"Project-Id-Version: (.*)\\\\n\"", "0.0.1") |>
       regex_sub("\"PO-Revision-Date: (.*)\\\\n\"", format(Sys.time(), format = "%Y-%m-%d %H:%M%z")) |>
-      regex_sub("\"Last-Translator: (.*)\\\\n\"", with(last_translator, sprintf("%s <%s>", name, mail))) |>
+      regex_sub("\"Last-Translator: (.*)\\\\n\"",  sprintf("%s <%s>", name, email)) |>
       regex_sub("\"Language-Team: (.*)\\\\n\"", "es")  |> 
-      append("\"Language: es\\n\"", after = grep("\"Language-Team: (.*)\\\\n\"", lines))
-    writeLines(lines, i)
+      append("\"Language: es\\n\"", after = grep("\"Language-Team: (.*)\\\\n\"", lines)) |>
+      writeLines(i)
   })
+  invisible()
 }
 
 # Usa las rutinas de rmd2po para generar archivos ".po" y traducir las viñetas
@@ -128,24 +132,12 @@ generar_po_desde_rmd_en_ingles <- function() {
 # po2rmd utiliza "po2md" (librerías escritas en python)
 # po2rmd hace algunas transformaciones sobre el .Rmd original para 
 convertir_po_a_rmd <- function() {
-  rmd_files <- dir("es", ".Rmd$")
+  rmd_files <- dir(, ".Rmd$")
   for (f in rmd_files) {
     po2rmd(f, lang = "es", verbose = TRUE)
   }  
 }
 
-# generar las viñetas html
-generar_viñetas_html <- function() {
-  rmd_files  <- dir("es", pattern=".Rmd$")
-  lapply(rmd_files, \(i) {
-    # Corre en su propio subproceso.
-    # NOTA no pasar knitr directamente en lapply (porque topenv() es "base" 
-    # en lugar de .Globalenv y cedta() no lo detecta)
-    callr::r(\(f) knitr::knit2html(file.path("es", f)), list(i))
-  })
-  # borrar markdown generados
-  file.remove(dir("es", pattern = "[.]md$"))
-}
 
 # Aquí: Script provisorio para traducir los títulos
 traducir_titulos_rmd <- function() {
@@ -189,6 +181,7 @@ traducir_titulos_rmd <- function() {
     } else {warning(sprintf("título para %s no en titles_es", i))}
   })
 }
+
 
 extrae_texto_de_msgid <- function() {
   message("Extraer msgid de archivos...")
@@ -271,6 +264,9 @@ extraer_traducciones_con_selenium <- function(google_urls) {
 
 #==== Inicio ====
 
+setwd("~/R/traduccion-vignettes-datatable")
+source("rmd2po.R")
+
 if (FALSE) {
   
   
@@ -278,7 +274,7 @@ if (FALSE) {
   # TODO: MODIFICAR CON LA RUTA DONDE CADA UNO GUARDA LAS VIGNETTES
   # O CLONA EL GIT
   # TODO: alguna automatización de CI/CD de github para que lo haga automático? 
-  setwd("~/R/traduccion-vignettes-datatable/vignettes")
+  setwd("vignettes")
   
   # hacks para que md2po funcione con rmd's
   # https://github.com/SciViews/rmdpo
@@ -288,8 +284,6 @@ if (FALSE) {
   
   # version de rm2po
   system2("md2po", "--version", stderr = TRUE)
-  
-  source("../rmd2po.R")
   
   generar_po_desde_rmd_en_ingles()
   
@@ -301,22 +295,51 @@ if (FALSE) {
             "datatable-reference-semantics.Rmd-en.txt", "datatable-reshape.Rmd-en.txt", 
             "datatable-sd-usage.Rmd-en.txt", "datatable-secondary-indices-and-auto-indexing.Rmd-en.txt")
   
+  # Estos links vinculan a las traducciones de google
   google_urls <- traducciones_google_english(
     url = "https://raw-githubusercontent-com.translate.goog/cienciadedatos/traduccion-vignettes-datatable/refs/heads/main/vignettes/es/po/",
     files = files)
   
   writeLines(sprintf("[%s](%s)", files, google_urls), "../google_translate_urls.md")
   
-  extraer_traducciones_con_selenium(google_urls = google_urls)
-  
-  
-  
-  #Hacer un commit en este punto.
-  #system2("git", "add .",  stderr = TRUE)
+  # Hacer un commit en este punto o subir a github.
+  # para que google pueda traducirlo (método gratuito:;)
+
+  # system2("git", "add .",  stderr = TRUE)
   #   system2("git", "commit -m \"texto extraido de msgid\"",  stderr = TRUE)
   
-  # extraer traducciones con SELENIUM
+  # una vez subidos los txt ingles, extraer traducciones con SELENIUM
+  extraer_traducciones_con_selenium(google_urls = google_urls)
   
+  # TODO: en windows requiere msgcat, por ejemplo el que viene con git.
+  if (.Platform$OS.type == "windows") Sys.setenv("PATH" = paste0(
+    sep = .Platform$file.sep, Sys.getenv("PATH"), 
+    "c:\\apps\\git\\mingw64\\bin",
+    "c:\\apps\\git\\bin"))
   
+  # combinar texto plano en PO.
+  combinar_plain_txt_en_po() 
+  
+  # Actualiza metadata ej: name = "Ricardo Villalba", mail = "rikivillalba@gmail.com"
+  actualizar_po_metadata(name = "Nombre Apellido", email = "direccion@ejemplo.com") 
+  
+  # correr path donde se encuentra po2md y md2po si no se corrió antes i.e. cargar_entorno_conda(condaenv = "main")
+  convertir_po_a_rmd()
 
+  # copia a "es" los otros archivos que son necesarios para ejecutar las viñeytas
+  vignette_files <- setdiff(
+    list.files(recursive = FALSE), c(
+      "es", list.files( recursive = FALSE, pattern = "[.]Rmd$")))
+  file.copy(vignette_files, "es", recursive = T)
+  
+  # generar las viñetas html
+  setwd("es")
+  rmd_files  <- dir(pattern=".Rmd$")
+  lapply(rmd_files, \(f)  knitr::knit2html(f))
+  
+  # borrar markdown generados
+  file.remove(dir(pattern = "[.]md$"))
+ 
+  
+  
 }
