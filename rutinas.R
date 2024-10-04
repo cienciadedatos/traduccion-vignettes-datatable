@@ -37,7 +37,7 @@ regex_sub <- function(x, pattern, ...) {
   x
 }
 
-.combinar_plain_txt_en_po <- function() {
+combinar_plain_txt_en_po <- function() {
   
   # Script para cargar los archivos .txt generados en los po originales
   # los txt se generan ocn el script siguiente :
@@ -50,8 +50,9 @@ regex_sub <- function(x, pattern, ...) {
   pwd <- getwd()
   on.exit(setwd(pwd))
   setwd("es/po")
-  po_files  <- dir(pattern="po$")
-  po_txt_files <- paste0(po_files, ".txt")
+  
+  po_files  <- dir(pattern="-es[.]po$")
+  po_txt_files <- sub("-es[.]po$", "-es.txt$", po_files)
   stopifnot(all(file.exists(po_txt_files)))
   
   for (f in split(data.frame(po_files, po_txt_files), po_files)) {
@@ -72,10 +73,13 @@ regex_sub <- function(x, pattern, ...) {
         
         lines_po <- readLines(f$po_files)
         lines_txt <- readLines(f$po_txt_files)
+        # Esta línea escapa las comillas " que pudieran haberse introducido
         lines_txt <- gsub("(?<!\\\\)\"", "\\\\\"", lines_txt, perl = T)
+        # Si la primera linea está vacía la suprime
+        lines_txt <- if(!nzchar(lines_txt[1])) lines_txt[-1] else lines_txt
+        # la primera línea de msgstr es el encabezado del PO
         msgstr_pos <- grep("msgstr \"\"", lines_po)[-1]
-        # los .po y los archivos planos deben tener el mismo nro de
-        # elementos
+        # los .po y los archivos planos deben tener el mismo nro de elementos
         if(length(msgstr_pos) != length(lines_txt)) 
           stop(sprintf("po: %d líneas vs txt: %d líneas", 
                        length(msgstr_pos), length(lines_txt)))
@@ -226,18 +230,43 @@ cargar_entorno_conda <- function(condaenv) {
 
 
 
-traducciones_google_english <- function(url ) {
-  files <- c("datatable-benchmarking.Rmd-es.po.txt", "datatable-faq.Rmd-es.po.txt", 
-             "datatable-importing.Rmd-es.po.txt", "datatable-intro.Rmd-es.po.txt", 
-             "datatable-keys-fast-subset.Rmd-es.po.txt", "datatable-programming.Rmd-es.po.txt", 
-             "datatable-reference-semantics.Rmd-es.po.txt", "datatable-reshape.Rmd-es.po.txt", 
-             "datatable-sd-usage.Rmd-es.po.txt", "datatable-secondary-indices-and-auto-indexing.Rmd-es.po.txt")
-  
+traducciones_google_english <- function(url, files) {
   sapply(gsub("-es\\.", "-en\\.", files), \(file) {
     httr::build_url(within.list(httr::parse_url(
       paste0(url, file)), 
       query <- list(`_x_tr_sl`="en", `_x_tr_tl`="es", `_x_tr_hl`="es", `_x_tr_pto`="wapp")
     ))})
+}
+
+# usa SELENIUM para traducir con google desde github
+extraer_traducciones_con_selenium <- function(google_urls) {
+  tryCatch(
+    {
+      selenium_driver <- RSelenium::rsDriver(
+        browser = "chrome",
+        check  = FALSE, 
+        extraCapabilities = list(
+          chromeOptions = list(
+            prefs = list(
+              "profile.default_content_settings.popups" = 0L))))
+      
+      for (link_id in names(google_urls)) {
+        selenium_driver$client$navigate(google_urls[link_id])
+        selenium_driver$server$process$wait(1000)
+        
+        element <- selenium_driver$client$findElement(using="xpath", "/html/body/pre")
+        lines <- element$getElementText()[[1]] |> strsplit("\n", fixed = TRUE) |> _[[1]]
+        writeLines(lines, file.path("es/po", sub("en\\.txt$", "es.txt", link_id)))
+        message(paste(link_id, "ok."))
+        #    sub("^.*/([^/]+en\\.txt)\\?.*$", "\\1", link)
+      }
+    },
+    error = \(e) message(e),
+    finally = {
+      (get0("selenium_driver")$server$stop 
+       %||% \() warning("no hay server para detener"))()
+    }
+  )  
 }
 
 #==== Inicio ====
@@ -263,12 +292,31 @@ if (FALSE) {
   source("../rmd2po.R")
   
   generar_po_desde_rmd_en_ingles()
+  
   extrae_texto_de_msgid()
   
-  #Hacer un commit en este punto.
+  files <- c("datatable-benchmarking.Rmd-en.txt", "datatable-faq.Rmd-en.txt", 
+            "datatable-importing.Rmd-en.txt", "datatable-intro.Rmd-en.txt", 
+            "datatable-keys-fast-subset.Rmd-en.txt", "datatable-programming.Rmd-en.txt", 
+            "datatable-reference-semantics.Rmd-en.txt", "datatable-reshape.Rmd-en.txt", 
+            "datatable-sd-usage.Rmd-en.txt", "datatable-secondary-indices-and-auto-indexing.Rmd-en.txt")
   
   google_urls <- traducciones_google_english(
-    url = "https://raw-githubusercontent-com.translate.goog/cienciadedatos/traduccion-vignettes-datatable/refs/heads/main/vignettes/es/po")
+    url = "https://raw-githubusercontent-com.translate.goog/cienciadedatos/traduccion-vignettes-datatable/refs/heads/main/vignettes/es/po/",
+    files = files)
   
-}  
+  writeLines(sprintf("[%s](%s)", files, google_urls), "../google_translate_urls.md")
+  
+  extraer_traducciones_con_selenium(google_urls = google_urls)
+  
+  
+  
+  #Hacer un commit en este punto.
+  #system2("git", "add .",  stderr = TRUE)
+  #   system2("git", "commit -m \"texto extraido de msgid\"",  stderr = TRUE)
+  
+  # extraer traducciones con SELENIUM
+  
+  
 
+}

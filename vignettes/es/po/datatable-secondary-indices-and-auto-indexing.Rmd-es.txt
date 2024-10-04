@@ -1,0 +1,85 @@
+Esta viñeta supone que el lector está familiarizado con la sintaxis `[i, j, by]` de data.table y con la forma de realizar subconjuntos rápidos basados en claves. Si no está familiarizado con estos conceptos, lea primero las viñetas *\"Introducción a data.table\"*, *\"Semántica de referencia\"* y *\"Claves y subconjuntos rápidos basados en búsquedas binarias\"*.
+Datos {#data}
+Utilizaremos los mismos datos de "vuelos" que en la viñeta *\"Introducción a data.table\"*.
+Introducción
+En esta viñeta, vamos a
+=====* analizar los *índices secundarios* y justificar por qué los necesitamos citando casos en los que configurar claves no es necesariamente ideal,=====
+=====* realizar subconjuntos rápidos, una vez más, pero utilizando el nuevo argumento `on`, que calcula índices secundarios internamente para la tarea (temporalmente) y reutiliza si ya existe uno,=====
+=====* y finalmente observe la *indexación automática* que va un paso más allá y crea índices secundarios automáticamente, pero lo hace en la sintaxis nativa de R para crear subconjuntos.=====
+1. Índices secundarios
+a) ¿Qué son los índices secundarios?
+Los índices secundarios son similares a las `claves` en *data.table*, excepto por dos diferencias importantes:
+=====* No reordena físicamente toda la tabla de datos en la RAM. En cambio, solo calcula el orden para el conjunto de columnas proporcionadas y almacena ese *vector de orden* en un atributo adicional llamado `index`.=====
+=====* Puede haber más de un índice secundario para una tabla de datos (como veremos a continuación).=====
+b) Establecer y obtener índices secundarios
+-- ¿Cómo podemos establecer la columna `origen` como un índice secundario en la *tabla de datos* `vuelos`?
+=====* `setindex` y `setindexv()` permiten agregar un índice secundario a data.table.=====
+=====* Tenga en cuenta que `vuelos` **no** se reordena físicamente en orden creciente de `origen`, como habría sido el caso con `setkey()`.=====
+=====* Tenga en cuenta también que se ha añadido el atributo `index` a `flights`.=====
+=====* `setindex(flights, NULL)` eliminaría todos los índices secundarios.=====
+-- ¿Cómo podemos obtener todos los índices secundarios establecidos hasta ahora en 'vuelos'?
+=====* La función `indices()` devuelve todos los índices secundarios actuales en la tabla de datos. Si no existe ninguno, se devuelve `NULL`.=====
+=====* Nótese que al crear otro índice en las columnas `origin, dest`, no perdemos el primer índice creado en la columna `origin`, es decir, podemos tener múltiples índices secundarios.=====
+c) ¿Por qué necesitamos índices secundarios?
+-- Reordenar una tabla de datos puede ser costoso y no siempre ideal.
+Considere el caso en el que desea realizar un subconjunto rápido basado en clave en la columna `origin` para el valor \"JFK\". Lo haríamos de la siguiente manera:
+`setkey()` requiere:
+a) calcular el vector de orden para la(s) columna(s) proporcionada(s), aquí, `origen`, y
+b) reordenar toda la tabla de datos, por referencia, en función del vector de orden calculado.
+Calcular el orden no es la parte que consume mucho tiempo, ya que data.table utiliza un ordenamiento por base real en vectores de números enteros, caracteres y números. Sin embargo, reordenar data.table puede consumir mucho tiempo (según la cantidad de filas y columnas).
+A menos que nuestra tarea implique la creación repetida de subconjuntos en la misma columna, la creación rápida de subconjuntos basada en claves podría anularse efectivamente al momento de reordenar, dependiendo de las dimensiones de nuestra tabla de datos.
+-- Solo puede haber una `clave` como máximo
+Ahora, si quisiéramos repetir la misma operación pero en la columna `dest`, para el valor \"LAX\", entonces tenemos que `setkey()`, *nuevamente*.
+Y esto reordena los "vuelos" por "destino", *nuevamente*. Lo que realmente nos gustaría es poder realizar la subdivisión rápida eliminando el paso de reordenación.
+¡Y esto es precisamente lo que permiten los *índices secundarios*!
+-- Los índices secundarios se pueden reutilizar
+Dado que puede haber varios índices secundarios y crear un índice es tan simple como almacenar el vector de orden como un atributo, esto nos permite incluso eliminar el tiempo para volver a calcular el vector de orden si ya existe un índice.
+-- El nuevo argumento `on` permite una sintaxis más limpia y la creación y reutilización automática de índices secundarios.
+Como veremos en la siguiente sección, el argumento `on` proporciona varias ventajas:
+argumento `on`
+=====* permite la creación de subconjuntos mediante el cálculo de índices secundarios sobre la marcha. Esto elimina la necesidad de ejecutar `setindex()` cada vez.=====
+=====* permite la reutilización sencilla de índices existentes simplemente verificando los atributos.=====
+=====* permite una sintaxis más clara al incluir las columnas en las que se ejecuta el subconjunto como parte de la sintaxis. Esto hace que el código sea más fácil de seguir cuando se lo analiza más adelante.=====
+2. Creación rápida de subconjuntos mediante el argumento `on` e índices secundarios
+a) Subconjuntos rápidos en `i`
+-- Subconjunto de todas las filas donde el aeropuerto de origen coincide con *\"JFK\"* usando `on`
+=====* Esta instrucción también realiza una búsqueda binaria rápida basada en subconjuntos, calculando el índice sobre la marcha. Sin embargo, tenga en cuenta que no guarda el índice como un atributo automáticamente. Esto puede cambiar en el futuro.=====
+=====* Si ya hubiéramos creado un índice secundario, utilizando `setindex()`, entonces `on` lo reutilizaría en lugar de (re)computarlo. Podemos ver esto utilizando `verbose = TRUE`:=====
+-- ¿Cómo puedo crear subconjuntos basados en las columnas `origen` *y* `dest`?
+Por ejemplo, si queremos crear un subconjunto de la combinación `\"JFK\", \"LAX\"`, entonces:
+=====* El argumento `on` acepta un vector de caracteres de nombres de columnas correspondientes al orden proporcionado a `i-argument`.=====
+=====* Dado que el tiempo para calcular el índice secundario es bastante pequeño, no tenemos que usar `setindex()`, a menos que, una vez más, la tarea implique subconjuntos repetidos en la misma columna.=====
+b) Seleccionar en `j`
+Todas las operaciones que analizaremos a continuación no son diferentes a las que ya vimos en la viñeta *Subconjunto basado en claves y búsqueda binaria rápida*. Excepto que usaremos el argumento `on` en lugar de establecer claves.
+-- Devuelve la columna `arr_delay` sola como una tabla de datos correspondiente a `origin = \"LGA\"` y `dest = \"TPA\"`
+c) Encadenamiento
+-- Sobre el resultado obtenido anteriormente, utilice el encadenamiento para ordenar la columna en orden decreciente.
+d) Calcular o *hacer* en `j`
+-- Encuentra el retraso máximo de llegada correspondiente a `origin = \"LGA\"` y `dest = \"TPA\"`.
+e) *sub-asignar* por referencia usando `:=` en `j`
+Ya hemos visto este ejemplo en la viñeta *Semántica de referencia* y *Claves y subconjunto basado en búsqueda binaria rápida*. Echemos un vistazo a todas las `horas` disponibles en la *tabla de datos* `vuelos`:
+Vemos que hay un total de `25` valores únicos en los datos. Parece que están presentes tanto *0* como *24* horas. Reemplacemos *24* por *0*, pero esta vez usemos `on` en lugar de claves de configuración.
+Ahora, verifiquemos si `24` se reemplaza con `0` en la columna `hora`.
+=====* Esta es una gran ventaja de los índices secundarios. Antes, para actualizar unas pocas filas de `hour`, teníamos que ejecutar `setkey()` sobre él, lo que inevitablemente reordenaba toda la tabla de datos. Con `on`, se conserva el orden y la operación es mucho más rápida. Si observamos el código, la tarea que queríamos realizar también es bastante clara.=====
+f) Agregación utilizando `por`
+-- Obtener el retraso máximo de salida para cada `mes` correspondiente a `origen = \"JFK\"`. Ordenar el resultado por `mes`
+=====* Tendríamos que haber establecido la `clave` nuevamente en `origen, destino`, si no usáramos `on`, que internamente construye índices secundarios sobre la marcha.=====
+g) El argumento *mult*
+Los demás argumentos, incluido `mult`, funcionan exactamente de la misma manera que vimos en la viñeta *Subconjunto basado en claves y búsqueda binaria rápida*. El valor predeterminado para `mult` es \"all\". Podemos elegir, en lugar de eso, solo se deben devolver las \"primeras\" o \"últimas\" filas coincidentes.
+-- Subconjunto solo de la primera fila coincidente donde `dest` coincide con *\"BOS\"* y *\"DAY\"*
+-- Subconjunto solo de la última fila coincidente donde `origin` coincide con *\"LGA\", \"JFK\", \"EWR\"* y `dest` coincide con *\"XNA\"*
+h) El argumento *nomatch*
+Podemos elegir si las consultas que no coinciden deben devolver "NA" o ignorarse por completo utilizando el argumento "nomatch".
+-- Del ejemplo anterior, crea un subconjunto de todas las filas solo si hay una coincidencia
+=====* No hay vuelos que conecten "JFK" y "XNA". Por lo tanto, esa fila se omite en el resultado.=====
+3. Indexación automática
+Primero, analizamos cómo crear subconjuntos rápidos mediante búsqueda binaria con *claves*. Luego, descubrimos que podíamos mejorar aún más el rendimiento y tener una sintaxis más clara utilizando índices secundarios.
+Esto es lo que hace la *indexación automática*. Por el momento, solo está implementada para los operadores binarios `==` y `%in%`. Se crea un índice automáticamente *y* se guarda como un atributo. Es decir, a diferencia del argumento `on` que calcula el índice sobre la marcha cada vez (a menos que ya exista uno), aquí se crea un índice secundario.
+Comencemos creando una tabla de datos lo suficientemente grande para resaltar la ventaja.
+Cuando usamos `==` o `%in%` en una sola columna por primera vez, se crea automáticamente un índice secundario y se utiliza para realizar el subconjunto.
+El tiempo necesario para crear el subconjunto la primera vez es el tiempo necesario para crear el índice + el tiempo necesario para crear el subconjunto. Dado que crear un índice secundario implica únicamente la creación del vector de orden, esta operación combinada es más rápida que los escaneos de vectores en muchos casos. Pero la verdadera ventaja se encuentra en los subconjuntos sucesivos, ya que son extremadamente rápidos.
+=====* La primera ejecución tardó `r sprintf(\"%.3f\", t1[\"elapsed\"])` segundos, mientras que la segunda vez tardó `r sprintf(\"%.3f\", t2[\"elapsed\"])` segundos.=====
+=====* La indexación automática se puede desactivar configurando el argumento global `options(datatable.auto.index = FALSE)`.=====
+=====* Deshabilitar la indexación automática aún permite usar índices creados explícitamente con `setindex` o `setindexv`. Puede deshabilitar los índices por completo configurando el argumento global `options(datatable.use.index = FALSE)`.=====
+En la versión reciente, ampliamos la indexación automática a expresiones que involucran más de una columna (combinadas con el operador `&`). En el futuro, planeamos ampliar la búsqueda binaria para que funcione con más operadores binarios como `<`, `<=`, `>` y `>=`.
+Discutiremos *subconjuntos* rápidos usando claves e índices secundarios para *uniones* en la siguiente viñeta, *\"Uniones y uniones continuas\"*.
