@@ -151,7 +151,7 @@ section.footnotes::before {
 <div class="frontmatter">
 <div class="title"><h1>Frequently Asked Questions about data.table</h1></div>
 <div class="author"><h2></h2></div>
-<div class="date"><h3>2024-10-04</h3></div>
+<div class="date"><h3>2024-10-07</h3></div>
 </div>
 <div class="body">
 <div id="TOC">
@@ -772,13 +772,13 @@ DT[2, b := 7L]        # works (faster) without warning
 class(7L)             # L makes it an integer
 # [1] &quot;integer&quot;
 DT[ , b := rnorm(5)]  # 'replace' integer column with a numeric column
-#        a          b
-#    &lt;int&gt;      &lt;num&gt;
-# 1:     1  0.4557028
-# 2:     2 -1.7119540
-# 3:     3  0.5389235
-# 4:     4  0.4989523
-# 5:     5  0.4392248
+#        a           b
+#    &lt;int&gt;       &lt;num&gt;
+# 1:     1 -0.49712742
+# 2:     2 -0.67258583
+# 3:     3  0.21280856
+# 4:     4 -0.09731697
+# 5:     5  0.44175691
 </code></pre>
 <h2 id="lectura-de-data-table-desde-un-archivo-rds-o-rdata"><span class="section-number">5.3</span> Lectura de data.table desde un archivo RDS o RData</h2>
 <p><code>*.RDS</code> y <code>*.RData</code> son tipos de archivos que pueden almacenar objetos R en memoria en el disco de manera eficiente. Sin embargo, al almacenar data.table en el archivo binario se pierde la sobreasignación de columnas. Esto no es un gran problema: su data.table se copiará en la memoria en la siguiente operación <em>por referencia</em> y generará una advertencia. Por lo tanto, se recomienda llamar a <code>setalloccol()</code> en cada data.table cargado con llamadas <code>readRDS()</code> o <code>load()</code>.</p>

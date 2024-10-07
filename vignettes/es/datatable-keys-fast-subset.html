@@ -142,7 +142,7 @@ section.footnotes::before {
 <div class="frontmatter">
 <div class="title"><h1>Keys and fast binary search based subset</h1></div>
 <div class="author"><h2></h2></div>
-<div class="date"><h3>2024-10-04</h3></div>
+<div class="date"><h3>2024-10-07</h3></div>
 </div>
 <div class="body">
 <p>Esta viñeta está dirigida a aquellos que ya están familiarizados con la sintaxis de <em>data.table</em>, su forma general, cómo crear subconjuntos de filas en <code>i</code>, seleccionar y calcular columnas, agregar/modificar/eliminar columnas <em>por referencia</em> en <code>j</code> y agrupar utilizando <code>by</code>. Si no está familiarizado con estos conceptos, lea primero las viñetas <em>“Introducción a data.table”</em> y <em>“Semántica de referencia”</em>.</p>
@@ -669,7 +669,7 @@ print(object.size(DT), units = &quot;Mb&quot;)
 t1 &lt;- system.time(ans1 &lt;- DT[x == &quot;g&quot; &amp; y == 877L])
 t1
 #    user  system elapsed 
-#    0.22    0.03    0.37
+#    0.29    0.30    0.74
 head(ans1)
 #         x     y        val
 #    &lt;char&gt; &lt;int&gt;      &lt;num&gt;
@@ -708,7 +708,7 @@ identical(ans1$val, ans2$val)
 # [1] TRUE
 </code></pre>
 <ul>
-<li>La aceleración es <strong>~370x</strong>!</li>
+<li>La aceleración es <strong>~740x</strong>!</li>
 </ul>
 <h3 id="b-por-qu-al-introducir-datos-en-una-tabla-de-datos-se-obtienen-subconjuntos-incre-blemente-r-pidos">b) ¿Por qué al introducir datos en una <em>tabla de datos</em> se obtienen subconjuntos increíblemente rápidos?</h3>
 <p>Para entender esto, veamos primero qué hace el <em>enfoque de escaneo vectorial</em> (método 1).</p>

@@ -142,7 +142,7 @@ section.footnotes::before {
 <div class="frontmatter">
 <div class="title"><h1>Secondary indices and auto indexing</h1></div>
 <div class="author"><h2></h2></div>
-<div class="date"><h3>2024-10-04</h3></div>
+<div class="date"><h3>2024-10-07</h3></div>
 </div>
 <div class="body">
 <p>Esta viñeta supone que el lector está familiarizado con la sintaxis <code>[i, j, by]</code> de data.table y con la forma de realizar subconjuntos rápidos basados en claves. Si no está familiarizado con estos conceptos, lea primero las viñetas <em>“Introducción a data.table”</em>, <em>“Semántica de referencia”</em> y <em>“Claves y subconjuntos rápidos basados en búsquedas binarias”</em>.</p>
@@ -310,9 +310,9 @@ flights[&quot;JFK&quot;, on = &quot;origin&quot;, verbose = TRUE][1:5]
 # on= matches existing index, using index
 # Starting bmerge ...
 # &lt;forder.c&gt;: recibió 1 filas y 1 columnas
-# forderReuseSorting: opt=-1, took 0.000s
+# forderReuseSorting: opt=-1, took 0.001s
 # bmerge: looping bmerge_r took 0.000s
-# bmerge: took 0.000s
+# bmerge: took 0.001s
 # bmerge done in 0.000s elapsed (0.000s cpu)
 # Constructing irows for '!byjoin || nqbyjoin' ... 0.000s elapsed (0.000s cpu)
 #     year month   day dep_delay arr_delay carrier origin   dest air_time distance  hour
@@ -477,7 +477,7 @@ names(attributes(dt))
 ## run thefirst time
 (t1 &lt;- system.time(ans &lt;- dt[x == 989L]))
 #    user  system elapsed 
-#    0.45    0.01    0.50
+#    0.50    0.05    0.60
 head(ans)
 #        x         y
 #    &lt;int&gt;     &lt;num&gt;
@@ -500,14 +500,14 @@ indices(dt)
 <pre><code class="language-r">## successive subsets
 (t2 &lt;- system.time(dt[x == 989L]))
 #    user  system elapsed 
-#    0.02    0.00    0.01
+#    0.03    0.00    0.04
 system.time(dt[x %in% 1989:2012])
 #    user  system elapsed 
-#    0.01    0.00    0.02
+#    0.00    0.01    0.03
 </code></pre>
 <ul>
 <li>
-<p>La primera ejecución tardó 0.500 segundos, mientras que la segunda vez tardó 0.010 segundos.</p>
+<p>La primera ejecución tardó 0.600 segundos, mientras que la segunda vez tardó 0.040 segundos.</p>
 </li>
 <li>
 <p>La indexación automática se puede desactivar configurando el argumento global <code>options(datatable.auto.index = FALSE)</code>.</p>
