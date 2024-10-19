@@ -1,5 +1,5 @@
 ---
-title: "Frequently Asked Questions about data.table"
+title: "Preguntas Frecuentes sobre data.table"
 date: "`r Sys.Date()`"
 output:
   markdown::html_format:
@@ -37,6 +37,10 @@ The first section, Beginner FAQs, is intended to be read in order, from start to
 This FAQ is required reading and considered core documentation. Please do not ask questions on Stack Overflow or raise issues on GitHub until you have read it. We can all tell when you ask that you haven't read it. So if you do ask and haven't read it, don't use your real name.
 
 This document has been quickly revised given the changes in v1.9.8 released Nov 2016. Please do submit pull requests to fix mistakes or improvements.  If anyone knows why the table of contents comes out so narrow and squashed when displayed by CRAN, please let us know.  This document used to be a PDF and we changed it recently to HTML.
+
+
+
+
 
 
 # Beginner FAQs
@@ -158,6 +162,9 @@ The request to change came from users. The feeling was that if a query is doing 
 Of the 66 packages on CRAN or Bioconductor that depended on or import data.table at the time of releasing v1.9.4 (it is now over 300), only one was affected by the change. That could be because many packages don't have comprehensive tests, or just that grouping by each row in `i` wasn't being used much by downstream packages. We always test the new version with all dependent packages before release and coordinate any changes with those maintainers. So this release was quite straightforward in that regard.
 
 Another compelling reason to make the change was that previously, there was no efficient way to achieve what `X[Y, sum(foo*bar)]` does now. You had to write `X[Y][ , sum(foo*bar)]`. That was suboptimal because `X[Y]` joined all the columns and passed them all to the second compound query without knowing that only `foo` and `bar` are needed. To solve that efficiency problem, extra programming effort was required: `X[Y, list(foo, bar)][ , sum(foo*bar)]`.  The change to `by = .EACHI` has simplified this by allowing both queries to be expressed inside a single `DT[...]` query for efficiency.
+
+
+
 
 # General Syntax
 
