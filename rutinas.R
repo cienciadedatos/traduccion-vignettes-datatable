@@ -22,6 +22,13 @@
 #    4) generar_viñetas_html()
 #
 
+# # TODO: en windows requiere msgcat, por ejemplo el que viene con git.
+# if (.Platform$OS.type == "windows") Sys.setenv("PATH" = paste0(
+#   sep = .Platform$file.sep, Sys.getenv("PATH"), 
+#   "c:\\apps\\git\\mingw64\\bin",
+#   "c:\\apps\\git\\bin"))
+
+
 ## ---- funciones auxiliares ----
 
 # dada la posición de espacios en una cadena, devuelve las
@@ -52,7 +59,6 @@ regex_sub <- function(x, pattern, ...) {
   regmatches(x, lapply(matches, drop_first)) <- Map(f = c, ...)
   x
 }
-
 
 # Obtiene los nro de lineas o el valor de las líneas de una entrada de un PO
 get_po_msgs <- function(lines_po, type = c("msgid", "msgstr"), ret = c("position", "value")) {
@@ -103,12 +109,21 @@ get_po_msgs <- function(lines_po, type = c("msgid", "msgstr"), ret = c("position
 #   lines_po[msgstr_pos] <- paste0("msgstr \"", lines_txt, "\"")
 #        msgstr_pos <- grep("^\\s+msgstr \"\"", lines_po)[-1]
 
-combinar_plain_txt_en_po <- function() {
-  
-  po_files <- dir(pattern = "-es[.]po$")
-  po_txt_files <- sub("-es[.]po$", "-es.txt", po_files)
-  stopifnot(all(file.exists(po_txt_files)))
+extrae_texto_de_PO <- function(files.po, files.txt) {
+  for (i in seq_along(files.po)) {
+    lines <- grep(
+      pattern = "^\\s*(\"|msg)", value= TRUE, readLines(files.po[i]))
+    msgs <- grep("^\\s*msg", lines)
+    grps <- cut(seq_along(lines), c(msgs, Inf), labels = FALSE, right = FALSE)
+    text <- vapply(seq_along(msgs), "", FUN = function(j) paste0(gsub(
+      "\\s*(msg(id|id_plural|str)(\\[\\d*\\])?)?\\s*\"(([^\"]|\\\\.)*)\".*", 
+      "\\4", lines[grps == j]), collapse = ""))
+    writeLines(text[grep("^\\s*msgid", lines[msgs])], files.txt[i])
+  }
+}
 
+combinar_plain_txt_en_po <- function(po_txt_files, po_files) {
+  
   for (i in seq_along(po_files)) {
     message("-- combinando ", po_files[i])
     tryCatch(
@@ -252,20 +267,33 @@ traducir_titulos_rmd <- function() {
 
 
 # usa SELENIUM para traducir con google desde github
-extraer_traducciones_con_selenium <- function(google_urls, wait = .8) {
-  selenium_driver <- RSelenium::rsDriver(
-    browser = "chrome", check  = FALSE, extraCapabilities = list(
-      chromeOptions = list(prefs = list(
-        "profile.default_content_settings.popups" = 0L))))
-  
-  if (is.null(selenium_driver))
-    stop("--no se pudo iniciar Selenium")
-  
+extraer_traducciones_con_selenium <- function(files, files_es, wait = .8) {
+  while(TRUE) {
+    try({
+      selenium_driver <- RSelenium::rsDriver(
+        browser = "chrome", check  = FALSE, extraCapabilities = list(
+          chromeOptions = list(prefs = list(
+            "profile.default_content_settings.popups" = 0L))))
+      break
+    })
+    try({
+      selenium_driver <- try(RSelenium::rsDriver())
+      break
+    })
+    stop("No fue posible iniciar Selenium")
+  }
+
+  # Estos links vinculan a las traducciones de google
+  google_urls <- paste0(
+    "https://raw-githubusercontent-com.translate.goog/cienciadedatos/",
+    "traduccion-vignettes-datatable/refs/heads/main/vignettes/",
+    URLencode(files), "?_x_tr_sl=en&_x_tr_tl=es&_x_tr_hl=es&_x_tr_pto=wapp")
+
   tryCatch(
     error = \(e) message(e),
     finally = selenium_driver$server$stop,
-    for (url in google_urls) {
-      selenium_driver$client$navigate(url)
+    for (i in seq(files)) {
+      selenium_driver$client$navigate(google_urls[i])
       selenium_driver$server$process$wait(1000 * wait)
       
       element <- selenium_driver$client$findElement(using="xpath", "/html/body/pre")
@@ -273,23 +301,30 @@ extraer_traducciones_con_selenium <- function(google_urls, wait = .8) {
         stop("Problema al analizar el documento con chromote ",
              "(no fue posible interpretar html de la traducción, pruebe mayor wait )")
       
-      lines <- element$getElementText()[[1]] |> strsplit("\n", fixed = TRUE) |> _[[1]]
+      lines <- element$getElementText()[[1]] |> 
+        strsplit("\n", fixed = TRUE) |> _[[1]]
       
-      file <- sub("en\\.txt$", "es.txt", basename(sub("\\?.*$", "", url)))
-      writeLines(lines, file.path("es/po", file))
-      message("--ok ", file) 
+      writeLines(lines, files_es[i])
+      message("--ok ", files_es[i]) 
     }
   ) 
   invisible()
 }
 
 # client$view() # para verlo en chrome
-extraer_traducciones_con_chromote <- function(google_urls, wait = .8) {
+extraer_traducciones_con_chromote <- function(files, files_es, wait = .8) {
   client <- chromote::ChromoteSession$new()
+  
+  # Estos links vinculan a las traducciones de google
+  google_urls <- paste0(
+    "https://raw-githubusercontent-com.translate.goog/cienciadedatos/",
+    "traduccion-vignettes-datatable/refs/heads/main/vignettes/",
+    URLencode(files), "?_x_tr_sl=en&_x_tr_tl=es&_x_tr_hl=es&_x_tr_pto=wapp")
+  
   tryCatch(
-    for (url in google_urls) {
+    for (i in seq(files)) {
       DOM <- client$DOM
-      client$Page$navigate(url)
+      client$Page$navigate(google_urls[i])
       Sys.sleep(wait)
       doc.nodeId <- DOM$getDocument()[[1]]$nodeId
       sel.nodeId <- DOM$querySelector(
@@ -301,9 +336,8 @@ extraer_traducciones_con_chromote <- function(google_urls, wait = .8) {
       lines <- DOM$getOuterHTML(sel.nodeId)[[1]] |>
         xml2::as_xml_document(html) |> xml2::xml_text(xml) |>
         strsplit("\n", fixed = TRUE) |> _[[1]]
-      file <- sub("en\\.txt$", "es.txt", basename(sub("\\?.*$", "", url)))
-      writeLines(lines, file.path("es/po", file))
-      message("--ok ", file) 
+      writeLines(lines, files_es[i])
+      message("--ok ", files_es[i]) 
     },
     finally = client$close()
   ) 
@@ -366,21 +400,16 @@ setwd(file.path(basedir, "vignettes"))
   # extrae directo del PO para evitar msgcat, msggrep y programas
   # similares de gettext
   message("Extraer texto de archivos PO y generar .txt ...")
+  
+  dir.create(file.path("es", "google-tranlations"), showWarnings = FALSE)
+  
   files.po <- dir(file.path("es", "po"), "[.]po$", full.names = TRUE) 
-  files.txt <- file.path("es", "google-translations", sub(
-    "[.]po$", "-en.txt", basename(files.po)))
-    for (i in seq_along(files.po)) {
-    lines <- grep(
-      pattern = "^\\s*(\"|msg)", value= TRUE, readLines(files_po[i]))
-    msgs <- grep("^\\s*msg", lines)
-    grps <- cut(seq_along(lines), c(msgs, Inf), labels = FALSE, right = FALSE)
-    text <- vapply(seq_along(msgs), "", FUN = function(j) paste0(gsub(
-      "\\s*(msg(id|id_plural|str)(\\[\\d*\\])?)?\\s*\"(([^\"]|\\\\.)*)\".*", 
-      "\\4", lines[grps == j]), collapse = ""))
-    dir.create(file.path("es", "google-tranlations"), showWarnings = FALSE)
-    writeLines(text[grep("^\\s*msgid", lines[msgs])], files.txt[i])
-  }
+  files.txt <- file.path(
+    "es", "google-translations", sub("[.]po$", "-en.txt", files.po))
+  extrae_texto_de_PO(files.po, files.txt)
 }
+
+
 
 ## ---- paso (4) subir estos txt al repo ----
 # Hacer un commit en este punto o subir a github.
@@ -409,12 +438,6 @@ setwd(file.path(basedir, "vignettes"))
       message(conditionMessage(e))
     })
   }
-
-  # Estos links vinculan a las traducciones de google
-  google_urls <- paste0(
-    "https://raw-githubusercontent-com.translate.goog/cienciadedatos/",
-    "traduccion-vignettes-datatable/refs/heads/main/vignettes/",
-    URLencode(files.txt), "?_x_tr_sl=en&_x_tr_tl=es&_x_tr_hl=es&_x_tr_pto=wapp")
 }
 
 
@@ -422,38 +445,41 @@ setwd(file.path(basedir, "vignettes"))
 
 ## ---- paso (5) scrapping de traducciones ----
 # Todo esto se evitaría con una buena api de traducción gratuita.
+# pero NO EXISTE!
+
+# para guardar los archivos con nuevo nombre
+files.txt.es <- sub("en[.]txt$",paste0("es",".txt"),files.txt)
 
 while(TRUE) {
-  tryCatch(error = \(e) message("--falló: ", conditionMessage(e)), { 
-    message("--probar con chromote")
-    extraer_traducciones_con_chromote(google_urls, wait = 0.75)
+  try({ 
+    message("--probar con chromote (requiere google chrome)")
+    extraer_traducciones_con_chromote(files.txt, files.txt.es, wait = 0.75)
     break 
   })
-  tryCatch(error = \(e) message("--falló: ", conditionMessage(e)), { 
-    message("--probar con selenium")
-    extraer_traducciones_con_selenium(google_urls, wait = 0.75)
+  try({ 
+    message("--probar con selenium (requiere java)")
+    extraer_traducciones_con_selenium(files.txt, files.txt.es, wait = 0.75)
     break 
   })
-  stop("no fue posible extraer traducciones.")
+  stop("no fue posible extraer traducciones. ")
 }
 
+# verificar que hayan sido creados los txt traducidos
+stopifnot(all(file.exists(files.txt.es)))
 
-# TODO: en windows requiere msgcat, por ejemplo el que viene con git.
-if (.Platform$OS.type == "windows") Sys.setenv("PATH" = paste0(
-  sep = .Platform$file.sep, Sys.getenv("PATH"), 
-  "c:\\apps\\git\\mingw64\\bin",
-  "c:\\apps\\git\\bin"))
-
+#TODO: No es necesario actualizar los -es.txt en el repo aunque 
+# pueden quedar como backup
 
 ## ---- paso (6) combinar traducción en el PO ----
-message("-- cambiando a directorio «./vignettes/es/po»")
-setwd("es/po")
-combinar_plain_txt_en_po()
-undebug(wrap_msg)
+
+# función hace el trabajo de msgcat, etc.
+# analizar si potools tiene algo similar...
+combinar_plain_txt_en_po(files.txt.es, files.po)    
+
+#undebug(wrap_msg)
 # TODO
 # combinar texto plano en PO.
 stop("DONE")
-
 
 # Actualiza metadata ej: name = "Ricardo Villalba", mail = "rikivillalba@gmail.com"
 actualizar_po_metadata(name = "Nombre Apellido", email = "direccion@ejemplo.com") 
@@ -477,5 +503,3 @@ convertir_po_a_rmd()
 # # borrar markdown generados
 # file.remove(dir(pattern = "[.]md$"))
 # 
-# 
-
