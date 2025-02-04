@@ -252,7 +252,7 @@
 #' # TODO: and example using a short vignette
 rmd2po <- function(rmdfile, lang = "fr", podir = "po",
   mdpodir = getOption("mdpodir"), min.version = "2.0.0",
-  verbose = FALSE, keep.tmpfile = FALSE) {
+  verbose = FALSE, keep.tmpfile = FALSE, cmd_options = c()) {
 
   # Check external program availability and version
   md2po <- .check_mdpo("md2po", min.version = min.version, mdpodir = mdpodir)
@@ -271,7 +271,7 @@ rmd2po <- function(rmdfile, lang = "fr", podir = "po",
   odir <- setwd(rmddir)
   on.exit(setwd(odir))
   if (isTRUE(verbose)) {
-    message("Temporarily switching to directory '", rmddir, "'", sep = "")
+  #  message("Temporarily switching to directory '", rmddir, "'", sep = "")
     message("Processing: ", rmdfilename)
   }
   # Make sure required subdirectories exist
@@ -285,24 +285,31 @@ rmd2po <- function(rmdfile, lang = "fr", podir = "po",
 
   # Create the .po file, using md2po on the temporary rmd file
   pofile <- file.path(lang, podir, paste0(rmdfilename, "-", lang, ".po"))
-  #@@
-  ## La versión usada de md2po es diferente Translate Toolkit (3.13.3)
-  # cmd <- paste0('"', md2po, '" --quiet --metadata "Language: ', lang,
-  #               '" --include-codeblocks --merge-pofiles --remove-not-found ',
-  #               '--save --po-filepath ', pofile)
-  cmd <- paste0(shQuote(md2po), ' -i ', shQuote(tmpfile), ' -o ', shQuote(pofile))
-  #@@
+
+  ## Usando Translate Toolkit (3.13.3):
+  # cmd <- paste0(shQuote(md2po), ' -i ', shQuote(tmpfile), ' -o ', shQuote(pofile))
+  # res <- tryCatch(system(cmd, intern = TRUE), ...
   
-  if (isTRUE(verbose))
-    message("Running: ", cmd)
-  #@@
-  ## tt 3.12.3 no toma de stdin
-  # res <- tryCatch(system(cmd, input = tmpfile, intern = TRUE),
-  res <- tryCatch(system(cmd, intern = TRUE),
-  #@@
+  # Usando https://pypi.org/project/mdpo/ 
+  # @@ agregué:
+  #  --no-location (ya que toma del temp)
+  #  --metadata  
+  # @@ quité
+  #  --include-codeblocks          
+  #  --merge-pofiles         # genera PO limpios
+  
+  cmd <- do.call(function(...) paste(
+    shQuote(md2po), 
+    "--quiet", "--save", "--no-location", "--remove-not-found",
+    "--metadata", shQuote(sprintf("Language: %s", lang)),
+    "--metadata", shQuote("Content-Type: text/plain; charset=UTF-8"),
+    "--po-filepath", shQuote(pofile), ...), as.list(cmd_options))
+  
+  res <- tryCatch(system(cmd, input = tmpfile, intern = TRUE),
     error = function(e) stop(e, call. = FALSE))
   if (isTRUE(verbose))
     message(res)
+  
   # Cut any unnecessary parts in the .po file
   writeLines(.cut_after_end(readLines(pofile)), pofile)
 
@@ -328,7 +335,7 @@ po2rmd <- function(rmdfile, lang = "fr", podir = "po",
   # always escape spaces with backslashes if they exist in the vignette name
   # It also waits for the name of the md file to process on stdin, even if it
   # is provided as first argument (both using system() and system2()). So, we
-  # provide it through input =
+  # provide it through input = 
   rmddir <- dirname(rmdfile)
   rmdfilename <- basename(rmdfile)
   if (!dir.exists(rmddir))
