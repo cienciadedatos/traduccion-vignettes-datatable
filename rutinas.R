@@ -363,43 +363,58 @@ setwd(file.path(basedir, "vignettes"))
 
 ## ---- paso (3) extrae texto de archivos PO ----
 {
+  # extrae directo del PO para evitar msgcat, msggrep y programas
+  # similares de gettext
   message("Extraer texto de archivos PO y generar .txt ...")
-  files.po <- dir("es/po", ".po$") 
-  for (i in files.po) {
-    lines <- grep(readLines(file.path("es/po", i)), pattern = "^\\s*(\"|msg)", value= TRUE)
+  files.po <- dir(file.path("es", "po"), "[.]po$", full.names = TRUE) 
+  files.txt <- file.path("es", "google-translations", sub(
+    "[.]po$", "-en.txt", basename(files.po)))
+    for (i in seq_along(files.po)) {
+    lines <- grep(
+      pattern = "^\\s*(\"|msg)", value= TRUE, readLines(files_po[i]))
     msgs <- grep("^\\s*msg", lines)
     grps <- cut(seq_along(lines), c(msgs, Inf), labels = FALSE, right = FALSE)
     text <- vapply(seq_along(msgs), "", FUN = function(j) paste0(gsub(
       "\\s*(msg(id|id_plural|str)(\\[\\d*\\])?)?\\s*\"(([^\"]|\\\\.)*)\".*", 
       "\\4", lines[grps == j]), collapse = ""))
-    writeLines(text[grep("^\\s*msgid", lines[msgs])], 
-               file.path("es/po", sub("es\\.po$", "en.txt", i)))
+    dir.create(file.path("es", "google-tranlations"), showWarnings = FALSE)
+    writeLines(text[grep("^\\s*msgid", lines[msgs])], files.txt[i])
   }
-  files.txt <- sub("es\\.po$", "en.txt", files.po)
-  if (!all(file.exists(file.path("es/po", files.txt)))) 
-    stop("alguno de los archivos txt no se encuentra.")
 }
 
 ## ---- paso (4) subir estos txt al repo ----
 # Hacer un commit en este punto o subir a github.
 # para que google pueda traducirlo (método gratuito:;)
 {
-  if (interactive()) {
+  if (!interactive()) 
+    r <- "Y" 
+  else {
+    r <- "n"
     message(
       "-- Subir los archivos *-en.txt al repo para traducir. ",
       "La manera mas obvia es usar `git add -u *.txt && git push`. ", 
-      "O sinó, subirlos manualmente al repo, dentro de ./vignettes/es/po.")
-    readline("Una vez subidos los archivos, presione [Enter] para continuar")
-  } else {
-    system("git add -u *.txt")
-    system("git push")
+      "O sinó, subirlos manualmente al repo, dentro de ./vignettes/es/po.",
+      "Si desea R intentará hacerlo desde R ahora (`gert::git_add`)")
+    while(!(r <- readline("¿Desea actualizar el repo con los archivos generados[Y/n]?")) %in% c("Y","n")) 
+      cat("Elija Y/n")
+  }
+  if (r == "Y") {
+    tryCatch({
+      gert::git_add(files.txt)
+      gert::git_commit("Actualizar txt para traducir")
+      gert::git_push()
+      gert::git_remote_list()
+    }, error = \(e) {
+      message("Error al intentar `git push`")
+      message(conditionMessage(e))
+    })
   }
 
   # Estos links vinculan a las traducciones de google
   google_urls <- paste0(
     "https://raw-githubusercontent-com.translate.goog/cienciadedatos/",
     "traduccion-vignettes-datatable/refs/heads/main/vignettes/",
-    URLencode(files), "?_x_tr_sl=en&_x_tr_tl=es&_x_tr_hl=es&_x_tr_pto=wapp")
+    URLencode(files.txt), "?_x_tr_sl=en&_x_tr_tl=es&_x_tr_hl=es&_x_tr_pto=wapp")
 }
 
 
