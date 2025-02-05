@@ -12,7 +12,6 @@ All the operations we have seen so far in the previous vignette resulted in a ne
 a) Background
 Before we look at *reference semantics*, consider the *data.frame* shown below:
 When we did:
-both (1) and (2) resulted in deep copy of the entire data.frame in versions of `R < 3.1`. [It copied more than once]{1}. To improve performance by avoiding these redundant copies, *data.table* utilised the [available but unused `:=` operator in R]{2}.
 Great performance improvements were made in `R v3.1` as a result of which only a *shallow* copy is made for (1) and not *deep* copy. However, for (2) still, the entire column is *deep* copied even in `R v3.1+`. This means the more columns one subassigns to in the *same query*, the more *deep* copies R does.
 *shallow* vs *deep* copy
 A *shallow* copy is just a copy of the vector of column pointers (corresponding to the columns in a *data.frame* or *data.table*). The actual data is not physically copied in memory.
@@ -55,7 +54,6 @@ c) Delete column by reference
 =====* We can also pass column numbers instead of names in the `LHS`, although it is good programming practice to use column names.=====
 =====* When there is just one column to delete, we can drop the `c()` and double quotes and just use the column name *unquoted*, for convenience. That is:=====
 d) `:=` along with grouping using `by` {#ref-j-by}
-We have already seen the use of `i` along with `:=` in [Section 2b]{1}. Let's now see how we can use `:=` along with `by`.
 -- How can we add a new column which contains for each `orig,dest` pair the maximum speed?
 =====* We add a new column `max_speed` using the `:=` operator by reference.=====
 =====* We provide the columns to group by the same way as shown in the *Introduction to data.table* vignette. For each group, `max(speed)` is computed, which returns a single value. That value is recycled to fit the length of the group. Once again, no copies are being made at all. `flights` *data.table* is modified *in-place*.=====
@@ -63,11 +61,9 @@ We have already seen the use of `i` along with `:=` in [Section 2b]{1}. Let's no
 e) Multiple columns and `:=`
 -- How can we add two more columns computing `max()` of `dep_delay` and `arr_delay` for each month, using `.SD`?
 =====* We use the `LHS := RHS` form. We store the input column names and the new columns to add in separate variables and provide them to `.SDcols` and for `LHS` (for better readability).=====
-=====* Note that since we allow assignment by reference without quoting column names when there is only one column as explained in [Section 2c]{1}, we can not do `out_cols := lapply(.SD, max)`. That would result in adding one new column named `out_cols`. Instead we should do either `c(out_cols)` or simply `(out_cols)`. Wrapping the variable name with `(` is enough to differentiate between the two cases.=====
 =====* The `LHS := RHS` form allows us to operate on multiple columns. In the RHS, to compute the `max` on columns specified in `.SDcols`, we make use of the base function `lapply()` along with `.SD` in the same way as we have seen before in the *\"Introduction to data.table\"* vignette. It returns a list of two elements, containing the maximum value corresponding to `dep_delay` and `arr_delay` for each group.=====
 Before moving on to the next section, let's clean up the newly created columns `speed`, `max_speed`, `max_dep_delay` and `max_arr_delay`.
 -- How can we update multiple existing columns in place using `.SD`?
-Let's clean up again and convert our newly-made factor columns back into character columns. This time we will make use of `.SDcols` accepting a function to decide which columns to include. In this case, `is.factor()` will return the columns which are factors. For more on the **S**ubset of the **D**ata, there is also an [SD Usage vignette]{1}.
 Sometimes, it is also nice to keep track of columns that we transform. That way, even after we convert our columns we would be able to call the specific columns we were updating.
 {.bs-callout .bs-callout-info}
 =====* We also could have used `(factor_cols)` on the `LHS` instead of `names(.SD)`.=====
@@ -84,7 +80,6 @@ There are two particular places where `copy()` function is essential:
 =====1. Contrary to the situation we have seen in the previous point, we may not want the input data.table to a function to be modified *by reference*. As an example, let's consider the task in the previous section, except we don't want to modify `flights` by reference.=====
 =====* Using `copy()` function did not update `flights` *data.table* by reference. It doesn't contain the column `speed`.=====
 =====* And `ans` contains the maximum speed corresponding to each month.=====
-However we could improve this functionality further by *shallow* copying instead of *deep* copying. In fact, we would very much like to [provide this functionality for `v1.9.8`]{1}. We will touch up on this again in the *data.table design* vignette.
 =====2. When we store the column names on to a variable, e.g., `DT_n = names(DT)`, and then *add/update/delete* column(s) *by reference*. It would also modify `DT_n`, unless we do `copy(names(DT))`.=====
 Summary
 The `:=` operator
@@ -92,3 +87,8 @@ The `:=` operator
 =====* We have also seen how to use `:=` along with `i` and `by` the same way as we have seen in the *Introduction to data.table* vignette. We can in the same way use `keyby`, chain operations together, and pass expressions to `by` as well all in the same way. The syntax is *consistent*.=====
 =====* We can use `:=` for its side effect or use `copy()` to not modify the original object while updating by reference.=====
 So far we have seen a whole lot in `j`, and how to combine it with `by` and little of `i`. Let's turn our attention back to `i` in the next vignette *\"Keys and fast binary search based subset\"* to perform *blazing fast subsets* by *keying data.tables*.
+both (1) and (2) resulted in deep copy of the entire data.frame in versions of `R < 3.1`. [It copied more than once](https://stackoverflow.com/q/23898969/559784). To improve performance by avoiding these redundant copies, *data.table* utilised the [available but unused `:=` operator in R](https://stackoverflow.com/q/7033106/559784).
+We have already seen the use of `i` along with `:=` in [Section 2b](#ref-i-j). Let's now see how we can use `:=` along with `by`.
+=====* Note that since we allow assignment by reference without quoting column names when there is only one column as explained in [Section 2c](#delete-convenience), we can not do `out_cols := lapply(.SD, max)`. That would result in adding one new column named `out_cols`. Instead we should do either `c(out_cols)` or simply `(out_cols)`. Wrapping the variable name with `(` is enough to differentiate between the two cases.=====
+Let's clean up again and convert our newly-made factor columns back into character columns. This time we will make use of `.SDcols` accepting a function to decide which columns to include. In this case, `is.factor()` will return the columns which are factors. For more on the **S**ubset of the **D**ata, there is also an [SD Usage vignette](https://cran.r-project.org/package=data.table/vignettes/datatable-sd-usage.html).
+However we could improve this functionality further by *shallow* copying instead of *deep* copying. In fact, we would very much like to [provide this functionality for `v1.9.8`](https://github.com/Rdatatable/data.table/issues/617). We will touch up on this again in the *data.table design* vignette.

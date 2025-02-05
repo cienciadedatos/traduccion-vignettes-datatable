@@ -56,7 +56,6 @@ How does the subset work here? {#multiple-key-point}
 =====* Since we did not provide any values for the second key column `dest`, it just matches *\"JFK\"* against the first key column `origin` and returns all the matched rows.=====
 -- Subset all rows where just the second key column `dest` matches *\"MIA\"*
 What's happening here?
-=====* Read [this]{1} again. The value provided for the second key column *\"MIA\"* has to find the matching values in `dest` key column *on the matching rows provided by the first key column `origin`*. We can not skip the values of key columns *before*. Therefore, we provide *all* unique values from key column `origin`.=====
 =====* *\"MIA\"* is automatically recycled to fit the length of `unique(origin)` which is *3*.=====
 2. Combining keys with `j` and `by`
 All we have seen so far is the same concept -- obtaining *row indices* in `i`, but just using a different method -- using `keys`. It shouldn't be surprising that we can do exactly the same things in `j` and `by` as seen from the previous vignettes. We will highlight this with a few examples.
@@ -101,7 +100,6 @@ We can choose if queries that do not match should return `NA` or be skipped alto
 We have seen so far how we can set and use keys to subset. But what's the advantage? For example, instead of doing:
 we could have done:
 One advantage very likely is shorter syntax. But even more than that, *binary search based subsets* are **incredibly fast**.
-As the time goes `data.table` gets new optimization and currently the latter call is automatically optimized to use *binary search*.\nTo use slow *vector scan* key needs to be removed.
 a) Performance of binary search approach
 To illustrate, let's create a sample *data.table* with 20 million rows and three columns and key it by columns `x` and `y`.
 `DT` is ~380MB. It is not really huge, but this will do to illustrate the point.
@@ -115,7 +113,6 @@ Vector scan approach
 =====* Similarly, the column `y` is searched for `877` on all 20 million rows one by one, and stored in another logical vector.=====
 =====* Element wise `&` operations are performed on the intermediate logical vectors and all the rows where the expression evaluates to `TRUE` are returned.=====
 This is what we call a *vector scan approach*. And this is quite inefficient, especially on larger tables and when one needs repeated subsetting, because it has to scan through all the rows each time.
-Now let us look at binary search approach (method 2). Recall from [Properties of key]{1} - *setting keys reorders the data.table by key columns*. Since the data is sorted, we don't have to *scan through the entire length of the column*! We can instead use *binary search* to search a value in `O(log n)` as opposed to `O(n)` in case of *vector scan approach*, where `n` is the number of rows in the *data.table*.
 Binary search approach
 Here's a very simple illustration. Let's consider the (sorted) numbers shown below:
 Suppose we'd like to find the matching position of the value *1*, using binary search, this is how we would proceed - because we know that the data is *sorted*.
@@ -132,3 +129,6 @@ In this vignette, we have learnt another method to subset rows in `i` by keying 
 =====* subset using keys which fetches *row indices* in `i`, but much faster.=====
 =====* combine key based subsets with `j` and `by`. Note that the `j` and `by` operations are exactly the same as before.=====
 Key based subsets are **incredibly fast** and are particularly useful when the task involves *repeated subsetting*. But it may not be always desirable to set key and physically reorder the *data.table*. In the next vignette, we will address this using a *new* feature -- *secondary indexes*.
+=====* Read [this](#multiple-key-point) again. The value provided for the second key column *\"MIA\"* has to find the matching values in `dest` key column *on the matching rows provided by the first key column `origin`*. We can not skip the values of key columns *before*. Therefore, we provide *all* unique values from key column `origin`.=====
+As the time goes `data.table` gets new optimization and currently the latter call is automatically optimized to use *binary search*. To use slow *vector scan* key needs to be removed.
+Now let us look at binary search approach (method 2). Recall from [Properties of key](#key-properties) - *setting keys reorders the data.table by key columns*. Since the data is sorted, we don't have to *scan through the entire length of the column*! We can instead use *binary search* to search a value in `O(log n)` as opposed to `O(n)` in case of *vector scan approach*, where `n` is the number of rows in the *data.table*.

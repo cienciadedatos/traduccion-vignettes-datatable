@@ -7,7 +7,6 @@ Data manipulation operations such as *subset*, *group*, *update*, *join*, etc. a
 =====* *automatically* optimising operations internally and very effectively by knowing precisely the data required for each operation, leading to very fast and memory-efficient code.=====
 Briefly, if you are interested in reducing *programming* and *compute* time tremendously, then this package is for you. The philosophy that `data.table` adheres to makes this possible. Our goal is to illustrate it through this series of vignettes.
 Data {#data}
-In this vignette, we will use [NYC-flights14]{1} data obtained from the [flights]{2} package (available on GitHub only). It contains On-Time flights data from the Bureau of Transportation Statistics for all the flights that departed from New York City airports in 2014 (inspired by [nycflights13]{3}). The data is available only for Jan-Oct'14.
 We can use `data.table`'s fast-and-friendly file reader `fread` to load `flights` directly as follows:
 Aside: `fread` accepts `http` and `https` URLs directly, as well as operating system commands such as `sed` and `awk` output. See `?fread` for examples.
 Introduction
@@ -16,11 +15,9 @@ In this vignette, we will
 =====2. Then we will look at performing data aggregations by group=====
 1. Basics {#basics-1}
 a) What is `data.table`? {#what-is-datatable-1a}
-`data.table` is an R package that provides **an enhanced version** of a `data.frame`, the standard data structure for storing data in `base` R. In the [Data]{1} section above, we saw how to create a `data.table` using `fread()`, but alternatively we can also create one using the `data.table()` function. Here is an example:
 You can also convert existing objects to a `data.table` using `setDT()` (for `data.frame` and `list` structures) or `as.data.table()` (for other structures). For more details pertaining to the difference (goes beyond the scope of this vignette), please see `?setDT` and `?as.data.table`.
 Note that:
 =====* Row numbers are printed with a `:` in order to visually separate the row number from the first column.=====
-=====* When the number of rows to print exceeds the global option `datatable.print.nrows` (default = `r getOption(\"datatable.print.nrows\")`), it automatically prints only the top 5 and bottom 5 rows (as can be seen in the [Data]{1} section). For a large `data.frame`, you may have found yourself waiting around while larger tables print-and-page, sometimes seemingly endlessly. This restriction helps with that, and you can query the default number like so:=====
 =====* `data.table` doesn't set or use *row names*, ever. We will see why in the *\"Keys and fast binary search based subset\"* vignette.=====
 b) General form - in what way is a `data.table` *enhanced*? {#enhanced-1b}
 In contrast to a `data.frame`, you can do *a lot more* than just subsetting rows and selecting columns within the frame of a `data.table`, i.e., within `[ ... ]` (NB: we might also refer to writing things inside `DT[...]` as \"querying `DT`\", as an analogy or in relevance to SQL). To understand it we will have to first look at the *general form* of the `data.table` syntax, as shown below:
@@ -39,14 +36,12 @@ c) Subset rows in `i` {#subset-i-1c}
 We can use the R function `order()` to accomplish this.
 `order()` is internally optimised
 =====* We can use \"-\" on `character` columns within the frame of a `data.table` to sort in decreasing order.=====
-=====* In addition, `order(...)` within the frame of a `data.table` uses `data.table`'s internal fast radix order `forder()`. This sort provided such a compelling improvement over R's `base::order` that the R project adopted the `data.table` algorithm as its default sort in 2016 for R 3.3.0 (for reference, check `?sort` and the [R Release NEWS]{1}).=====
 We will discuss `data.table`'s fast order in more detail in the *`data.table` internals* vignette.
 d) Select column(s) in `j` {#select-j-1d}
 -- Select `arr_delay` column, but return it as a *vector*.
 =====* Since columns can be referred to as if they are variables within the frame of a `data.table`, we directly refer to the *variable* we want to subset. Since we want *all the rows*, we simply skip `i`.=====
 =====* It returns *all* the rows for the column `arr_delay`.=====
 -- Select `arr_delay` column, but return as a `data.table` instead.
-=====* We wrap the *variables* (column names) within `list()`, which ensures that a `data.table` is returned. In the case of a single column name, not wrapping with `list()` returns a vector instead, as seen in the [previous example]{1}.=====
 =====* `data.table` also allows wrapping columns with `.()` instead of `list()`. It is an *alias* to `list()`; they both mean the same. Feel free to use whichever you prefer; we have noticed most users seem to prefer `.()` for conciseness, so we will continue to use `.()` hereafter.=====
 A `data.table` (and a `data.frame` too) is internally a `list` as well, with the stipulation that each element has the same length and the `list` has a `class` attribute. Allowing `j` to return a `list` enables converting and returning `data.table` very efficiently.
 Tip: {#tip-1}
@@ -61,9 +56,7 @@ What's happening here?
 =====* `data.table`'s `j` can handle more than just *selecting columns* - it can handle *expressions*, i.e., *computing on columns*. This shouldn't be surprising, as columns can be referred to as if they are variables. Then we should be able to *compute* by calling functions on those variables. And that's what precisely happens here.=====
 f) Subset in `i` *and* do in `j`
 -- Calculate the average arrival and departure delay for all flights with \"JFK\" as the origin airport in the month of June.
-=====* We first subset in `i` to find matching *row indices* where `origin` airport equals `\"JFK\"`, and `month` equals `6L`. We *do not* subset the _entire_ `data.table` corresponding to those rows _yet_.=====
 =====* Now, we look at `j` and find that it uses only *two columns*. And what we have to do is to compute their `mean()`. Therefore, we subset just those columns corresponding to the matching rows, and compute their `mean()`.=====
-Because the three main components of the query (`i`, `j` and `by`) are *together* inside `[...]`, `data.table` can see all three and optimise the query altogether *before evaluation*, rather than optimizing each separately. We are able to therefore avoid the entire subset (i.e., subsetting the columns _besides_ `arr_delay` and `dep_delay`), for both speed and memory efficiency.
 -- How many trips have been made in 2014 from \"JFK\" airport in the month of June?
 The function `length()` requires an input argument. We just need to compute the number of rows in the subset. We could have used any other column as the input argument to `length()`. This approach is reminiscent of `SELECT COUNT(dest) FROM flights WHERE origin = 'JFK' AND month = 6` in SQL.
 This type of operation occurs quite frequently, especially while grouping (as we will see in the next section), to the point where `data.table` provides a *special symbol* `.N` for it.
@@ -78,7 +71,6 @@ This performs a standard subset operation that does not find any matching rows a
 For exact matches without `NA` for non-existing elements, use `nomatch=NULL`:
 Understanding these behaviors can help prevent confusion when dealing with non-existing elements in your data.
 Special symbol `.N`: {#special-N}
-`.N` is a special built-in variable that holds the number of observations _in the current group_. It is particularly useful when combined with `by` as we'll see in the next section. In the absence of group by operations, it simply returns the number of rows in the subset.
 Now that we now, we can now accomplish the same task by using `.N` as follows:
 =====* Once again, we subset in `i` to get the *row indices* where `origin` airport equals *\"JFK\"*, and `month` equals *6*.=====
 =====* We see that `j` uses only `.N` and no other columns. Therefore, the entire subset is not materialised. We simply return the number of rows in the subset (which is just the length of row indices).=====
@@ -100,8 +92,6 @@ The argument is named `with` after the R function `with()` because of similar fu
 We've already seen `i` and `j` from `data.table`'s general form in the previous section. In this section, we'll see how they can be combined together with `by` to perform operations *by group*. Let's look at some examples.
 a) Grouping using `by`
 -- How can we get the number of trips corresponding to each origin airport?
-=====* We know `.N` [is a special variable]{1} that holds the number of rows in the current group. Grouping by `origin` obtains the number of rows, `.N`, for each group.=====
-=====* By doing `head(flights)` you can see that the origin airports occur in the order *\"JFK\"*, *\"LGA\"*, and *\"EWR\"*. The original order of grouping variables is preserved in the result. _This is important to keep in mind!_=====
 =====* Since we did not provide a name for the column returned in `j`, it was named `N` automatically by recognising the special symbol `.N`.=====
 =====* `by` also accepts a character vector of column names. This is particularly useful for coding programmatically, e.g., designing a function with the grouping columns (in the form of a `character` vector) as a function argument.=====
 =====* When there's only one column or expression to refer to in `j` and `by`, we can drop the `.()` notation. This is purely for convenience. We could instead do:=====
@@ -122,7 +112,6 @@ b) Sorted `by`: `keyby`
 **Keys:** Actually `keyby` does a little more than *just ordering*. It also *sets a key* after ordering by setting an `attribute` called `sorted`.
 We'll learn more about `keys` in the *Keys and fast binary search based subset* vignette; for now, all you have to know is that you can use `keyby` to automatically order the result by the columns specified in `by`.
 c) Chaining
-Let's reconsider the task of [getting the total number of trips for each `origin, dest` pair for carrier *\"AA\"*]{1}.
 -- How can we order `ans` using the columns `origin` in ascending order, and `dest` in descending order?
 We can store the intermediate result in a variable, and then use `order(origin, -dest)` on that variable. It seems fairly straightforward.
 =====* Recall that we can use `-` on a `character` column in `order()` within the frame of a `data.table`. This is possible due to `data.table`'s internal query optimisation.=====
@@ -139,37 +128,29 @@ Yes it does. As an example, if we would like to find out how many flights starte
 e) Multiple columns in `j` - `.SD`
 -- Do we have to compute `mean()` for each column individually?
 It is of course not practical to have to type `mean(myCol)` for every column one by one. What if you had 100 columns to average `mean()`?
-How can we do this efficiently and concisely? To get there, refresh on [this tip]{1} - *\"As long as the `j`-expression returns a `list`, each element of the `list` will be converted to a column in the resulting `data.table`\"*. If we can refer to the *data subset for each group* as a variable *while grouping*, we can then loop through all the columns of that variable using the already- or soon-to-be-familiar base function `lapply()`. No new names to learn specific to `data.table`.
 Special symbol `.SD`: {#special-SD}
 `data.table` provides a *special* symbol called `.SD`. It stands for **S**ubset of **D**ata. It by itself is a `data.table` that holds the data for *the current group* defined using `by`.
 Recall that a `data.table` is internally a `list` as well with all its columns of equal length.
-Let's use the [`data.table` `DT` from before]{1} to get a glimpse of what `.SD` looks like.
 =====* `.SD` contains all the columns *except the grouping columns* by default.=====
 =====* It is also generated by preserving the original order - data corresponding to `ID = \"b\"`, then `ID = \"a\"`, and then `ID = \"c\"`.=====
 To compute on (multiple) columns, we can then simply use the base R function `lapply()`.
 =====* `.SD` holds the rows corresponding to columns `a`, `b` and `c` for that group. We compute the `mean()` on each of these columns using the already-familiar base function `lapply()`.=====
 =====* Each group returns a list of three elements containing the mean value which will become the columns of the resulting `data.table`.=====
-=====* Since `lapply()` returns a `list`, so there is no need to wrap it with an additional `.()` (if necessary, refer to [this tip]{1}).=====
 We are almost there. There is one little thing left to address. In our `flights` `data.table`, we only wanted to calculate the `mean()` of the two columns `arr_delay` and `dep_delay`. But `.SD` would contain all the columns other than the grouping variables by default.
 -- How can we specify just the columns we would like to compute the `mean()` on?
 .SDcols
 Using the argument `.SDcols`. It accepts either column names or column indices. For example, `.SDcols = c(\"arr_delay\", \"dep_delay\")` ensures that `.SD` contains only these two columns for each group.
-Similar to [part g)]{1}, you can also specify the columns to remove instead of columns to keep using `-` or `!`. Additionally, you can select consecutive columns as `colA:colB` and deselect them as `!(colA:colB)` or `-(colA:colB)`.
 Now let us try to use `.SD` along with `.SDcols` to get the `mean()` of `arr_delay` and `dep_delay` columns grouped by `origin`, `dest` and `month`.
 f) Subset `.SD` for each group:
 -- How can we return the first two rows for each `month`?
-=====* `.SD` is a `data.table` that holds all the rows for *that group*. We simply subset the first two rows as we have seen [here]{1} already.=====
 =====* For each group, `head(.SD, 2)` returns the first two rows as a `data.table`, which is also a `list`, so we do not have to wrap it with `.()`.=====
 g) Why keep `j` so flexible?
-So that we have a consistent syntax and keep using already existing (and familiar) base functions instead of learning new functions. To illustrate, let us use the `data.table` `DT` that we created at the very beginning under the section [What is a data.table?]{1}.
 -- How can we concatenate columns `a` and `b` for each group in `ID`?
-=====* That's it. There is no special syntax required. All we need to know is the base function `c()` which concatenates vectors and [the tip from before]{1}.=====
 -- What if we would like to have all the values of column `a` and `b` concatenated, but returned as a list column?
 =====* Here, we first concatenate the values with `c(a,b)` for each group, and wrap that with `list()`. So for each group, we return a list of all concatenated values.=====
 =====* Note that those commas are for display only. A list column can contain any object in each cell, and in this example, each cell is itself a vector and some cells contain longer vectors than others.=====
 Once you start internalising usage in `j`, you will realise how powerful the syntax can be. A very useful way to understand it is by playing around, with the help of `print()`.
 For example:
-In (1), for each group, a vector is returned, with length = 6,4,2 here. However, (2) returns a list of length 1 for each group, with its first element holding vectors of length 6,4,2. Therefore, (1) results in a length of ` 6+4+2 = `r 6+4+2``, whereas (2) returns `1+1+1=`r 1+1+1``.
 Summary
 The general form of `data.table` syntax is:
 We have seen so far that,
@@ -194,3 +175,22 @@ Using `by`:
 And remember the tip:
 As long as `j` returns a `list`, each element of the list will become a column in the resulting `data.table`.
 We will see how to *add/update/delete* columns *by reference* and how to combine them with `i` and `by` in the next vignette.
+In this vignette, we will use [NYC-flights14](https://raw.githubusercontent.com/Rdatatable/data.table/master/vignettes/flights14.csv) data obtained from the [flights](https://github.com/arunsrinivasan/flights) package (available on GitHub only). It contains On-Time flights data from the Bureau of Transportation Statistics for all the flights that departed from New York City airports in 2014 (inspired by [nycflights13](https://github.com/tidyverse/nycflights13)). The data is available only for Jan-Oct'14.
+`data.table` is an R package that provides **an enhanced version** of a `data.frame`, the standard data structure for storing data in `base` R. In the [Data](#data) section above, we saw how to create a `data.table` using `fread()`, but alternatively we can also create one using the `data.table()` function. Here is an example:
+=====* When the number of rows to print exceeds the global option `datatable.print.nrows` (default = `r getOption(\"datatable.print.nrows\")`), it automatically prints only the top 5 and bottom 5 rows (as can be seen in the [Data](#data) section). For a large `data.frame`, you may have found yourself waiting around while larger tables print-and-page, sometimes seemingly endlessly. This restriction helps with that, and you can query the default number like so:=====
+=====* In addition, `order(...)` within the frame of a `data.table` uses `data.table`'s internal fast radix order `forder()`. This sort provided such a compelling improvement over R's `base::order` that the R project adopted the `data.table` algorithm as its default sort in 2016 for R 3.3.0 (for reference, check `?sort` and the [R Release NEWS](https://cran.r-project.org/doc/manuals/r-release/NEWS.pdf)).=====
+=====* We wrap the *variables* (column names) within `list()`, which ensures that a `data.table` is returned. In the case of a single column name, not wrapping with `list()` returns a vector instead, as seen in the [previous example](#select-j-1d).=====
+=====* We first subset in `i` to find matching *row indices* where `origin` airport equals `\"JFK\"`, and `month` equals `6L`. We *do not* subset the *entire* `data.table` corresponding to those rows *yet*.=====
+Because the three main components of the query (`i`, `j` and `by`) are *together* inside `[...]`, `data.table` can see all three and optimise the query altogether *before evaluation*, rather than optimizing each separately. We are able to therefore avoid the entire subset (i.e., subsetting the columns *besides* `arr_delay` and `dep_delay`), for both speed and memory efficiency.
+`.N` is a special built-in variable that holds the number of observations *in the current group*. It is particularly useful when combined with `by` as we'll see in the next section. In the absence of group by operations, it simply returns the number of rows in the subset.
+=====* We know `.N` [is a special variable](#special-N) that holds the number of rows in the current group. Grouping by `origin` obtains the number of rows, `.N`, for each group.=====
+=====* By doing `head(flights)` you can see that the origin airports occur in the order *\"JFK\"*, *\"LGA\"*, and *\"EWR\"*. The original order of grouping variables is preserved in the result. *This is important to keep in mind!*=====
+Let's reconsider the task of [getting the total number of trips for each `origin, dest` pair for carrier *\"AA\"*](#origin-dest-.N).
+How can we do this efficiently and concisely? To get there, refresh on [this tip](#tip-1) - *\"As long as the `j`-expression returns a `list`, each element of the `list` will be converted to a column in the resulting `data.table`\"*. If we can refer to the *data subset for each group* as a variable *while grouping*, we can then loop through all the columns of that variable using the already- or soon-to-be-familiar base function `lapply()`. No new names to learn specific to `data.table`.
+Let's use the [`data.table` `DT` from before](#what-is-datatable-1a) to get a glimpse of what `.SD` looks like.
+=====* Since `lapply()` returns a `list`, so there is no need to wrap it with an additional `.()` (if necessary, refer to [this tip](#tip-1)).=====
+Similar to [part g)](#refer_j), you can also specify the columns to remove instead of columns to keep using `-` or `!`. Additionally, you can select consecutive columns as `colA:colB` and deselect them as `!(colA:colB)` or `-(colA:colB)`.
+=====* `.SD` is a `data.table` that holds all the rows for *that group*. We simply subset the first two rows as we have seen [here](#subset-rows-integer) already.=====
+So that we have a consistent syntax and keep using already existing (and familiar) base functions instead of learning new functions. To illustrate, let us use the `data.table` `DT` that we created at the very beginning under the section [What is a data.table?](#what-is-datatable-1a).
+=====* That's it. There is no special syntax required. All we need to know is the base function `c()` which concatenates vectors and [the tip from before](#tip-1).=====
+In (1), for each group, a vector is returned, with length = 6,4,2 here. However, (2) returns a list of length 1 for each group, with its first element holding vectors of length 6,4,2. Therefore, (1) results in a length of `6+4+2 =`r 6+4+2``, whereas (2) returns `1+1+1=`r 1+1+1``.
