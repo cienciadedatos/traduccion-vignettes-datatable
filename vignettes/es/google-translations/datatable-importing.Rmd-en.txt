@@ -1,4 +1,3 @@
-
 Importing `data.table` is no different from importing other R packages. This vignette is meant to answer the most common questions arising around that subject; the lessons presented here can be applied to other R packages.
 Why to import `data.table`
 One of the biggest features of `data.table` is its concise syntax which makes exploratory analysis faster and easier to write and perceive; this convenience can drive package authors to use `data.table`. Another, perhaps more important reason is high performance. When outsourcing heavy computing tasks from your package to `data.table`, you usually get top performance without needing to re-invent any of these numerical optimization tricks on your own.

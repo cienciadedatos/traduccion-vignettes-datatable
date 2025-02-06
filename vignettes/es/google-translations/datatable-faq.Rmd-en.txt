@@ -1,4 +1,3 @@
-
 The first section, Beginner FAQs, is intended to be read in order, from start to finish. It's just written in a FAQ style to be digested more easily. It isn't really the most frequently asked questions. A better measure for that is looking on Stack Overflow.
 This FAQ is required reading and considered core documentation. Please do not ask questions on Stack Overflow or raise issues on GitHub until you have read it. We can all tell when you ask that you haven't read it. So if you do ask and haven't read it, don't use your real name.
 This document has been quickly revised given the changes in v1.9.8 released Nov 2016. Please do submit pull requests to fix mistakes or improvements. If anyone knows why the table of contents comes out so narrow and squashed when displayed by CRAN, please let us know. This document used to be a PDF and we changed it recently to HTML.

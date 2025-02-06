@@ -1,4 +1,3 @@
-
 This vignette introduces the `data.table` syntax, its general form, how to *subset* rows, *select and compute* on columns, and perform aggregations *by group*. Familiarity with the `data.frame` data structure from base R is useful, but not essential to follow this vignette.
 Data analysis using `data.table`
 Data manipulation operations such as *subset*, *group*, *update*, *join*, etc. are all inherently related. Keeping these *related operations together* allows for:

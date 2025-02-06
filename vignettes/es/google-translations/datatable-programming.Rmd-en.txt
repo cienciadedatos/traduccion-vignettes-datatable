@@ -1,4 +1,3 @@
-
 Introduction
 `data.table`, from its very first releases, enabled the usage of `subset` and `with` (or `within`) functions by defining the `[.data.table` method. `subset` and `with` are base R functions that are useful for reducing repetition in code, enhancing readability, and reducing number the total characters the user has to type. This functionality is possible in R because of a quite unique feature called *lazy evaluation*. This feature allows a function to catch its arguments, before they are evaluated, and to evaluate them in a different scope than the one in which they were called. Let's recap usage of the `subset` function.
 Here, `subset` takes the second argument and evaluates it within the scope of the `data.frame` given as its first argument. This removes the need for variable repetition, making it less prone to errors, and makes the code more readable.

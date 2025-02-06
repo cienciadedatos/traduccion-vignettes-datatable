@@ -1,4 +1,3 @@
-
 This document is meant to guide on measuring performance of `data.table`. Single place to document best practices and traps to avoid.
 fread: clear caches
 Ideally each `fread` call should be run in fresh session with the following commands preceding R execution. This clears OS cache file in RAM and HD cache.
