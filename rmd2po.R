@@ -252,7 +252,7 @@
 #' # TODO: and example using a short vignette
 rmd2po <- function(rmdfile, lang = "fr", podir = "po",
   mdpodir = getOption("mdpodir"), min.version = "2.0.0",
-  verbose = FALSE, keep.tmpfile = FALSE, cmd_options = c()) {
+  verbose = FALSE, keep.tmpfile = FALSE, cmd_options = character(0)) {
 
   # Check external program availability and version
   md2po <- .check_mdpo("md2po", min.version = min.version, mdpodir = mdpodir)
@@ -298,17 +298,33 @@ rmd2po <- function(rmdfile, lang = "fr", podir = "po",
   #  --include-codeblocks          
   #  --merge-pofiles         # genera PO limpios
   
-  cmd <- do.call(function(...) paste(
-    shQuote(md2po), 
-    "--quiet", "--save", "--no-location", "--remove-not-found",
-    "--metadata", shQuote(sprintf("Language: %s", lang)),
-    "--metadata", shQuote("Content-Type: text/plain; charset=UTF-8"),
-    "--po-filepath", shQuote(pofile), ...), as.list(cmd_options))
+  if (length(cmd_options)) 
+    message("Opciones extra: ", paste(cmd_options, collapse = " "))
+  cmd_output_tmp <- tempfile()
+  tryCatch({
+    exit_code <- system2(md2po, c(
+      "--quiet", "--save", "--no-location", "--remove-not-found",
+      "--metadata", shQuote(sprintf("Language: %s", lang)),
+      "--metadata", shQuote("Content-Type: text/plain; charset=UTF-8"),
+      "--po-filepath", shQuote(pofile), cmd_options, 
+      shQuote(pofile)),           # la entrada se puede especificar como nombre  
+#      stdin = tmpfile,           # de archivo o como stdin.
+      stdout = cmd_output_tmp, 
+      stderr = cmd_output_tmp)
+    cmd_output <- readLines(cmd_output_tmp)
+    if (exit_code) 
+      message("Aviso: md2po terminó con estado de salida no cero: ",exit_code)
+    }, 
+    finally = unlink(cmd_output_tmp))
+
+  #   error = function(e) stop(e, call. = FALSE))
+  if (isTRUE(verbose) && any(nzchar(cmd_output))) {
+    if(any(grepl("OSError:", cmd_output)))
+      message(sub(".*OSError:", "OSError:", cmd_output))
+    else message("salida de md2po: ", cmd_output)
+  }
   
-  res <- tryCatch(system(cmd, input = tmpfile, intern = TRUE),
-    error = function(e) stop(e, call. = FALSE))
-  if (isTRUE(verbose))
-    message(res)
+  
   
   # Cut any unnecessary parts in the .po file
   writeLines(.cut_after_end(readLines(pofile)), pofile)
