@@ -25,38 +25,37 @@
     pgm <- file.path(path.expand(mdpodir), pgm)
 
   pgm_version <- tryCatch(system2(pgm, args = "--version",
-    stdout = TRUE, stderr = TRUE), error = function(e) stop(pgm,
-      " not found. Install mdpo Python library and make it available.",
-      call. = FALSE))
+    stdout = TRUE, stderr = TRUE), error = function(e) 
+      stopf("%s not found. Install mdpo Python library and make it available.", 
+            pgm, call = NULL))
   # Returned string is like "md2po 2.0.0", but we need "2.0.0" only
   pgm_version <- sub("^[^ ]+ +", "", pgm_version)
   if (package_version(pgm_version) < min.version)
-    stop(pgm, " version ", min.version, " or higher is required, but ",
-      pgm_version, " is found.")
+    stopf( "%s version %s or higher is required, but %s is found.",
+      pgm, min.version, pgm_version)
   pgm
 }
 
+# md2po is not aware of the Rmd peculiarities. It does not processes correctly
+# 1) The YAML header
+# 2) chunks with options like {r, echo=FALSE}
+# 3) List items with empty lines between items (list items are transformed
+#    into plain paragraphs to avoid this). For unknown reasons, po2md
+#    eliminates equations tags ($...$) in such lists => escape them by
+#    replacing $ by $$$ in list items
+# 4) Indentation using tabulations, to be replaced by four spaces
+# 5) md2po adds footnotes a second time at the en of the .po file with a
+#    traduction that is identical to the original strings. To avoid this, we
+#    flag the end of the file and will delete anything past this flag in the
+#    .po file as a workaround
+# 6) Display equations (equations on its own line) is not correctly handled
+#    by po2md and the $...$ tags disappear. So, we escape them by `$$$...$$$`
+# So, we change these to something that can be easily reversed on the
+# translated version to restore these Rmd/qmd features
+# This is done in a temporary file
+# Note: we assume that current directory is the one where we should place
+# the temporary file in the "lang" subdirectory
 .create_temp_rmd <- function(rmdfile, tmpfile) {
-  # md2po is not aware of the Rmd peculiarities. It does not processes correctly
-  # 1) The YAML header
-  # 2) chunks with options like {r, echo=FALSE}
-  # 3) List items with empty lines between items (list items are transformed
-  #    into plain paragraphs to avoid this). For unknown reasons, po2md
-  #    eliminates equations tags ($...$) in such lists => escape them by
-  #    replacing $ by $$$ in list items
-  # 4) Indentation using tabulations, to be replaced by four spaces
-  # 5) md2po adds footnotes a second time at the en of the .po file with a
-  #    traduction that is identical to the original strings. To avoid this, we
-  #    flag the end of the file and will delete anything past this flag in the
-  #    .po file as a workaround
-  # 6) Display equations (equations on its own line) is not correctly handled
-  #    by po2md and the $...$ tags disappear. So, we escape them by `$$$...$$$`
-  # So, we change these to something that can be easily reversed on the
-  # translated version to restore these Rmd/qmd features
-  # This is done in a temporary file
-  # Note: we assume that current directory is the one where we should place
-  # the temporary file in the "lang" subdirectory
-
   rmddata <- readLines(rmdfile)
 
   # 1) YAML header
@@ -188,9 +187,6 @@
 #'   like "2.0.0")
 #' @param verbose If `TRUE`, print more info about md2po or po2md and the
 #'   command that is executed
-#' @param keep.tmpfile If `TRUE`, keep the modified .tmp file that is created
-#'   from the original .Rmd/.qmd to allow better handling of YAML header and R
-#'   chunks. `FALSE` by default, change it only for debugging purposes
 #'
 #' @details This function internally uses md2po and po2md CLI programs that are
 #' from the mdpo Python library. You have to install these before use and make
@@ -250,162 +246,182 @@
 #'
 #' @examples
 #' # TODO: and example using a short vignette
+# NOTE: md2po does not process quoted paths correctly. It is thus better to
+# temporarily switch to the directory where the rdmfile is located and to
+# always escape spaces with backslashes if they exist in the vignette name
+# It also waits for the name of the md file to process on stdin, even if it
+# is provided as first argument (both using system() and system2()). So, we
+# provide it through input =
+# @@ eliminado: 
+# @param keep.tmpfile If `TRUE`, keep the modified .tmp file that is created
+# from the original .Rmd/.qmd to allow better handling of YAML header and R
+# chunks. `FALSE` by default, change it only for debugging purposes
 rmd2po <- function(rmdfile, lang = "fr", podir = "po",
   mdpodir = getOption("mdpodir"), min.version = "2.0.0",
-  verbose = FALSE, keep.tmpfile = FALSE, cmd_options = character(0)) {
+  verbose = FALSE, cmd_options = character(0)) {
 
   # Check external program availability and version
   md2po <- .check_mdpo("md2po", min.version = min.version, mdpodir = mdpodir)
 
   if (!file.exists(rmdfile))
-    stop("The file '", rmdfile, "' is not found.")
+    stopf("The file '%s' is not found.", rmdfile)
+  
+  # los encabezados PO.
+  metadata <- paste(
+    "Project-Id-Version: 0.0.1",
+    "Report-Msgid-Bugs-To: ",
+    #    "POT-Creation-Date: 2024-10-04 11:40-0300",
+    #    "PO-Revision-Date: 2025-02-06 15:35-0300",
+    #    "Last-Translator: Nombre Apellido <direccion@ejemplo.com>",
+    "Language-Team: es",
+    "Language: es",
+    "MIME-Version: 1.0",
+    "Content-Type: text/plain; charset=UTF-8",
+    "Content-Transfer-Encoding: 8bit",
+    #    "X-Generator: Translate Toolkit 3.13.3",
+    sep = "; ")
 
-  # md2po does not process quoted paths correctly. It is thus better to
-  # temporarily switch to the directory where the rdmfile is located and to
-  # always escape spaces with backslashes if they exist in the vignette name
-  # It also waits for the name of the md file to process on stdin, even if it
-  # is provided as first argument (both using system() and system2()). So, we
-  # provide it through input =
   rmddir <- dirname(rmdfile)
   rmdfilename <- basename(rmdfile)
-  odir <- setwd(rmddir)
-  on.exit(setwd(odir))
-  if (isTRUE(verbose)) {
-  #  message("Temporarily switching to directory '", rmddir, "'", sep = "")
-    message("Processing: ", rmdfilename)
-  }
-  # Make sure required subdirectories exist
-  dir.create(lang, showWarnings = FALSE)
-  dir.create(file.path(lang, podir), showWarnings = FALSE)
-
-  # Create temporary file with modified Rmd/qmd file so that it is correctly
-  # processed with md2po
+  odir <- setwd(rmddir)     # see NOTE above
   tmpfile <- file.path(lang, paste0(basename(rmdfile), ".tmp"))
-  .create_temp_rmd(rmdfile, tmpfile)
-
-  # Create the .po file, using md2po on the temporary rmd file
-  pofile <- file.path(lang, podir, paste0(rmdfilename, "-", lang, ".po"))
-
-  ## Usando Translate Toolkit (3.13.3):
-  # cmd <- paste0(shQuote(md2po), ' -i ', shQuote(tmpfile), ' -o ', shQuote(pofile))
-  # res <- tryCatch(system(cmd, intern = TRUE), ...
   
-  # Usando https://pypi.org/project/mdpo/ 
-  # @@ agregué:
-  #  --no-location (ya que toma del temp)
-  #  --metadata  
-  # @@ quité
-  #  --include-codeblocks          
-  #  --merge-pofiles         # genera PO limpios
-  
-  if (length(cmd_options)) 
-    message("Opciones extra: ", paste(cmd_options, collapse = " "))
-  cmd_output_tmp <- tempfile()
-  tryCatch({
-    exit_code <- system2(md2po, c(
-      "--quiet", "--save", "--no-location", "--remove-not-found",
-      "--metadata", shQuote(sprintf("Language: %s", lang)),
-      "--metadata", shQuote("Content-Type: text/plain; charset=UTF-8"),
-      "--po-filepath", shQuote(pofile), cmd_options, 
-      shQuote(pofile)),           # la entrada se puede especificar como nombre  
-#      stdin = tmpfile,           # de archivo o como stdin.
-      stdout = cmd_output_tmp, 
-      stderr = cmd_output_tmp)
-    cmd_output <- readLines(cmd_output_tmp)
-    if (exit_code) 
-      message("Aviso: md2po terminó con estado de salida no cero: ",exit_code)
-    }, 
-    finally = unlink(cmd_output_tmp))
+  tryCatch(
+    finally = {
+      setwd(odir) 
+      unlink(tmpfile)
+    },  { 
+      if (isTRUE(verbose)) 
+        messagef("Procesando %s", rmdfilename)
+      
+      # Make sure required subdirectories exist
+      dir.create(lang, showWarnings = FALSE)
+      dir.create(file.path(lang, podir), showWarnings = FALSE)
+    
+      # Create temporary file with modified Rmd/qmd file so that it is correctly
+      # processed with md2po
+      .create_temp_rmd(rmdfile, tmpfile)
+    
+      # Create the .po file, using md2po on the temporary rmd file
+      pofile <- file.path(lang, podir, paste0(rmdfilename, "-", lang, ".po"))
+    
+      if (length(cmd_options)) 
+        messagef("Opciones extra: %s", paste(cmd_options, collapse = " "))
+      cmd_output_tmp <- tempfile()
 
-  #   error = function(e) stop(e, call. = FALSE))
+      # Usando https://pypi.org/project/mdpo/ 
+      # @@ agregué:
+      #  --metadata  
+      # @@ quité
+      #  --include-codeblocks          
+      # la entrada se puede especificar como nombre de archivo o como stdin.
+      # pero leer NOTA ut supra
+      tryCatch(
+        finally = unlink(cmd_output_tmp), 
+        { exit_code <- system2(
+            command = md2po, 
+            args = c(
+              "--quiet", "--save", "--merge-pofiles", "--remove-not-found", 
+              "--metadata", shQuote(sprintf("Language: %s", lang)),
+              "--metadata", shQuote(metadata),
+              "--po-filepath", shQuote(pofile), 
+              cmd_options),        
+            stdin = tmpfile,
+            stdout = cmd_output_tmp, 
+            stderr = cmd_output_tmp)
+          cmd_output <- readLines(cmd_output_tmp)
+          if (exit_code) 
+            messagef("Aviso: md2po terminó con estado de salida no cero: %d", exit_code)
+        }
+      )
+    }
+  )
+  
   if (isTRUE(verbose) && any(nzchar(cmd_output))) {
-    if(any(grepl("OSError:", cmd_output)))
-      message(sub(".*OSError:", "OSError:", cmd_output))
-    else message("salida de md2po: ", cmd_output)
+    if(any(grepl("OSError:", cmd_output))) {
+      cmd_output <- sub(".*OSError:", "OSError:", cmd_output)
+      messagef("%s", cmd_output)
+    } else messagef("salida de md2po: %s", cmd_output)
   }
-  
-  
-  
+
   # Cut any unnecessary parts in the .po file
   writeLines(.cut_after_end(readLines(pofile)), pofile)
-
-  if (!isTRUE(keep.tmpfile))
-    unlink(tmpfile)
 
   file.path(rmddir, pofile)
 }
 
-#' @rdname rmd2po
-#' @export
+# NOTE: po2md does not process quoted paths correctly. It is thus better to
+# temporarily switch to the directory where the rdmfile is located and to
+# always escape spaces with backslashes if they exist in the vignette name
+# It also waits for the name of the md file to process on stdin, even if it
+# is provided as first argument (both using system() and system2()). So, we
+# provide it through input = 
 po2rmd <- function(rmdfile, lang = "fr", podir = "po",
   mdpodir = getOption("mdpodir"), min.version = "2.0.0",
-  verbose = FALSE, keep.tmpfile = FALSE) {
+  verbose = FALSE) {
 
   po2md <- .check_mdpo("po2md", min.version = min.version, mdpodir = mdpodir)
 
   if (!file.exists(rmdfile))
-    stop("The file '", rmdfile, "' is not found.")
+    stopf("The file '%s' is not found.", rmdfile)
+  else if (!dir.exists(rmddir <- dirname(rmdfile)))
+    stopf("The directory '%s' is not found.", rmddir)
 
-  # po2md does not process quoted paths correctly. It is thus better to
-  # temporarily switch to the directory where the rdmfile is located and to
-  # always escape spaces with backslashes if they exist in the vignette name
-  # It also waits for the name of the md file to process on stdin, even if it
-  # is provided as first argument (both using system() and system2()). So, we
-  # provide it through input = 
-  rmddir <- dirname(rmdfile)
   rmdfilename <- basename(rmdfile)
-  if (!dir.exists(rmddir))
-    stop("The directory '", rmddir, "' is not found.")
-  odir <- setwd(rmddir)
-  on.exit(setwd(odir))
-  if (isTRUE(verbose)) {
-    message("Temporarily switching to directory '", rmddir, "'", sep = "")
-    message("Processing: ", rmdfilename)
-  }
+  
+  odir <- setwd(rmddir)  # read NOTE above.
+  if (normalizePath(getwd()) != normalizePath(odir) && verbose) 
+    messagef("cambiando temporalmente a %s", rmddir)
+  tmpfile <- file.path(lang, paste0(basename(rmdfile), ".tmp"))
+  tryCatch(
+    finally = {
+      unlink(tmpfile)
+      setwd(odir) }, 
+    { 
+      if (isTRUE(verbose))
+        messagef("Procesando %s", rmdfilename)
 
-  # Make sure required subdirectories exist
-  dir.create(lang, showWarnings = FALSE)
+      # Make sure required subdirectories exist
+      # Create temporary file, if needed, with modified Rmd/qmd file so that it is
+      # correctly processed with po2md
+      dir.create(lang, showWarnings = FALSE)
+      .create_temp_rmd(rmdfile, tmpfile)
+    
+      # Create translated .Rmd/.qmd file using the temporary .Rmd/.qmd and .po file
+      rmd2file <- file.path(lang, rmdfilename)
+      pofile <- file.path(lang, podir, paste0(rmdfilename, "-", lang, ".po"))
+      if (!file.exists(pofile))
+        stopf("The .po file '%s' is not found.", pofile)
+ 
+      cmd_output_tmp <- tempfile()
+      # la entrada se puede especificar como nombre de archivo o como stdin.
+      # pero leer NOTA ut supra
+      tryCatch(
+        finally = unlink(cmd_output_tmp),
+        { exit_code <- system2(
+            command = po2md, 
+            args = c(
+              "--po-files", shQuote(pofile),
+              "--save", shQuote(rmd2file), 
+              "--wrapwidth", "0",  # Necesario para que .postprocess.. funcione
+              "--quiet"  
+              # c("--no-obsolete", "--no-fuzzy", "--no-empty-msgstr"),    # desactivado por ahora
+              ),    
+            stdin = tmpfile,
+            stdout = cmd_output_tmp, 
+            stderr = cmd_output_tmp
+          )
+          cmd_output <- readLines(cmd_output_tmp)
+        } 
+      )
+      if (exit_code) 
+        messagef("Aviso: md2po terminó con estado de salida no cero: %d", exit_code)
 
-  # Create temporary file, if needed, with modified Rmd/qmd file so that it is
-  # correctly processed with po2md
-  #@@
-  ## adicionalmente lo renombramos .md, porque parece que la versión de 
-  ## Translate Toolkit (3.13.3) que uso no lo reconoce de otra forma 
-  #  tmpfile <- file.path(lang, paste0(basename(rmdfile), ".tmp"))
-  tmpfile <- file.path(lang, paste0(basename(rmdfile), ".tmp.md"))
-  #@@
-  if (!file.exists(tmpfile))
-    .create_temp_rmd(rmdfile, tmpfile)
-
-  # Create translated .Rmd/.qmd file using the temporary .Rmd/.qmd and .po file
-  rmd2file <- file.path(lang, rmdfilename)
-  pofile <- file.path(lang, podir, paste0(rmdfilename, "-", lang, ".po"))
-  if (!file.exists(pofile))
-    stop("The .po file '", pofile, "' is not found.")
-    #@@
-    ## la opción -m0 para que no recorte las cadenas muy largas  
-    # cmd <- paste0('"', po2md, '" --quiet --pofiles ', pofile,
-    #  ' --wrapwidth 0 --save ', rmd2file)
-    cmd <- paste(shQuote(po2md), "-m0", "-i", shQuote(pofile), "-t", shQuote(tmpfile), 
-                 "-o", shQuote(rmd2file))
-    #@@
-    if (isTRUE(verbose))
-    message("Running: ", cmd)
-    #@@
-    # res <- tryCatch(system(cmd, input = tmpfile, intern = TRUE),
-    res <- tryCatch(system(cmd, intern = TRUE),
-    #@@
-                    
-    error = function(e) stop(e, call. = FALSE))
-  if (isTRUE(verbose))
-    message(res)
-
-  if (!isTRUE(keep.tmpfile))
-    unlink(tmpfile)
-
-  # Rework the translated .Rmd/.qmd file to restore YAML header, R chunks and
-  # list items
-  .postprocess_translated_rmd(rmd2file)
-
-  file.path(rmddir, rmd2file)
+      # Rework the translated .Rmd/.qmd file to restore YAML header, R chunks and
+      # list items
+      .postprocess_translated_rmd(rmd2file)
+      
+      file.path(rmddir, rmd2file)
+    }
+  )
 }
