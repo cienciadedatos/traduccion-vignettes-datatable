@@ -1,7 +1,8 @@
-
-This vignette assumes that the reader is familiar with data.table's `[i, j, by]` syntax, and how to perform fast key based subsets. If you're not familiar with these concepts, please read the *\"Introduction to data.table\"*, *\"Reference semantics\"* and *\"Keys and fast binary search based subset\"* vignettes first.
+Translations of this document are available in
+=====* [French](https://rdatatable.gitlab.io/data.table/articles/fr/datatable-secondary-indices-and-auto-indexing.html)=====
+This vignette assumes that the reader is familiar with data.table's `[i, j, by]` syntax, and how to perform fast key based subsets. If you're not familiar with these concepts, please read the [`vignette(\"datatable-intro\", package=\"data.table\")`](datatable-intro.html), [`vignette(\"datatable-reference-semantics\", package=\"data.table\")`](datatable-reference-semantics.html), and [`vignette(\"datatable-keys-fast-subset\", package=\"data.table\")`](datatable-keys-fast-subset.html) vignettes first.
 Data {#data}
-We will use the same `flights` data as in the *\"Introduction to data.table\"* vignette.
+We will use the same `flights` data as in the [`vignette(\"datatable-intro\", package=\"data.table\")`](datatable-intro.html) vignette.
 Introduction
 In this vignette, we will
 =====* discuss *secondary indices* and provide rationale as to why we need them by citing cases where setting keys is not necessarily ideal,=====
@@ -51,14 +52,14 @@ For example, if we want to subset `\"JFK\", \"LAX\"` combination, then:
 =====* `on` argument accepts a character vector of column names corresponding to the order provided to `i-argument`.=====
 =====* Since the time to compute the secondary index is quite small, we don't have to use `setindex()`, unless, once again, the task involves repeated subsetting on the same column.=====
 b) Select in `j`
-All the operations we will discuss below are no different to the ones we already saw in the *Keys and fast binary search based subset* vignette. Except we'll be using the `on` argument instead of setting keys.
+All the operations we will discuss below are no different to the ones we already saw in the [`vignette(\"datatable-keys-fast-subset\", package=\"data.table\")`](datatable-keys-fast-subset.html) vignette. Except we'll be using the `on` argument instead of setting keys.
 -- Return `arr_delay` column alone as a data.table corresponding to `origin = \"LGA\"` and `dest = \"TPA\"`
 c) Chaining
 -- On the result obtained above, use chaining to order the column in decreasing order.
 d) Compute or *do* in `j`
 -- Find the maximum arrival delay corresponding to `origin = \"LGA\"` and `dest = \"TPA\"`.
 e) *sub-assign* by reference using `:=` in `j`
-We have seen this example already in the *Reference semantics* and *Keys and fast binary search based subset* vignette. Let's take a look at all the `hours` available in the `flights` *data.table*:
+We have seen this example already in the vignettes [`vignette(\"datatable-reference-semantics\", package=\"data.table\")`](datatable-reference-semantics.html) and [`vignette(\"datatable-keys-fast-subset\", package=\"data.table\")`](datatable-keys-fast-subset.html). Let's take a look at all the `hours` available in the `flights` *data.table*:
 We see that there are totally `25` unique values in the data. Both *0* and *24* hours seem to be present. Let's go ahead and replace *24* with *0*, but this time using `on` instead of setting keys.
 Now, let's check if `24` is replaced with `0` in the `hour` column.
 =====* This is particularly a huge advantage of secondary indices. Previously, just to update a few rows of `hour`, we had to `setkey()` on it, which inevitably reorders the entire data.table. With `on`, the order is preserved, and the operation is much faster! Looking at the code, the task we wanted to perform is also quite clear.=====
@@ -66,7 +67,7 @@ f) Aggregation using `by`
 -- Get the maximum departure delay for each `month` corresponding to `origin = \"JFK\"`. Order the result by `month`
 =====* We would have had to set the `key` back to `origin, dest` again, if we did not use `on` which internally builds secondary indices on the fly.=====
 g) The *mult* argument
-The other arguments including `mult` work exactly the same way as we saw in the *Keys and fast binary search based subset* vignette. The default value for `mult` is \"all\". We can choose, instead only the \"first\" or \"last\" matching rows should be returned.
+The other arguments including `mult` work exactly the same way as we saw in the [`vignette(\"datatable-keys-fast-subset\", package=\"data.table\")`](datatable-keys-fast-subset.html) vignette. The default value for `mult` is \"all\". We can choose, instead only the \"first\" or \"last\" matching rows should be returned.
 -- Subset only the first matching row where `dest` matches *\"BOS\"* and *\"DAY\"*
 -- Subset only the last matching row where `origin` matches *\"LGA\", \"JFK\", \"EWR\"* and `dest` matches *\"XNA\"*
 h) The *nomatch* argument
@@ -83,4 +84,4 @@ The time to subset the first time is the time to create the index + the time to 
 =====* Auto indexing can be disabled by setting the global argument `options(datatable.auto.index = FALSE)`.=====
 =====* Disabling auto indexing still allows to use indices created explicitly with `setindex` or `setindexv`. You can disable indices fully by setting global argument `options(datatable.use.index = FALSE)`.=====
 In recent version we extended auto indexing to expressions involving more than one column (combined with `&` operator). In the future, we plan to extend binary search to work with more binary operators like `<`, `<=`, `>` and `>=`.
-We will discuss fast *subsets* using keys and secondary indices to *joins* in the next vignette, *\"Joins and rolling joins\"*.
+We will discuss fast *subsets* using keys and secondary indices to *joins* in the [next vignette (`vignette(\"datatable-joins\", package=\"data.table\")`)](datatable-joins.html).

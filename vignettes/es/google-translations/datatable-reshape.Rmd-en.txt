@@ -1,10 +1,12 @@
-
+Translations of this document are available in
+=====* [French](https://rdatatable.gitlab.io/data.table/articles/fr/datatable-reshape.html)===== =====* [Russian](https://rdatatable.gitlab.io/data.table/articles/ru/datatable-reshape.html)=====
 This vignette discusses the default usage of reshaping functions `melt` (wide to long) and `dcast` (long to wide) for *data.tables* as well as the **new extended functionalities** of melting and casting on *multiple columns* available from `v1.9.6`.
 Data
 We will load the data sets directly within sections.
 Introduction
 The `melt` and `dcast` functions for `data.table`s are for reshaping wide-to-long and long-to-wide, respectively; the implementations are specifically designed with large in-memory data (e.g. 10Gb) in mind.
 In this vignette, we will
+=====1. First briefly look at the default `melt`ing and `dcast`ing of `data.table`s to convert them from *wide* to *long* format and *vice versa*=====
 =====2. Look at scenarios where the current functionalities become cumbersome and inefficient=====
 =====3. Finally look at the new improvements to both `melt` and `dcast` methods for `data.table`s to handle multiple columns simultaneously.=====
 The extended functionalities are in line with `data.table`'s philosophy of performing operations efficiently and in a straightforward manner.
@@ -31,13 +33,13 @@ That is, we'd like to collect all *child* observations corresponding to each `fa
 - Starting from `DT.m1`, how can we get the number of children in each family?
 You can also pass a function to aggregate by in `dcast` with the argument `fun.aggregate`. This is particularly essential when the formula provided does not identify single observation for each cell.
 Check `?dcast` for other useful arguments and additional examples.
-2. Limitations in current `melt/dcast` approaches
+2. Limitations in previous `melt/dcast` approaches
 So far we've seen features of `melt` and `dcast` that are implemented efficiently for `data.table`s, using internal `data.table` machinery (*fast radix ordering*, *binary search* etc.).
 However, there are situations we might run into where the desired operation is not expressed in a straightforward manner. For example, consider the `data.table` shown below:
 And you'd like to combine (`melt`) all the `dob` columns together, and `gender` columns together. Using the current functionality, we can do something like this:
 Issues
 =====1. What we wanted to do was to combine all the `dob` and `gender` type columns together respectively. Instead, we are combining *everything* together, and then splitting them again. I think it's easy to see that it's quite roundabout (and inefficient).=====
-=====2. The columns to `melt` may be of different types, as in this case (`character` and `integer` types). By `melt`ing them all together, the columns will be coerced in result, as explained by the warning message above and shown from output of `str(DT.c1)`, where `gender` has been converted to *`character`* type.=====
+=====2. The columns to `melt` may be of different types. By `melt`ing them all together, the columns will be coerced in result.=====
 =====3. We are generating an additional column by splitting the `variable` column into two columns, whose purpose is quite cryptic. We do it because we need it for *casting* in the next step.=====
 =====4. Finally, we cast the data set. But the issue is it's a much more computationally involved operation than *melt*. Specifically, it requires computing the order of the variables in formula, and that's costly.=====
 In fact, `stats::reshape` is capable of performing this operation in a very straightforward manner. It is an extremely useful and often underrated function. You should definitely give it a try!
@@ -69,4 +71,3 @@ We can now provide **multiple `value.var` columns** to `dcast` for `data.table`s
 =====* Everything is taken care of internally, and efficiently. In addition to being fast, it is also very memory efficient.=====
 Multiple functions to `fun.aggregate`:
 You can also provide *multiple functions* to `fun.aggregate` to `dcast` for *data.tables*. Check the examples in `?dcast` which illustrates this functionality.
-=====1. First briefly look at the default `melt`ing and `dcast`ing of `data.table`s to convert them from *wide* to *long* format and *vice versa*=====
