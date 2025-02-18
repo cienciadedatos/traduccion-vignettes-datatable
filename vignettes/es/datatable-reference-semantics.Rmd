@@ -9,6 +9,10 @@ vignette: >
   \usepackage[utf8]{inputenc}
 ---
 
+Las traducciones de este documento están disponibles en
+
+* [Francés](https://rdatatable.gitlab.io/data.table/articles/fr/datatable-reference-semantics.html)
+
 ```{r, echo = FALSE, message = FALSE}
 require(data.table)
 knitr::opts_chunk$set(
@@ -19,20 +23,21 @@ knitr::opts_chunk$set(
  collapse = TRUE)
 .old.th = setDTthreads(1)
 ```
-Esta viñeta analiza la semántica de referencia de *data.table*, que permite *agregar/actualizar/eliminar* columnas de una *data.table por referencia*, y también combinarlas con `i` y `by`. Está dirigida a aquellos que ya están familiarizados con la sintaxis de *data.table*, su forma general, cómo crear subconjuntos de filas en `i`, seleccionar y calcular columnas, y realizar agregaciones por grupo. Si no está familiarizado con estos conceptos, lea primero la viñeta *"Introducción a data.table"*.
+
+Esta viñeta analiza la semántica de referencia de *data.table*, que permite *agregar/actualizar/eliminar* columnas de una *data.table* por referencia*, y también combinarlas con `i` y `by`. Está dirigida a aquellos que ya están familiarizados con la sintaxis de *data.table*, su forma general, cómo crear subconjuntos de filas en `i`, seleccionar y calcular columnas, y realizar agregaciones por grupo. Si no estás familiarizado con estos conceptos, lee primero la viñeta [`vignette("datatable-intro", package="data.table")`](datatable-intro.html).
 
 ***
 
 ## Datos {#data}
 
-Utilizaremos los mismos datos de "vuelos" que en la viñeta *"Introducción a data.table"*.
+Utilizaremos los mismos datos de "vuelos" que en la viñeta [`vignette("datatable-intro", package="data.table")`](datatable-intro.html).
 
 ```{r echo = FALSE}
 options(width = 100L)
 ```
 
 ```{r}
-flights <- fread("flights14.csv")
+flights <- fread("../flights14.csv")
 flights
 dim(flights)
 ```
@@ -41,9 +46,9 @@ dim(flights)
 
 En esta viñeta, vamos a
 
-1. Primero analicemos brevemente la semántica de referencia y observemos las dos formas diferentes en las que se puede utilizar el operador `:=`
+1. Primero, analizar brevemente la semántica de referencia y observemos las dos formas diferentes en las que se puede utilizar el operador `:=`
 
-2. Luego veamos cómo podemos *agregar/actualizar/eliminar* columnas *por referencia* en `j` usando el operador `:=` y cómo combinarlo con `i` y `by`.
+2. Luego veremos cómo podemos *agregar/actualizar/eliminar* columnas *por referencia* en `j` usando el operador `:=` y cómo combinarlo con `i` y `by`.
 
 3. y finalmente veremos el uso de `:=` por sus *efectos secundarios* y cómo podemos evitar los efectos secundarios usando `copy()`.
 
@@ -53,7 +58,7 @@ Todas las operaciones que hemos visto hasta ahora en la viñeta anterior dieron 
 
 ### a) Antecedentes
 
-Antes de analizar la *semántica de referencia*, considere el *data.frame* que se muestra a continuación:
+Antes de analizar la *semántica de referencia*, considera el *data.frame* que se muestra a continuación:
 
 ```{r}
 DF = data.frame(ID = c("b","b","b","a","a","c"), a = 1:6, b = 7:12, c = 13:18)
@@ -80,7 +85,8 @@ Una copia *profunda*, por otro lado, copia todos los datos a otra ubicación en 
 
 Al crear un subconjunto de una *data.table* utilizando `i` (por ejemplo, `DT[1:10]`), se realiza una copia *profunda*. Sin embargo, cuando no se proporciona `i` o es igual a `TRUE`, se realiza una copia *superficial*.
 
-#
+# 
+
 Con el operador `:=` de *data.table*, no se realizan copias en *ambos* (1) y (2), independientemente de la versión de R que esté utilizando. Esto se debe a que el operador `:=` actualiza las columnas de *data.table* *en el lugar* (por referencia).
 
 ### b) El operador `:=`
@@ -108,9 +114,9 @@ DT[, `:=`(colA = valA, # valA is assigned to colA
 
 Tenga en cuenta que el código anterior explica cómo se puede utilizar `:=`. No son ejemplos prácticos. Comenzaremos a utilizarlos en la tabla de datos `flights` a partir de la siguiente sección.
 
-#
+# 
 
-* En (a), `LHS` toma un vector de caracteres de nombres de columnas y `RHS` una *lista de valores*. `RHS` solo necesita ser una `lista`, independientemente de cómo se genere (por ejemplo, utilizando `lapply()`, `list()`, `mget()`, `mapply()`, etc.). Esta forma suele ser fácil de programar y es particularmente útil cuando no se conocen de antemano las columnas a las que se deben asignar valores.
+* En (a), `LHS` toma un vector de caracteres de nombres de columnas y `RHS` una *lista de valores*. `RHS` solo necesita ser `list`, independientemente de cómo se genere (por ejemplo, utilizando `lapply()`, `list()`, `mget()`, `mapply()`, etc.). Esta forma suele ser fácil de programar y es particularmente útil cuando no se conocen de antemano las columnas a las que se deben asignar valores.
 
 * Por otro lado, (b) es útil si quieres anotar algunos comentarios para más tarde.
 
@@ -118,7 +124,7 @@ Tenga en cuenta que el código anterior explica cómo se puede utilizar `:=`. No
 
 * Dado que `:=` está disponible en `j`, podemos combinarlo con las operaciones `i` y `by` tal como las operaciones de agregación que vimos en la viñeta anterior.
 
-#
+# 
 
 En las dos formas de `:=` que se muestran arriba, tenga en cuenta que no asignamos el resultado a una variable, porque no es necesario. La entrada *data.table* se modifica por referencia. Veamos algunos ejemplos para entender lo que queremos decir con esto.
 
@@ -158,14 +164,14 @@ flights[, sort(unique(hour))]
 
 Vemos que hay un total de `25` valores únicos en los datos. Parece que hay tanto *0* como *24* horas. Reemplacemos *24* por *0*.
 
-#### -- Reemplace aquellas filas donde `hora == 24` con el valor `0`
+#### -- Reemplaza aquellas filas donde `hora == 24` con el valor `0`
 
 ```{r}
 # subassign by reference
 flights[hour == 24L, hour := 0L]
 ```
 
-* Podemos usar `i` junto con `:=` en `j` de la misma manera que ya hemos visto en la viñeta *"Introducción a data.table"*.
+* Podemos usar `i` junto con `:=` en `j` de la misma manera que ya hemos visto en la viñeta [`vignette("datatable-intro", package="data.table")`](datatable-intro.html).
 
 * La columna `hora` se reemplaza con `0` solo en aquellos *índices de fila* donde la condición `hora == 24L` especificada en `i` se evalúa como `VERDADERO`.
 
@@ -175,7 +181,8 @@ flights[hour == 24L, hour := 0L]
     flights[hour == 24L, hour := 0L][]
     ```
 
-#
+# 
+
 Veamos todas las “horas” para verificar.
 
 ```{r}
@@ -185,9 +192,9 @@ flights[, sort(unique(hour))]
 
 #### Ejercicio: {#update-by-reference-question}
 
-¿Cuál es la diferencia entre `vuelos[hora == 24L, hora := 0L]` y `vuelos[hora == 24L][, hora := 0L]`? Sugerencia: El último necesita una asignación (`<-`) si desea utilizar el resultado más adelante.
+¿Cuál es la diferencia entre `flights[hour == 24L, hora := 0L]` y `flights[hour == 24L][, hour := 0L]`? Sugerencia: El último necesita una asignación (`<-`) si desea utilizar el resultado más adelante.
 
-Si no puedes resolverlo, echa un vistazo a la sección `Nota` de `?":="`.
+Si no puede resolverlo, eche un vistazo a la sección "Nota" de "?":="`.
 
 ### c) Eliminar columna por referencia
 
@@ -212,12 +219,12 @@ head(flights)
     ```{r eval = FALSE}
     flights[, delay := NULL]
     ```
-
+    
     is equivalent to the code above.
 
 ### d) `:=` junto con la agrupación usando `by` {#ref-j-by}
 
-Ya hemos visto el uso de `i` junto con `:=` en la [Sección 2b](#ref-i-j). Veamos ahora cómo podemos usar `:=` junto con `by`.
+Ya hemos visto el uso de `i` junto con `:=` en la [Sección 2b](#ref-ij). Veamos ahora cómo podemos usar `:=` junto con `by`.
 
 #### -- ¿Cómo podemos agregar una nueva columna que contenga para cada par `orig,dest` la velocidad máxima?
 
@@ -228,11 +235,11 @@ head(flights)
 
 * Agregamos una nueva columna `max_speed` usando el operador `:=` por referencia.
 
-* Proporcionamos las columnas para agrupar de la misma manera que se muestra en la viñeta *Introducción a data.table*. Para cada grupo, se calcula `max(speed)`, que devuelve un único valor. Ese valor se recicla para ajustarse a la longitud del grupo. Una vez más, no se realizan copias en absoluto. La tabla *data.table* `flights` se modifica *in situ*.
+* Proporcionamos las columnas para agrupar de la misma manera que se muestra en la viñeta *Introducción a data.table*. Para cada grupo, se calcula `max(speed)`, que devuelve un único valor. Ese valor se recicla para ajustarse a la longitud del grupo. Una vez más, no se realizan copias en absoluto. La *tabla de datos* `flights` se modifica *in situ*.
 
-* También podríamos haber proporcionado `by` con un *vector de caracteres* como vimos en la viñeta *Introducción a data.table*, por ejemplo, `by = c("origin", "dest")`.
+* También podríamos haber proporcionado `by` con un *vector de caracteres* como vimos en la viñeta [`vignette("datatable-intro", package="data.table")`](datatable-intro.html), por ejemplo, `by = c("origin", "dest")`.
 
-#
+# 
 
 ### e) Varias columnas y `:=`
 
@@ -247,11 +254,12 @@ head(flights)
 
 * Usamos el formato `LHS := RHS`. Almacenamos los nombres de las columnas de entrada y las nuevas columnas que se agregarán en variables separadas y las proporcionamos a `.SDcols` y a `LHS` (para una mejor legibilidad).
 
-* Tenga en cuenta que, dado que permitimos la asignación por referencia sin citar los nombres de las columnas cuando solo hay una columna, como se explica en la [Sección 2c](#delete-convenience), no podemos hacer `out_cols := lapply(.SD, max)`. Eso daría como resultado la adición de una nueva columna llamada `out_cols`. En su lugar, deberíamos hacer `c(out_cols)` o simplemente `(out_cols)`. Envolver el nombre de la variable con `(` es suficiente para diferenciar entre los dos casos.
+* Ten en cuenta que, dado que permitimos la asignación por referencia sin citar los nombres de las columnas cuando solo hay una columna, como se explica en la [Sección 2c](#delete-convenience), no podemos hacer `out_cols := lapply(.SD, max)`. Eso daría como resultado la adición de una nueva columna llamada `out_cols`. En su lugar, deberíamos hacer `c(out_cols)` o simplemente `(out_cols)`. Envolver el nombre de la variable con `(` es suficiente para diferenciar entre los dos casos.
 
-* La forma `LHS := RHS` nos permite operar en múltiples columnas. En la forma RHS, para calcular el `max` en las columnas especificadas en `.SDcols`, utilizamos la función base `lapply()` junto con `.SD` de la misma manera que hemos visto antes en la viñeta *"Introducción a data.table"*. Devuelve una lista de dos elementos, que contiene el valor máximo correspondiente a `dep_delay` y `arr_delay` para cada grupo.
+* La forma `LHS := RHS` nos permite operar en múltiples columnas. En la forma RHS, para calcular el `max` en las columnas especificadas en `.SDcols`, utilizamos la función base `lapply()` junto con `.SD` de la misma manera que hemos visto antes en la viñeta [`vignette("datatable-intro", package="data.table")`](datatable-intro.html). Devuelve una lista de dos elementos, que contiene el valor máximo correspondiente a `dep_delay` y `arr_delay` para cada grupo.
 
-#
+# 
+
 Antes de pasar a la siguiente sección, limpiemos las columnas recién creadas `speed`, `max_speed`, `max_dep_delay` y `max_arr_delay`.
 
 ```{r}
@@ -260,14 +268,16 @@ flights[, c("speed", "max_speed", "max_dep_delay", "max_arr_delay") := NULL]
 head(flights)
 ```
 
-#### -- ¿Cómo podemos actualizar varias columnas existentes utilizando `.SD`?
+#### -- ¿Cómo podemos actualizar varias columnas existentes usando `.SD`?
 
 ```{r}
 flights[, names(.SD) := lapply(.SD, as.factor), .SDcols = is.character]
 ```
-Limpiemos nuevamente y convirtamos nuestras columnas de factores recién creadas nuevamente en columnas de caracteres. Esta vez, utilizaremos `.SDcols`, que acepta una función para decidir qué columnas incluir. En este caso, `is.factor()` devolverá las columnas que son factores. Para obtener más información sobre el **S**subconjunto de los **D**ata, también hay una [viñeta de uso de SD](https://cran.r-project.org/package=data.table/vignettes/datatable-sd-usage.html).
+
+Limpiemos nuevamente y convirtamos nuestras columnas de factores recién creadas nuevamente en columnas de caracteres. Esta vez, haremos uso de `.SDcols` que acepta una función para decidir qué columnas incluir. En este caso, `is.factor()` devolverá las columnas que son factores. Para obtener más información sobre el **S**subconjunto de **D**ata, también hay una [viñeta de uso de SD](https://cran.r-project.org/package=data.table/vignettes/datatable-sd-usage.html).
 
 A veces, también es bueno llevar un registro de las columnas que transformamos. De esa manera, incluso después de convertir nuestras columnas, podremos llamar a las columnas específicas que estábamos actualizando.
+
 ```{r}
 factor_cols <- sapply(flights, is.factor)
 flights[, names(.SD) := lapply(.SD, as.character), .SDcols = factor_cols]
@@ -280,7 +290,7 @@ str(flights[, ..factor_cols])
 
 ## 3. `:=` y `copy()`
 
-`:=` modifica el objeto de entrada por referencia. Aparte de las características que ya hemos comentado, a veces podríamos querer utilizar la función de actualización por referencia por su efecto secundario. Y en otras ocasiones puede que no sea deseable modificar el objeto original, en cuyo caso podemos utilizar la función `copy()`, como veremos en un momento.
+`:=` modifica el objeto de entrada por referencia. Aparte de las características que ya hemos comentado, a veces podemos querer utilizar la función de actualización por referencia por su efecto secundario. Y en otras ocasiones puede que no sea deseable modificar el objeto original, en cuyo caso podemos utilizar la función `copy()`, como veremos en un momento.
 
 ### a) `:=` por su efecto secundario
 
@@ -306,19 +316,19 @@ En la sección anterior, usamos `:=` por su efecto secundario. Pero, por supuest
 
 La función `copy()` copia *deep* el objeto de entrada y, por lo tanto, cualquier operación de actualización por referencia posterior realizada en el objeto copiado no afectará al objeto original.
 
-#
+# 
 
 Hay dos lugares particulares donde la función `copy()` es esencial:
 
 1. Contrariamente a la situación que hemos visto en el punto anterior, es posible que no queramos que la tabla de datos de entrada de una función se modifique *por referencia*. Como ejemplo, consideremos la tarea de la sección anterior, excepto que no queremos modificar `vuelos` por referencia.
 
     Let's first delete the `speed` column we generated in the previous section.
-
+    
     ```{r}
     flights[, speed := NULL]
     ```
     Now, we could accomplish the task as follows:
-
+    
     ```{r}
     foo <- function(DT) {
       DT <- copy(DT)                              ## deep copy
@@ -334,9 +344,9 @@ Hay dos lugares particulares donde la función `copy()` es esencial:
 
 * Y `ans` contiene la velocidad máxima correspondiente a cada mes.
 
-Sin embargo, podríamos mejorar aún más esta funcionalidad mediante una copia *superficial* en lugar de una copia *profunda*. De hecho, nos gustaría mucho [ofrecer esta funcionalidad para `v1.9.8`](https://github.com/Rdatatable/data.table/issues/617). Volveremos a abordar este tema en la viñeta *diseño de data.table*.
+Sin embargo, podríamos mejorar esta funcionalidad aún más mediante una copia *superficial* en lugar de una copia *profunda*. De hecho, nos gustaría mucho [ofrecer esta funcionalidad para `v1.9.8`](https://github.com/Rdatatable/data.table/issues/617). Volveremos a abordar este tema en la viñeta *diseño de data.table*.
 
-#
+# 
 
 2. Cuando almacenamos los nombres de las columnas en una variable, por ejemplo, `DT_n = names(DT)`, y luego *agregamos/actualizamos/eliminamos* columnas *por referencia*, también modificaría `DT_n`, a menos que hagamos `copy(names(DT))`.
 
@@ -344,17 +354,17 @@ Sin embargo, podríamos mejorar aún más esta funcionalidad mediante una copia 
     DT = data.table(x = 1L, y = 2L)
     DT_n = names(DT)
     DT_n
-
+    
     ## add a new column by reference
     DT[, z := 3L]
-
+    
     ## DT_n also gets updated
     DT_n
-
+    
     ## use `copy()`
     DT_n = copy(names(DT))
     DT[, w := 4L]
-
+    
     ## DT_n doesn't get updated
     DT_n
     ```
@@ -365,7 +375,7 @@ Sin embargo, podríamos mejorar aún más esta funcionalidad mediante una copia 
 
 * Se utiliza para *agregar/actualizar/eliminar* columnas por referencia.
 
-* También hemos visto cómo utilizar `:=` junto con `i` y `by` de la misma forma que hemos visto en la viñeta *Introducción a data.table*. De la misma forma, podemos utilizar `keyby`, encadenar operaciones y pasar expresiones a `by` también de la misma forma. La sintaxis es *consistente*.
+* También hemos visto cómo usar `:=` junto con `i` y `by` de la misma manera que hemos visto en la viñeta [`vignette("datatable-intro", package="data.table")`](datatable-intro.html). De la misma manera, podemos usar `keyby`, encadenar operaciones y pasar expresiones a `by` también de la misma manera. La sintaxis es *consistente*.
 
 * Podemos usar `:=` por su efecto secundario o usar `copy()` para no modificar el objeto original mientras actualizamos por referencia.
 
@@ -373,9 +383,8 @@ Sin embargo, podríamos mejorar aún más esta funcionalidad mediante una copia 
 setDTthreads(.old.th)
 ```
 
-#
+# 
 
-Hasta ahora hemos visto mucho sobre `j`, y cómo combinarlo con `by` y un poco de `i`. Volvamos nuestra atención a `i` en la siguiente viñeta *"Subconjunto basado en claves y búsqueda binaria rápida"* para realizar *subconjuntos ultrarrápidos* mediante *claves data.tables*.
+Hasta ahora hemos visto mucho sobre `j`, y cómo combinarlo con `by` y un poco de `i`. Volvamos nuestra atención a `i` en la [próxima viñeta (`vignette("datatable-keys-fast-subset", package="data.table")`)](datatable-keys-fast-subset.html) para realizar *subconjuntos ultrarrápidos* mediante *keying data.tables*.
 
 ***
-

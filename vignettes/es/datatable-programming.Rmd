@@ -9,6 +9,10 @@ vignette: >
   \usepackage[utf8]{inputenc}
 ---
 
+Las traducciones de este documento están disponibles en
+
+* [Francés](https://rdatatable.gitlab.io/data.table/articles/fr/datatable-programming.html)
+
 ```{r init, include = FALSE}
 require(data.table)
 knitr::opts_chunk$set(
@@ -19,7 +23,6 @@ knitr::opts_chunk$set(
  collapse = TRUE
 )
 ```
-
 
 ## Introducción
 
@@ -60,9 +63,9 @@ my_subset(iris, Species, "setosa")
 
 Hay varias formas de solucionar este problema.
 
-#### Evite la *evaluación perezosa*
+#### Evitar la *evaluación perezosa*
 
-La solución más sencilla es evitar la *evaluación perezosa* en primer lugar y recurrir a enfoques menos intuitivos y más propensos a errores, como `df[["variable"]]`, etc.
+La solución más sencilla es evitar la *evaluación perezosa* en primer lugar y volver a enfoques menos intuitivos y más propensos a errores, como `df[["variable"]]`, etc.
 
 ```{r subset_nolazy}
 my_subset = function(data, col, val) {
@@ -75,7 +78,7 @@ Aquí, calculamos un vector lógico de longitud `nrow(iris)`, luego este vector 
 
 #### Uso de `parse` / `eval`
 
-Este método suele ser el preferido por los principiantes en R, ya que es, quizás, el más sencillo desde el punto de vista conceptual. Esta forma requiere generar la expresión requerida mediante concatenación de cadenas, analizarla y, luego, evaluarla.
+Este método suele ser el preferido por los principiantes en R, ya que es, quizás, el más sencillo desde el punto de vista conceptual. Esta forma requiere generar la expresión requerida mediante concatenación de cadenas, analizarla y luego evaluarla.
 
 ```{r subset_parse}
 my_subset = function(data, col, val) {
@@ -100,7 +103,7 @@ Martin Machler, desarrollador principal del proyecto R, [dijo una vez](https://s
 
 #### Computación sobre el lenguaje
 
-Las funciones mencionadas anteriormente, junto con algunas otras (incluidas `as.call`, `as.name`/`as.symbol`, `bquote` y `eval`), se pueden categorizar como funciones para *computar en el lenguaje*, ya que operan en objetos _del lenguaje_ (por ejemplo, `call`, `name`/`symbol`).
+Las funciones mencionadas anteriormente, junto con algunas otras (incluidas `as.call`, `as.name`/`as.symbol`, `bquote` y `eval`), se pueden categorizar como funciones para *computar en el lenguaje*, ya que operan en objetos del *lenguaje* (por ejemplo, `call`, `name`/`symbol`).
 
 ```{r subset_substitute}
 my_subset = function(data, col, val) {
@@ -109,9 +112,9 @@ my_subset = function(data, col, val) {
 my_subset(iris, Species, "setosa")
 ```
 
-Aquí, usamos la función base R `substitute` para transformar la llamada `subset(data, col == val)` en `subset(iris, Species == "setosa")` sustituyendo `data`, `col` y `val` con sus nombres originales (o valores) de su entorno padre. Los beneficios de este enfoque con respecto a los anteriores deberían ser claros. Tenga en cuenta que, debido a que operamos en el nivel de objetos del lenguaje y no tenemos que recurrir a la manipulación de cadenas, nos referimos a esto como *computación en el lenguaje*. Hay un capítulo dedicado a *Computación en el lenguaje* en [Manual del lenguaje R](https://cran.r-project.org/doc/manuals/r-release/R-lang.html). Aunque no es necesario para *programar en data.table*, alentamos a los lectores a leer este capítulo para comprender mejor esta característica poderosa y única del lenguaje R.
+Aquí, usamos la función base R `substitute` para transformar la llamada `subset(data, col == val)` en `subset(iris, Species == "setosa")` sustituyendo `data`, `col` y `val` con sus nombres originales (o valores) de su entorno padre. Los beneficios de este enfoque con respecto a los anteriores deberían ser claros. Tenga en cuenta que, debido a que operamos en el nivel de objetos del lenguaje y no tenemos que recurrir a la manipulación de cadenas, nos referimos a esto como *computación en el lenguaje*. Hay un capítulo dedicado a *Computación en el lenguaje* en el [manual del lenguaje R](https://cran.r-project.org/doc/manuals/r-release/R-lang.html). Aunque no es necesario para *programar en data.table*, alentamos a los lectores a leer este capítulo para comprender mejor esta característica poderosa y única del lenguaje R.
 
-#### Utilice paquetes de terceros
+#### Utilizar paquetes de terceros
 
 Hay paquetes de terceros que pueden lograr lo que hace la computación R basada en las rutinas del lenguaje (`pryr`, `lazyeval` y `rlang`, por nombrar algunos).
 
@@ -121,7 +124,7 @@ Si bien esto puede ser útil, aquí analizaremos un enfoque exclusivo de `data.t
 
 Ahora que hemos establecido la forma correcta de parametrizar el código que utiliza *evaluación perezosa*, podemos pasar al tema principal de esta viñeta, *programación en data.table*.
 
-A partir de la versión 1.15.0, data.table proporciona un mecanismo robusto para parametrizar expresiones pasadas a los argumentos `i`, `j` y `by` (o `keyby`) de `[.data.table`. Está construido sobre la función `substitute` de R base e imita su interfaz. Aquí, presentamos `substitute2` como una versión más robusta y más fácil de usar de `substitute` de R base. Para obtener una lista completa de las diferencias entre `base::substitute` y `data.table::substitute2`, lea el [manual de `substitute2`](https://rdatatable.gitlab.io/data.table/library/data.table/html/substitute2.html).
+A partir de la versión 1.15.0, data.table proporciona un mecanismo robusto para parametrizar expresiones pasadas a los argumentos `i`, `j` y `by` (o `keyby`) de `[.data.table`. Se basa en la función `substitute` de R base e imita su interfaz. Aquí, presentamos `substitute2` como una versión más robusta y más fácil de usar de `substitute` de R base. Para obtener una lista completa de las diferencias entre `base::substitute` y `data.table::substitute2`, lea el [manual de `substitute2`](https://rdatatable.gitlab.io/data.table/library/data.table/html/substitute2.html).
 
 ### Sustituir variables y nombres
 
@@ -251,7 +254,7 @@ Teniendo el parámetro `cols`, nos gustaría unirlo en una llamada `list`, hacie
 DT[, list(Sepal.Length, Sepal.Width)]
 ```
 
-*Empalmar* es una operación en la que una lista de objetos se debe incluir en una expresión como una secuencia de argumentos para llamar. En el lenguaje R básico, empalmar `cols` en una `lista` se puede lograr usando `as.call(c(quote(list), lapply(cols, as.name)))`. Además, a partir de R 4.0.0, hay una nueva interfaz para dicha operación en la función `bquote`.
+*Empalmar* es una operación en la que una lista de objetos se debe incluir en una expresión como una secuencia de argumentos para llamar. En R básico, empalmar `cols` en una `lista` se puede lograr usando `as.call(c(quote(list), lapply(cols, as.name)))`. Además, a partir de R 4.0.0, hay una nueva interfaz para tal operación en la función `bquote`.
 
 En data.table, lo hacemos más fácil al incluir automáticamente una lista de objetos en una llamada de lista con esos objetos. Esto significa que cualquier objeto `list` dentro del argumento de lista `env` se convertirá en una `call` de lista, lo que hace que la API para ese caso de uso sea tan simple como se presenta a continuación.
 
@@ -268,7 +271,7 @@ DT[, j,
 
 Es importante proporcionar una llamada a `as.list`, en lugar de simplemente una lista, dentro del argumento de lista `env`, como se muestra en el ejemplo anterior.
 
-Exploremos el _alistamiento_ con más detalle.
+Exploremos el concepto de *alistar* (enlist) con más detalle.
 
 ```{r splice_enlist}
 DT[, j,  # data.table automatically enlists nested lists into list calls
@@ -284,7 +287,7 @@ DT[, j,  # the same as above but accepts character vector
    verbose = TRUE]
 ```
 
-Ahora, en lugar de llamar a esos símbolos a través de una lista, intentaremos pasar una lista de símbolos. Usaremos `I()` para evitar la conversión automática de _enlist_ pero, como esto también desactivará la conversión de caracteres a símbolos, también tenemos que usar `as.name`.
+Ahora, en lugar de llamar a esos símbolos a través de una lista, intentaremos pasar una lista de símbolos. Usaremos `I()` para evitar la conversión automática de *enlist*, pero como esto también desactivará la conversión de caracteres a símbolos, también tenemos que usar `as.name`.
 
 ```{r splice_not, error=TRUE, purl=FALSE}
 DT[, j,  # list of symbols
@@ -304,7 +307,7 @@ str(substitute2(j, env = I(list(j = lapply(cols, as.name)))))
 str(substitute2(j, env = list(j = as.list(cols))))
 ```
 
-Para obtener una explicación más detallada sobre este asunto, consulte los ejemplos en la [documentación de`substitute2`](https://rdatatable.gitlab.io/data.table/library/data.table/html/substitute2.html).
+Para obtener una explicación más detallada sobre este asunto, consulte los ejemplos en la [documentación de `substitute2`](https://rdatatable.gitlab.io/data.table/library/data.table/html/substitute2.html).
 
 ### Sustitución de una consulta compleja
 
@@ -312,7 +315,7 @@ Tomemos como ejemplo de una función más compleja el cálculo del valor cuadrá
 
 ${\displaystyle x_{\text{RMS}}={\sqrt{{\frac{1}{n}}\left(x_{1}^{2}+x_{2}^{2}+\cdots +x_{n}^{2}\right)}}}$
 
-Toma una cantidad arbitraria de variables en la entrada, pero ahora no podemos simplemente *unir* una lista de argumentos en una llamada de lista porque cada uno de esos argumentos tiene que estar envuelto en una llamada `cuadrada`. En este caso, tenemos que *unir* a mano en lugar de confiar en el _enlist_ automático de data.table.
+Toma una cantidad arbitraria de variables en la entrada, pero ahora no podemos simplemente *unir* una lista de argumentos en una llamada de lista porque cada uno de esos argumentos tiene que estar envuelto en una llamada `cuadrada`. En este caso, tenemos que *unir* a mano en lugar de confiar en la *lista* automática de data.table.
 
 Primero, tenemos que construir llamadas a la función `square` para cada una de las variables (ver `inner_calls`). Luego, tenemos que reducir la lista de llamadas a una sola llamada, que tenga una secuencia anidada de llamadas `+` (ver `add_calls`). Por último, tenemos que sustituir la llamada construida en la expresión circundante (ver `rms`).
 
@@ -419,4 +422,3 @@ DT[, cl, env = list(cl = cl)]
 options(.opts)
 registerS3method("print", "data.frame", base::print.data.frame)
 ```
-

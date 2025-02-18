@@ -9,6 +9,11 @@ vignette: >
   \usepackage[utf8]{inputenc}
 ---
 
+Las traducciones de este documento están disponibles en
+
+* [Francés](https://rdatatable.gitlab.io/data.table/articles/fr/datatable-reshape.html)
+* [Ruso](https://rdatatable.gitlab.io/data.table/articles/ru/datatable-reshape.html)
+
 ```{r, echo = FALSE, message = FALSE}
 require(data.table)
 knitr::opts_chunk$set(
@@ -20,7 +25,7 @@ knitr::opts_chunk$set(
 .old.th = setDTthreads(1)
 ```
 
-Esta viñeta analiza el uso predeterminado de las funciones de remodelación `melt` (de ancho a largo) y `dcast` (de largo a ancho) para *data.tables*, así como las **nuevas funcionalidades extendidas** de fusión y conversión en *múltiples columnas* disponibles a partir de `v1.9.6`.
+Esta viñeta analiza el uso predeterminado de las funciones de remodelación `melt` (de ancho a largo) y `dcast` (de largo a ancho) para *data.tables*, así como las **nuevas funcionalidades extendidas** de *fusión* y *moldeo* [ingl. *melting* y *casting*] en *múltiples columnas* disponibles a partir de `v1.9.6`.
 
 ***
 
@@ -28,7 +33,7 @@ Esta viñeta analiza el uso predeterminado de las funciones de remodelación `me
 options(width = 100L)
 ```
 
-## Datos
+## Datos 
 
 Cargaremos los conjuntos de datos directamente dentro de las secciones.
 
@@ -38,17 +43,17 @@ Las funciones `melt` y `dcast` para `data.table`s sirven para cambiar la forma d
 
 En esta viñeta, vamos a
 
-1. Primero, observe brevemente la conversión predeterminada de ``melt`` y ``dcast`` de ``data.table`` para convertirlas de formato *ancho* a *largo* y _viceversa_
+1. Primero, observar brevemente la conversión predeterminada de `melt` y `dcast` de `data.table` para convertirlas de formato *ancho* a *largo* y *viceversa*
 
-2. Analice los escenarios en los que las funcionalidades actuales se vuelven engorrosas e ineficientes
+2. Analizar los escenarios en los que las funcionalidades actuales se vuelven engorrosas e ineficientes
 
-3. Por último, observe las nuevas mejoras en los métodos `melt` y `dcast` para que `data.table` pueda manejar múltiples columnas simultáneamente.
+3. Por último, observar las nuevas mejoras en los métodos `melt` y `dcast` para que `data.table` pueda manejar múltiples columnas simultáneamente.
 
 Las funcionalidades extendidas están en línea con la filosofía de `data.table` de realizar operaciones de manera eficiente y sencilla.
 
 ## 1. Funcionalidad predeterminada
 
-### a) ``fusión`` de `data.table`` (de ancho a largo)
+### a) `data.table::melt` (de tabla ancha a larga)
 
 Supongamos que tenemos una `data.table` (datos artificiales) como se muestra a continuación:
 
@@ -65,7 +70,6 @@ DT
 
 str(DT)
 ```
-
 
 #### - Convertir 'DT' a formato *largo* donde cada 'dob' es una observación separada.
 
@@ -84,12 +88,11 @@ str(DT.m1)
 
 * De manera predeterminada, la columna `variable` es del tipo `factor`. Establezca el argumento `variable.factor` en `FALSO` si desea devolver un vector de *`carácter`* en su lugar.
 
-* De manera predeterminada, las columnas fundidas se denominan automáticamente `variable` y `valor`.
+* De forma predeterminada, las columnas fundidas se denominan automáticamente `variable` y `valor`.
 
 * `melt` conserva los atributos de la columna en el resultado.
 
 #### - Nombra las columnas `variable` y `valor` como `hijo` y `dob` respectivamente
-
 
 ```{r}
 DT.m1 = melt(DT, measure.vars = c("dob_child1", "dob_child2", "dob_child3"),
@@ -103,7 +106,7 @@ DT.m1
 
     In addition, a warning message is issued highlighting the columns that are automatically considered to be `id.vars`.
 
-### b) `dcast` de `data.table` (de largo a ancho)
+### b) `data.table::dcast` (de largo a ancho)
 
 En la sección anterior, vimos cómo pasar del formato ancho al formato largo. Veamos la operación inversa en esta sección.
 
@@ -131,7 +134,7 @@ dcast(DT.m1, family_id ~ ., fun.agg = function(x) sum(!is.na(x)), value.var = "d
 
 Consulte `?dcast` para obtener otros argumentos útiles y ejemplos adicionales.
 
-## 2. Limitaciones de los métodos actuales de «fusión/desintegración»
+## 2. Limitaciones de los enfoques anteriores de `melt` y `dcast`
 
 Hasta ahora hemos visto características de `melt` y `dcast` que se implementan de manera eficiente para `data.table`s, utilizando la maquinaria interna de `data.table` (*ordenamiento rápido de radix*, *búsqueda binaria*, etc.).
 
@@ -166,19 +169,19 @@ str(DT.c1) ## gender column is class IDate now!
 
     As an analogy, imagine you've a closet with four shelves of clothes and you'd like to put together the clothes from shelves 1 and 2 together (in 1), and 3 and 4 together (in 3). What we are doing is more or less to combine all the clothes together, and then split them back on to shelves 1 and 3!
 
-2. Las columnas que se van a `melt` pueden ser de tipos diferentes, como en este caso (tipos `character` y `integer`). Al `melt` todas juntas, las columnas se convertirán en el resultado, como se explica en el mensaje de advertencia anterior y se muestra en la salida de `str(DT.c1)`, donde `gender` se ha convertido al tipo *`character`*.
+2. Las columnas que se van a "fundir" pueden ser de distintos tipos. Al "fundirlas" todas juntas, las columnas se convertirán en el resultado.
 
-3. Estamos generando una columna adicional dividiendo la columna `variable` en dos columnas, cuyo propósito es bastante críptico. Lo hacemos porque lo necesitamos para la *conversión* en el siguiente paso.
+3. Estamos generando una columna adicional dividiendo la columna `variable` en dos columnas, cuyo propósito es bastante críptico. Lo hacemos porque lo necesitamos para el *moldeo* (`dcast`) en el siguiente paso.
 
-4. Finalmente, convertimos el conjunto de datos. Pero el problema es que es una operación que requiere mucho más trabajo computacional que *melt*. En concreto, requiere calcular el orden de las variables en la fórmula, y eso es costoso.
+4. Finalmente, *moldeamos* el conjunto de datos. Pero el problema es que es una operación que requiere mucho más trabajo computacional que *melt*. En concreto, requiere calcular el orden de las variables en la fórmula, y eso es costoso.
 
 De hecho, `stats::reshape` es capaz de realizar esta operación de una manera muy sencilla. Es una función extremadamente útil y a menudo subestimada. ¡Definitivamente deberías probarla!
 
 ## 3. Funcionalidad mejorada (nueva)
 
-### a) Fusión mejorada
+### a) `melt` mejorado
 
-Como nos gustaría que `data.table` realice esta operación de manera sencilla y eficiente utilizando la misma interfaz, seguimos adelante e implementamos una *funcionalidad adicional*, donde podemos `fusionar` varias columnas *simultáneamente*.
+Como nos gustaría que `data.table` realice esta operación de manera sencilla y eficiente utilizando la misma interfaz, seguimos adelante e implementamos una *funcionalidad adicional*, donde podemos `fundir` varias columnas *simultáneamente*.
 
 #### - `fundir` múltiples columnas simultáneamente
 
@@ -193,11 +196,11 @@ DT.m2
 str(DT.m2) ## col type is preserved
 ```
 
-* Podemos eliminar la columna `variable` si es necesario.
+*Podemos eliminar la columna `variable` si es necesario.
 
 * La funcionalidad está implementada completamente en C y, por lo tanto, es *rápida* y *eficiente en el uso de la memoria*, además de ser *sencilla*.
 
-#### - Usando `patrones()`
+#### - Usando `patterns()`
 
 Por lo general, en estos problemas, las columnas que queremos fundir se pueden distinguir por un patrón común. Podemos utilizar la función `patterns()`, implementada por conveniencia, para proporcionar expresiones regulares para las columnas que se combinarán. La operación anterior se puede reescribir como:
 
@@ -214,7 +217,7 @@ Si, como en los datos anteriores, las columnas de entrada que se van a fundir ti
 (two.iris = data.table(datasets::iris)[c(1,150)])
 ```
 
-Los datos del iris tienen cuatro columnas numéricas con una estructura regular: primero la parte de la flor, luego un punto y luego la dimensión de la medida. Para especificar que queremos fusionar esas cuatro columnas, podemos usar `measure` con `sep="."`, lo que significa usar `strsplit` en todos los nombres de columna; las columnas que resulten en la cantidad máxima de grupos después de la división se usarán como `measure.vars`:
+Los datos del iris tienen cuatro columnas numéricas con una estructura regular: primero la parte de la flor, luego un punto y luego la dimensión de la medida. Para especificar que queremos fundir esas cuatro columnas, podemos usar `measure` con `sep="."`, lo que significa usar `strsplit` en todos los nombres de columna; las columnas que resulten en la cantidad máxima de grupos después de la división se usarán como `measure.vars`:
 
 ```{r}
 melt(two.iris, measure.vars = measure(part, dim, sep="."))
@@ -264,7 +267,7 @@ melt(who, measure.vars = measure(
 
 ### b) `dcast` mejorado
 
-¡Genial! Ahora podemos fusionar varias columnas simultáneamente. Ahora, dado el conjunto de datos `DT.m2` como se muestra arriba, ¿cómo podemos volver al mismo formato que los datos originales con los que comenzamos?
+¡Genial! Ahora podemos fundir varias columnas simultáneamente. Ahora, dado el conjunto de datos `DT.m2` como se muestra arriba, ¿cómo podemos volver al mismo formato que los datos originales con los que comenzamos?
 
 Si usamos la funcionalidad actual de `dcast`, entonces tendríamos que realizar la conversión dos veces y vincular los resultados. Pero eso es, una vez más, demasiado verboso, no es sencillo y también es ineficiente.
 
@@ -282,7 +285,7 @@ DT.c2
 
 * Todo se gestiona internamente y de manera eficiente. Además de ser rápido, también es muy eficiente en el uso de la memoria.
 
-#
+# 
 
 #### Varias funciones para `fun.agregate`:
 
@@ -292,7 +295,6 @@ También puede proporcionar *múltiples funciones* a `fun.agregate` para `dcast`
 setDTthreads(.old.th)
 ```
 
-#
+# 
 
 ***
-

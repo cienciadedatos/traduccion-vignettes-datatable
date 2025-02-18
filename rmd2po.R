@@ -357,10 +357,22 @@ rmd2po <- function(rmdfile, lang = "fr", podir = "po",
 # It also waits for the name of the md file to process on stdin, even if it
 # is provided as first argument (both using system() and system2()). So, we
 # provide it through input = 
+# @@ EN WINDOWS hay algún problema para leer UTF8 de stdin, así que pruebo 
+# pasando el nombre del archivo
 po2rmd <- function(rmdfile, lang = "fr", podir = "po",
   mdpodir = getOption("mdpodir"), min.version = "2.0.0",
-  verbose = FALSE) {
+  verbose = FALSE, cmd_options = character(0)) {
 
+  # chequear cmd_options
+  for (i in seq_along(cmd_options)) {
+    if (!grepl("^--?\\S+$", md_options[i]) && (i == 1L || !grepl("^--?\\S+$", cmd_options[i - 1])))
+      stopf("bad cmd_options (two consecutive values with no option")
+    else if (
+      !grepl(
+        sub("(.)(.)", "^[\\1].*[\\2]$|^([^[:blank:]\\1]|\\\\\\\\\\1)*$", shQuote("")), cmd_options[i]))
+      stopf("bad cmd_options (no shQuote'd or extra space)")
+  }
+  
   po2md <- .check_mdpo("po2md", min.version = min.version, mdpodir = mdpodir)
 
   if (!file.exists(rmdfile))
@@ -405,10 +417,12 @@ po2rmd <- function(rmdfile, lang = "fr", podir = "po",
               "--po-files", shQuote(pofile),
               "--save", shQuote(rmd2file), 
               "--wrapwidth", "0",  # Necesario para que .postprocess.. funcione
-              "--quiet"  
+              cmd_options,          # que no sea el último
+              "--quiet",  
               # c("--no-obsolete", "--no-fuzzy", "--no-empty-msgstr"),    # desactivado por ahora
+              shQuote(tmpfile)
               ),    
-            stdin = tmpfile,
+#            stdin = tmpfile,
             stdout = cmd_output_tmp, 
             stderr = cmd_output_tmp
           )

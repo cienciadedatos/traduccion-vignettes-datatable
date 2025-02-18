@@ -1,24 +1,28 @@
 #
-#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: 0.0.1\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-10-04 11:40-0300\n"
-"PO-Revision-Date: 2024-10-04 16:53-0300\n"
-"Last-Translator: Nombre Apellido <direccion@ejemplo.com>\n"
-"Language-Team: es\n"
+"PO-Revision-Date: 2025-02-18 14:28-0300\n"
 "Language: es\n"
-"MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=UTF-8\n"
-"Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Translate Toolkit 3.13.3\n"
 
-#: es%5Cdatatable-programming.Rmd.tmp%2Bheading
+#: es/datatable-programming.Rmd.tmp:block 2 (paragraph)
+msgid "Translations of this document are available in"
+msgstr "Las traducciones de este documento están disponibles en"
+
+#: es/datatable-programming.Rmd.tmp:block 3 (paragraph)
+msgid ""
+"=====* "
+"[French](https://rdatatable.gitlab.io/data.table/articles/fr/datatable-"
+"programming.html)====="
+msgstr ""
+"=====* "
+"[Francés](https://rdatatable.gitlab.io/data.table/articles/fr/datatable-progra"
+"mming.html)====="
+
+#: es/datatable-programming.Rmd.tmp:block 5 (header)
 msgid "Introduction"
 msgstr "Introducción"
 
-#: es%5Cdatatable-programming.Rmd.tmp%2Bp
+#: es/datatable-programming.Rmd.tmp:block 6 (paragraph)
 msgid ""
 "`data.table`, from its very first releases, enabled the usage of `subset` "
 "and `with` (or `within`) functions by defining the `[.data.table` method. "
@@ -30,17 +34,17 @@ msgid ""
 "them in a different scope than the one in which they were called. Let's "
 "recap usage of the `subset` function."
 msgstr ""
-"`data.table`, desde sus primeras versiones, habilitó el uso de las funciones"
-" `subset` y `with` (o `within`) al definir el método `[.data.table`. "
-"`subset` y `with` son funciones básicas de R que son útiles para reducir la "
+"`data.table`, desde sus primeras versiones, habilitó el uso de las funciones "
+"`subset` y `with` (o `within`) al definir el método `[.data.table`. `subset` "
+"y `with` son funciones básicas de R que son útiles para reducir la "
 "repetición en el código, mejorar la legibilidad y reducir la cantidad total "
-"de caracteres que el usuario debe escribir. Esta funcionalidad es posible en"
-" R debido a una característica bastante única llamada *evaluación diferida*."
-" Esta característica permite que una función capte sus argumentos, antes de "
+"de caracteres que el usuario debe escribir. Esta funcionalidad es posible en "
+"R debido a una característica bastante única llamada *evaluación diferida*. "
+"Esta característica permite que una función capte sus argumentos, antes de "
 "que se evalúen, y los evalúe en un ámbito diferente de aquel en el que "
 "fueron llamados. Recapitulemos el uso de la función `subset`."
 
-#: es%5Cdatatable-programming.Rmd.tmp%2Bp
+#: es/datatable-programming.Rmd.tmp:block 9 (paragraph)
 msgid ""
 "Here, `subset` takes the second argument and evaluates it within the scope "
 "of the `data.frame` given as its first argument. This removes the need for "
@@ -52,11 +56,11 @@ msgstr ""
 "repetir variables, lo que lo hace menos propenso a errores y hace que el "
 "código sea más legible."
 
-#: es%5Cdatatable-programming.Rmd.tmp%2Bheading
+#: es/datatable-programming.Rmd.tmp:block 10 (header)
 msgid "Problem description"
 msgstr "Descripción del problema"
 
-#: es%5Cdatatable-programming.Rmd.tmp%2Bp
+#: es/datatable-programming.Rmd.tmp:block 11 (paragraph)
 msgid ""
 "The problem with this kind of interface is that we cannot easily "
 "parameterize the code that uses it. This is because the expressions passed "
@@ -66,33 +70,33 @@ msgstr ""
 "fácilmente el código que la utiliza, ya que las expresiones que se pasan a "
 "esas funciones se sustituyen antes de ser evaluadas."
 
-#: es%5Cdatatable-programming.Rmd.tmp%2Bheading
+#: es/datatable-programming.Rmd.tmp:block 12 (header)
 msgid "Example"
 msgstr "Ejemplo"
 
-#: es%5Cdatatable-programming.Rmd.tmp%2Bheading
+#: es/datatable-programming.Rmd.tmp:block 14 (header)
 msgid "Approaches to the problem"
 msgstr "Aproximaciones al problema"
 
-#: es%5Cdatatable-programming.Rmd.tmp%2Bp
+#: es/datatable-programming.Rmd.tmp:block 15 (paragraph)
 msgid "There are multiple ways to work around this problem."
 msgstr "Hay varias formas de solucionar este problema."
 
-#: es%5Cdatatable-programming.Rmd.tmp%2Bheading
+#: es/datatable-programming.Rmd.tmp:block 16 (header)
 msgid "Avoid *lazy evaluation*"
-msgstr "Evite la *evaluación perezosa*"
+msgstr "Evitar la *evaluación perezosa*"
 
-#: es%5Cdatatable-programming.Rmd.tmp%2Bp
+#: es/datatable-programming.Rmd.tmp:block 17 (paragraph)
 msgid ""
 "The easiest workaround is to avoid *lazy evaluation* in the first place, and"
 " fall back to less intuitive, more error-prone approaches like "
 "`df[[\"variable\"]]`, etc."
 msgstr ""
 "La solución más sencilla es evitar la *evaluación perezosa* en primer lugar "
-"y recurrir a enfoques menos intuitivos y más propensos a errores, como "
+"y volver a enfoques menos intuitivos y más propensos a errores, como "
 "`df[[\"variable\"]]`, etc."
 
-#: es%5Cdatatable-programming.Rmd.tmp%2Bp
+#: es/datatable-programming.Rmd.tmp:block 19 (paragraph)
 msgid ""
 "Here, we compute a logical vector of length `nrow(iris)`, then this vector "
 "is supplied to the `i` argument of `[.data.frame` to perform ordinary "
@@ -107,19 +111,19 @@ msgstr ""
 "Aquí, calculamos un vector lógico de longitud `nrow(iris)`, luego este "
 "vector se suministra al argumento `i` de `[.data.frame` para realizar un "
 "subconjunto ordinario basado en \"vectores lógicos\". Para alinearlo con "
-"`subset()`, que también descarta NA, necesitamos incluir un uso adicional de"
-" `data[[col]]` para capturarlo. Funciona bastante bien para este ejemplo "
+"`subset()`, que también descarta NA, necesitamos incluir un uso adicional de "
+"`data[[col]]` para capturarlo. Funciona bastante bien para este ejemplo "
 "simple, pero carece de flexibilidad, introduce repetición de variables y "
 "requiere que el usuario cambie la interfaz de la función para pasar el "
 "nombre de la columna como un carácter en lugar de un símbolo sin comillas. "
 "Cuanto más compleja sea la expresión que necesitamos parametrizar, menos "
 "práctico se vuelve este enfoque."
 
-#: es%5Cdatatable-programming.Rmd.tmp%2Bheading
+#: es/datatable-programming.Rmd.tmp:block 20 (header)
 msgid "Use of `parse` / `eval`"
 msgstr "Uso de `parse` / `eval`"
 
-#: es%5Cdatatable-programming.Rmd.tmp%2Bp
+#: es/datatable-programming.Rmd.tmp:block 21 (paragraph)
 msgid ""
 "This method is usually preferred by newcomers to R as it is, perhaps, the "
 "most straightforward conceptually. This way requires producing the required "
@@ -128,9 +132,9 @@ msgstr ""
 "Este método suele ser el preferido por los principiantes en R, ya que es, "
 "quizás, el más sencillo desde el punto de vista conceptual. Esta forma "
 "requiere generar la expresión requerida mediante concatenación de cadenas, "
-"analizarla y, luego, evaluarla."
+"analizarla y luego evaluarla."
 
-#: es%5Cdatatable-programming.Rmd.tmp%2Bp
+#: es/datatable-programming.Rmd.tmp:block 23 (paragraph)
 msgid ""
 "We have to use `deparse(substitute(...))` to catch the actual names of "
 "objects passed to function, so we can construct the `subset` function call "
@@ -138,14 +142,33 @@ msgid ""
 "with relatively low complexity, **use of `eval(parse(...))` should be "
 "avoided**. The main reasons are:"
 msgstr ""
-"Tenemos que usar `deparse(substitute(...))` para capturar los nombres reales"
-" de los objetos pasados a la función, de modo que podamos construir la "
+"Tenemos que usar `deparse(substitute(...))` para capturar los nombres reales "
+"de los objetos pasados a la función, de modo que podamos construir la "
 "llamada a la función `subset` usando esos nombres originales. Aunque esto "
 "proporciona una flexibilidad ilimitada con una complejidad relativamente "
 "baja, **se debe evitar el uso de `eval(parse(...))`**. Las principales "
 "razones son:"
 
-#: es%5Cdatatable-programming.Rmd.tmp%2Bquote.p
+#: es/datatable-programming.Rmd.tmp:block 24 (paragraph)
+msgid ""
+"=====- lack of syntax validation===== =====- [vulnerability to code "
+"injection](https://github.com/Rdatatable/data.table/issues/2655#issuecomment-376781159)====="
+" =====- the existence of better alternatives====="
+msgstr ""
+"=====- falta de validación de sintaxis===== =====- [vulnerabilidad a la "
+"inyección de "
+"código](https://github.com/Rdatatable/data.table/issues/2655#issuecomment-3767"
+"81159)===== =====- la existencia de mejores alternativas====="
+
+#: es/datatable-programming.Rmd.tmp:block 25 (paragraph)
+msgid ""
+"Martin Machler, R Project Core Developer, [once "
+"said](https://stackoverflow.com/a/40164111/2490497):"
+msgstr ""
+"Martin Machler, desarrollador principal del proyecto R, [dijo una "
+"vez](https://stackoverflow.com/a/40164111/2490497):"
+
+#: es/datatable-programming.Rmd.tmp:block 26 (quote)
 msgid ""
 "Sorry but I don't understand why too many people even think a string was "
 "something that could be evaluated. You must change your mindset, really. "
@@ -162,18 +185,59 @@ msgstr ""
 "evaluaciones del otro. La (posiblemente) única conexión es a través de "
 "`parse(text = ....)` y todos los buenos programadores de R deberían saber "
 "que esto rara vez es un medio eficiente o seguro para construir expresiones "
-"(o llamadas). En lugar de eso, aprende más sobre `substitute()`, `quote()` y"
-" posiblemente el poder de usar `do.call(substitute, ......)`."
+"(o llamadas). En lugar de eso, aprende más sobre `substitute()`, `quote()` y "
+"posiblemente el poder de usar `do.call(substitute, ......)`."
 
-#: es%5Cdatatable-programming.Rmd.tmp%2Bheading
+#: es/datatable-programming.Rmd.tmp:block 27 (header)
 msgid "Computing on the language"
 msgstr "Computación sobre el lenguaje"
 
-#: es%5Cdatatable-programming.Rmd.tmp%2Bheading
-msgid "Use third party packages"
-msgstr "Utilice paquetes de terceros"
+#: es/datatable-programming.Rmd.tmp:block 28 (paragraph)
+msgid ""
+"The aforementioned functions, along with some others (including `as.call`, "
+"`as.name`/`as.symbol`, `bquote`, and `eval`), can be categorized as "
+"functions to *compute on the language*, as they operate on *language* "
+"objects (e.g. `call`, `name`/`symbol`)."
+msgstr ""
+"Las funciones mencionadas anteriormente, junto con algunas otras (incluidas "
+"`as.call`, `as.name`/`as.symbol`, `bquote` y `eval`), se pueden categorizar "
+"como funciones para *computar en el lenguaje*, ya que operan en objetos del "
+"*lenguaje* (por ejemplo, `call`, `name`/`symbol`)."
 
-#: es%5Cdatatable-programming.Rmd.tmp%2Bp
+#: es/datatable-programming.Rmd.tmp:block 30 (paragraph)
+msgid ""
+"Here, we used the base R `substitute` function to transform the call "
+"`subset(data, col == val)` into `subset(iris, Species == \"setosa\")` by "
+"substituting `data`, `col`, and `val` with their original names (or values) "
+"from their parent environment. The benefits of this approach to the previous"
+" ones should be clear. Note that because we operate at the level of language"
+" objects, and don't have to resort to string manipulation, we refer to this "
+"as *computing on the language*. There is a dedicated chapter on *Computing "
+"on the language* in [R language "
+"manual](https://cran.r-project.org/doc/manuals/r-release/R-lang.html). "
+"Although it is not necessary for *programming on data.table*, we encourage "
+"readers to read this chapter for the sake of better understanding this "
+"powerful and unique feature of R language."
+msgstr ""
+"Aquí, usamos la función base R `substitute` para transformar la llamada "
+"`subset(data, col == val)` en `subset(iris, Species == \"setosa\")` "
+"sustituyendo `data`, `col` y `val` con sus nombres originales (o valores) de "
+"su entorno padre. Los beneficios de este enfoque con respecto a los "
+"anteriores deberían ser claros. Tenga en cuenta que, debido a que operamos "
+"en el nivel de objetos del lenguaje y no tenemos que recurrir a la "
+"manipulación de cadenas, nos referimos a esto como *computación en el "
+"lenguaje*. Hay un capítulo dedicado a *Computación en el lenguaje* en el "
+"[manual del lenguaje "
+"R](https://cran.r-project.org/doc/manuals/r-release/R-lang.html). Aunque no "
+"es necesario para *programar en data.table*, alentamos a los lectores a leer "
+"este capítulo para comprender mejor esta característica poderosa y única del "
+"lenguaje R."
+
+#: es/datatable-programming.Rmd.tmp:block 31 (header)
+msgid "Use third party packages"
+msgstr "Utilizar paquetes de terceros"
+
+#: es/datatable-programming.Rmd.tmp:block 32 (paragraph)
 msgid ""
 "There are third party packages that can achieve what base R computing on the"
 " language routines do (`pryr`, `lazyeval` and `rlang`, to name a few)."
@@ -182,7 +246,7 @@ msgstr ""
 "basada en las rutinas del lenguaje (`pryr`, `lazyeval` y `rlang`, por "
 "nombrar algunos)."
 
-#: es%5Cdatatable-programming.Rmd.tmp%2Bp
+#: es/datatable-programming.Rmd.tmp:block 33 (paragraph)
 msgid ""
 "Though these can be helpful, we will be discussing a `data.table`-unique "
 "approach here."
@@ -190,11 +254,11 @@ msgstr ""
 "Si bien esto puede ser útil, aquí analizaremos un enfoque exclusivo de "
 "`data.table`."
 
-#: es%5Cdatatable-programming.Rmd.tmp%2Bheading
+#: es/datatable-programming.Rmd.tmp:block 34 (header)
 msgid "Programming on data.table"
 msgstr "Programación en data.table"
 
-#: es%5Cdatatable-programming.Rmd.tmp%2Bp
+#: es/datatable-programming.Rmd.tmp:block 35 (paragraph)
 msgid ""
 "Now that we've established the proper way to parameterize code that uses "
 "*lazy evaluation*, we can move on to the main subject of this vignette, "
@@ -204,11 +268,32 @@ msgstr ""
 "utiliza *evaluación perezosa*, podemos pasar al tema principal de esta "
 "viñeta, *programación en data.table*."
 
-#: es%5Cdatatable-programming.Rmd.tmp%2Bheading
+#: es/datatable-programming.Rmd.tmp:block 36 (paragraph)
+msgid ""
+"Starting from version 1.15.0, data.table provides a robust mechanism for "
+"parameterizing expressions passed to the `i`, `j`, and `by` (or `keyby`) "
+"arguments of `[.data.table`. It is built upon the base R `substitute` "
+"function, and mimics its interface. Here, we introduce `substitute2` as a "
+"more robust and more user-friendly version of base R's `substitute`. For a "
+"complete list of differences between `base::substitute` and "
+"`data.table::substitute2` please read the [`substitute2` "
+"manual](https://rdatatable.gitlab.io/data.table/library/data.table/html/substitute2.html)."
+msgstr ""
+"A partir de la versión 1.15.0, data.table proporciona un mecanismo robusto "
+"para parametrizar expresiones pasadas a los argumentos `i`, `j` y `by` (o "
+"`keyby`) de `[.data.table`. Se basa en la función `substitute` de R base e "
+"imita su interfaz. Aquí, presentamos `substitute2` como una versión más "
+"robusta y más fácil de usar de `substitute` de R base. Para obtener una "
+"lista completa de las diferencias entre `base::substitute` y "
+"`data.table::substitute2`, lea el [manual de "
+"`substitute2`](https://rdatatable.gitlab.io/data.table/library/data.table/html"
+"/substitute2.html)."
+
+#: es/datatable-programming.Rmd.tmp:block 37 (header)
 msgid "Substituting variables and names"
 msgstr "Sustituir variables y nombres"
 
-#: es%5Cdatatable-programming.Rmd.tmp%2Bp
+#: es/datatable-programming.Rmd.tmp:block 38 (paragraph)
 msgid ""
 "Let's say we want to have a general function that applies a function to sum "
 "of two arguments that has been applied another function. As a concrete "
@@ -218,14 +303,14 @@ msgstr ""
 "Digamos que queremos tener una función general que aplique una función a la "
 "suma de dos argumentos a los que se les ha aplicado otra función. Como "
 "ejemplo concreto, a continuación tenemos una función para calcular la "
-"longitud de la hipotenusa en un triángulo rectángulo, conociendo la longitud"
-" de sus catetos."
+"longitud de la hipotenusa en un triángulo rectángulo, conociendo la longitud "
+"de sus catetos."
 
-#: es%5Cdatatable-programming.Rmd.tmp%2Bp
+#: es/datatable-programming.Rmd.tmp:block 39 (paragraph)
 msgid "`$$${\\displaystyle c = \\sqrt{a^2 + b^2}}$$$`"
 msgstr "`$$${\\displaystyle c = \\sqrt{a^2 + b^2}}$$$`"
 
-#: es%5Cdatatable-programming.Rmd.tmp%2Bp
+#: es/datatable-programming.Rmd.tmp:block 41 (paragraph)
 msgid ""
 "The goal is the make every name in the above call able to be passed as a "
 "parameter."
@@ -233,7 +318,7 @@ msgstr ""
 "El objetivo es hacer que cada nombre en la llamada anterior pueda pasarse "
 "como parámetro."
 
-#: es%5Cdatatable-programming.Rmd.tmp%2Bp
+#: es/datatable-programming.Rmd.tmp:block 43 (paragraph)
 msgid ""
 "We can see in the output that both the functions names, as well as the names"
 " of the variables passed to those functions, have been replaced. We used "
@@ -242,12 +327,12 @@ msgid ""
 "`lapply(env, as.name)`."
 msgstr ""
 "Podemos ver en la salida que se han reemplazado tanto los nombres de las "
-"funciones como los nombres de las variables pasadas a esas funciones. Usamos"
-" `substitute2` por conveniencia. En este caso simple, también se podría "
-"haber usado `substitute` de R base, aunque hubiera requerido el uso de "
+"funciones como los nombres de las variables pasadas a esas funciones. Usamos "
+"`substitute2` por conveniencia. En este caso simple, también se podría haber "
+"usado `substitute` de R base, aunque hubiera requerido el uso de "
 "`lapply(env, as.name)`."
 
-#: es%5Cdatatable-programming.Rmd.tmp%2Bp
+#: es/datatable-programming.Rmd.tmp:block 44 (paragraph)
 msgid ""
 "Now, to use substitution inside `[.data.table`, we don't need to call the "
 "`substitute2` function. As it is now being used internally, all we have to "
@@ -263,22 +348,22 @@ msgstr ""
 "todo lo que tenemos que hacer es proporcionar el argumento `env`, de la "
 "misma manera que lo hemos proporcionado a la función `substitute2` en el "
 "ejemplo anterior. La sustitución se puede aplicar a los argumentos `i`, `j` "
-"y `by` (o `keyby`) del método `[.data.table`. Tenga en cuenta que configurar"
-" el argumento `verbose` en `TRUE` se puede utilizar para imprimir "
-"expresiones después de que se aplique la sustitución. Esto es muy útil para "
-"la depuración."
+"y `by` (o `keyby`) del método `[.data.table`. Tenga en cuenta que configurar "
+"el argumento `verbose` en `TRUE` se puede utilizar para imprimir expresiones "
+"después de que se aplique la sustitución. Esto es muy útil para la "
+"depuración."
 
-#: es%5Cdatatable-programming.Rmd.tmp%2Bp
+#: es/datatable-programming.Rmd.tmp:block 45 (paragraph)
 msgid ""
 "Let's use the `iris` data set as a demonstration. Just as an example, let's "
 "pretend we want to compute the `Sepal.Hypotenuse`, treating the sepal width "
 "and length as if they were legs of a right triangle."
 msgstr ""
-"Utilicemos el conjunto de datos `iris` como demostración. Solo como ejemplo,"
-" supongamos que queremos calcular `Sepal.Hypotenuse`, tratando el ancho y la"
-" longitud del sépalo como si fueran los catetos de un triángulo rectángulo."
+"Utilicemos el conjunto de datos `iris` como demostración. Solo como ejemplo, "
+"supongamos que queremos calcular `Sepal.Hypotenuse`, tratando el ancho y la "
+"longitud del sépalo como si fueran los catetos de un triángulo rectángulo."
 
-#: es%5Cdatatable-programming.Rmd.tmp%2Bp
+#: es/datatable-programming.Rmd.tmp:block 47 (paragraph)
 msgid ""
 "In the last call, we added another parameter, `out = \"Sepal.Hypotenuse\"`, "
 "that conveys the intended name of output column. Unlike base R's "
@@ -287,18 +372,18 @@ msgid ""
 msgstr ""
 "En la última llamada, agregamos otro parámetro, `out = "
 "\"Sepal.Hypotenuse\"`, que transmite el nombre deseado de la columna de "
-"salida. A diferencia del `substitute` de la base R, `substitute2` también se"
-" encargará de la sustitución de los nombres de los argumentos de la llamada."
+"salida. A diferencia del `substitute` de la base R, `substitute2` también se "
+"encargará de la sustitución de los nombres de los argumentos de la llamada."
 
-#: es%5Cdatatable-programming.Rmd.tmp%2Bp
+#: es/datatable-programming.Rmd.tmp:block 48 (paragraph)
 msgid "Substitution works on `i` and `by` (or `keyby`), as well."
 msgstr "La sustitución también funciona en `i` y `by` (o `keyby`)."
 
-#: es%5Cdatatable-programming.Rmd.tmp%2Bheading
+#: es/datatable-programming.Rmd.tmp:block 50 (header)
 msgid "Substitute variables and character values"
 msgstr "Sustituir variables y valores de caracteres"
 
-#: es%5Cdatatable-programming.Rmd.tmp%2Bp
+#: es/datatable-programming.Rmd.tmp:block 51 (paragraph)
 msgid ""
 "In the above example, we have seen a convenient feature of `substitute2`: "
 "automatic conversion from strings into names/symbols. An obvious question "
@@ -325,7 +410,7 @@ msgstr ""
 "en `I()`. Alternativamente, cada elemento de la lista se puede envolver en "
 "`I()` individualmente. Exploremos ambos casos a continuación."
 
-#: es%5Cdatatable-programming.Rmd.tmp%2Bp
+#: es/datatable-programming.Rmd.tmp:block 53 (paragraph)
 msgid ""
 "Note that conversion works recursively on each list element, including the "
 "escape mechanism of course."
@@ -333,24 +418,24 @@ msgstr ""
 "Tenga en cuenta que la conversión funciona de forma recursiva en cada "
 "elemento de la lista, incluido el mecanismo de escape, por supuesto."
 
-#: es%5Cdatatable-programming.Rmd.tmp%2Bheading
+#: es/datatable-programming.Rmd.tmp:block 55 (header)
 msgid "Substituting lists of arbitrary length"
 msgstr "Sustitución de listas de longitud arbitraria"
 
-#: es%5Cdatatable-programming.Rmd.tmp%2Bp
+#: es/datatable-programming.Rmd.tmp:block 56 (paragraph)
 msgid ""
 "The example presented above illustrates a neat and powerful way to make your"
 " code more dynamic. However, there are many other much more complex cases "
 "that a developer might have to deal with. One common problem handling a list"
 " of arguments of arbitrary length."
 msgstr ""
-"El ejemplo presentado anteriormente ilustra una forma elegante y poderosa de"
-" hacer que su código sea más dinámico. Sin embargo, existen muchos otros "
+"El ejemplo presentado anteriormente ilustra una forma elegante y poderosa de "
+"hacer que su código sea más dinámico. Sin embargo, existen muchos otros "
 "casos mucho más complejos con los que un desarrollador podría tener que "
 "lidiar. Un problema común es manejar una lista de argumentos de longitud "
 "arbitraria."
 
-#: es%5Cdatatable-programming.Rmd.tmp%2Bp
+#: es/datatable-programming.Rmd.tmp:block 57 (paragraph)
 msgid ""
 "An obvious use case could be to mimic `.SD` functionality by injecting a "
 "`list` call into the `j` argument."
@@ -358,7 +443,7 @@ msgstr ""
 "Un caso de uso obvio podría ser imitar la funcionalidad de `.SD` inyectando "
 "una llamada `list` en el argumento `j`."
 
-#: es%5Cdatatable-programming.Rmd.tmp%2Bp
+#: es/datatable-programming.Rmd.tmp:block 59 (paragraph)
 msgid ""
 "Having `cols` parameter, we'd want to splice it into a `list` call, making "
 "`j` argument look like in the code below."
@@ -366,7 +451,7 @@ msgstr ""
 "Teniendo el parámetro `cols`, nos gustaría unirlo en una llamada `list`, "
 "haciendo que el argumento `j` se vea como en el código a continuación."
 
-#: es%5Cdatatable-programming.Rmd.tmp%2Bp
+#: es/datatable-programming.Rmd.tmp:block 61 (paragraph)
 msgid ""
 "*Splicing* is an operation where a list of objects have to be inlined into "
 "an expression as a sequence of arguments to call. In base R, splicing `cols`"
@@ -375,12 +460,25 @@ msgid ""
 " such an operation in the `bquote` function."
 msgstr ""
 "*Empalmar* es una operación en la que una lista de objetos se debe incluir "
-"en una expresión como una secuencia de argumentos para llamar. En el "
-"lenguaje R básico, empalmar `cols` en una `lista` se puede lograr usando "
+"en una expresión como una secuencia de argumentos para llamar. En R básico, "
+"empalmar `cols` en una `lista` se puede lograr usando "
 "`as.call(c(quote(list), lapply(cols, as.name)))`. Además, a partir de R "
-"4.0.0, hay una nueva interfaz para dicha operación en la función `bquote`."
+"4.0.0, hay una nueva interfaz para tal operación en la función `bquote`."
 
-#: es%5Cdatatable-programming.Rmd.tmp%2Bp
+#: es/datatable-programming.Rmd.tmp:block 62 (paragraph)
+msgid ""
+"In data.table, we make it easier by automatically *enlist*-ing a list of "
+"objects into a list call with those objects. This means that any `list` "
+"object inside the `env` list argument will be turned into list `call`, "
+"making the API for that use case as simple as presented below."
+msgstr ""
+"En data.table, lo hacemos más fácil al incluir automáticamente una lista de "
+"objetos en una llamada de lista con esos objetos. Esto significa que "
+"cualquier objeto `list` dentro del argumento de lista `env` se convertirá en "
+"una `call` de lista, lo que hace que la API para ese caso de uso sea tan "
+"simple como se presenta a continuación."
+
+#: es/datatable-programming.Rmd.tmp:block 64 (paragraph)
 msgid ""
 "It is important to provide a call to `as.list`, rather than simply a list, "
 "inside the `env` list argument, as is shown in the above example."
@@ -389,7 +487,22 @@ msgstr ""
 "una lista, dentro del argumento de lista `env`, como se muestra en el "
 "ejemplo anterior."
 
-#: es%5Cdatatable-programming.Rmd.tmp%2Bp
+#: es/datatable-programming.Rmd.tmp:block 65 (paragraph)
+msgid "Let's explore *enlist*-ing in more detail."
+msgstr "Exploremos el concepto de *alistar* (enlist) con más detalle."
+
+#: es/datatable-programming.Rmd.tmp:block 67 (paragraph)
+msgid ""
+"Now let's try to pass a list of symbols, rather than list call to those "
+"symbols. We'll use `I()` to escape automatic *enlist*-ing but, as this will "
+"also turn off character to symbol conversion, we also have to use `as.name`."
+msgstr ""
+"Ahora, en lugar de llamar a esos símbolos a través de una lista, "
+"intentaremos pasar una lista de símbolos. Usaremos `I()` para evitar la "
+"conversión automática de *enlist*, pero como esto también desactivará la "
+"conversión de caracteres a símbolos, también tenemos que usar `as.name`."
+
+#: es/datatable-programming.Rmd.tmp:block 69 (paragraph)
 msgid ""
 "Note that both expressions, although visually appearing to be the same, are "
 "not identical."
@@ -397,11 +510,22 @@ msgstr ""
 "Tenga en cuenta que ambas expresiones, aunque visualmente parecen iguales, "
 "no son idénticas."
 
-#: es%5Cdatatable-programming.Rmd.tmp%2Bheading
+#: es/datatable-programming.Rmd.tmp:block 71 (paragraph)
+msgid ""
+"For more detailed explanation on that matter, please see the examples in the"
+" [`substitute2` "
+"documentation](https://rdatatable.gitlab.io/data.table/library/data.table/html/substitute2.html)."
+msgstr ""
+"Para obtener una explicación más detallada sobre este asunto, consulte los "
+"ejemplos en la [documentación de "
+"`substitute2`](https://rdatatable.gitlab.io/data.table/library/data.table/html"
+"/substitute2.html)."
+
+#: es/datatable-programming.Rmd.tmp:block 72 (header)
 msgid "Substitution of a complex query"
 msgstr "Sustitución de una consulta compleja"
 
-#: es%5Cdatatable-programming.Rmd.tmp%2Bp
+#: es/datatable-programming.Rmd.tmp:block 73 (paragraph)
 msgid ""
 "Let's take, as an example of a more complex function, calculating root mean "
 "square."
@@ -409,7 +533,7 @@ msgstr ""
 "Tomemos como ejemplo de una función más compleja el cálculo del valor "
 "cuadrático medio."
 
-#: es%5Cdatatable-programming.Rmd.tmp%2Bp
+#: es/datatable-programming.Rmd.tmp:block 74 (paragraph)
 msgid ""
 "`$$${\\displaystyle "
 "x_{\\text{RMS}}={\\sqrt{{\\frac{1}{n}}\\left(x_{1}^{2}+x_{2}^{2}+\\cdots "
@@ -419,7 +543,20 @@ msgstr ""
 "x_{\\text{RMS}}={\\sqrt{{\\frac{1}{n}}\\left(x_{1}^{2}+x_{2}^{2}+\\cdots "
 "+x_{n}^{2}\\right)}}}$$$`"
 
-#: es%5Cdatatable-programming.Rmd.tmp%2Bp
+#: es/datatable-programming.Rmd.tmp:block 75 (paragraph)
+msgid ""
+"It takes arbitrary number of variables on input, but now we cannot just "
+"*splice* a list of arguments into a list call because each of those "
+"arguments have to be wrapped in a `square` call. In this case, we have to "
+"*splice* by hand rather than relying on data.table's automatic *enlist*."
+msgstr ""
+"Toma una cantidad arbitraria de variables en la entrada, pero ahora no "
+"podemos simplemente *unir* una lista de argumentos en una llamada de lista "
+"porque cada uno de esos argumentos tiene que estar envuelto en una llamada "
+"`cuadrada`. En este caso, tenemos que *unir* a mano en lugar de confiar en "
+"la *lista* automática de data.table."
+
+#: es/datatable-programming.Rmd.tmp:block 76 (paragraph)
 msgid ""
 "First, we have to construct calls to the `square` function for each of the "
 "variables (see `inner_calls`). Then, we have to reduce the list of calls "
@@ -428,16 +565,16 @@ msgid ""
 "expression (see `rms`)."
 msgstr ""
 "Primero, tenemos que construir llamadas a la función `square` para cada una "
-"de las variables (ver `inner_calls`). Luego, tenemos que reducir la lista de"
-" llamadas a una sola llamada, que tenga una secuencia anidada de llamadas "
-"`+` (ver `add_calls`). Por último, tenemos que sustituir la llamada "
-"construida en la expresión circundante (ver `rms`)."
+"de las variables (ver `inner_calls`). Luego, tenemos que reducir la lista de "
+"llamadas a una sola llamada, que tenga una secuencia anidada de llamadas `+` "
+"(ver `add_calls`). Por último, tenemos que sustituir la llamada construida "
+"en la expresión circundante (ver `rms`)."
 
-#: es%5Cdatatable-programming.Rmd.tmp%2Bheading
+#: es/datatable-programming.Rmd.tmp:block 78 (header)
 msgid "Retired interfaces"
 msgstr "Interfaces retiradas"
 
-#: es%5Cdatatable-programming.Rmd.tmp%2Bp
+#: es/datatable-programming.Rmd.tmp:block 79 (paragraph)
 msgid ""
 "In `[.data.table`, it is also possible to use other mechanisms for variable "
 "substitution or for passing quoted expressions. These include `get` and "
@@ -456,96 +593,24 @@ msgstr ""
 "ahora deben considerarse retiradas y recomendamos utilizar el nuevo "
 "argumento `env` en su lugar."
 
-#: es%5Cdatatable-programming.Rmd.tmp%2Bheading
+#: es/datatable-programming.Rmd.tmp:block 80 (header)
 msgid "`get`"
 msgstr "`obtener`"
 
-#: es%5Cdatatable-programming.Rmd.tmp%2Bheading
+#: es/datatable-programming.Rmd.tmp:block 82 (header)
 msgid "`mget`"
 msgstr "`Obtener`"
 
-#: es%5Cdatatable-programming.Rmd.tmp%2Bheading
+#: es/datatable-programming.Rmd.tmp:block 84 (header)
 msgid "`eval`"
 msgstr "`evaluar`"
 
-#: es%5Cdatatable-programming.Rmd.tmp%2Bp
+#: es/datatable-programming.Rmd.tmp:block 85 (paragraph)
 msgid ""
 "Instead of using `eval` function we can provide quoted expression into the "
 "element of `env` argument, no extra `eval` call is needed then."
 msgstr ""
 "En lugar de utilizar la función `eval`, podemos proporcionar una expresión "
-"entre comillas en el elemento del argumento `env`, por lo que no se necesita"
-" una llamada `eval` adicional."
+"entre comillas en el elemento del argumento `env`, por lo que no se necesita "
+"una llamada `eval` adicional."
 
-msgid ""
-"=====- lack of syntax validation===== =====- [vulnerability to code "
-"injection](https://github.com/Rdatatable/data.table/issues/2655#issuecomment-376781159)====="
-" =====- the existence of better alternatives====="
-msgstr ""
-
-msgid ""
-"Martin Machler, R Project Core Developer, [once "
-"said](https://stackoverflow.com/a/40164111/2490497):"
-msgstr ""
-
-msgid ""
-"The aforementioned functions, along with some others (including `as.call`, "
-"`as.name`/`as.symbol`, `bquote`, and `eval`), can be categorized as "
-"functions to *compute on the language*, as they operate on *language* "
-"objects (e.g. `call`, `name`/`symbol`)."
-msgstr ""
-
-msgid ""
-"Here, we used the base R `substitute` function to transform the call "
-"`subset(data, col == val)` into `subset(iris, Species == \"setosa\")` by "
-"substituting `data`, `col`, and `val` with their original names (or values) "
-"from their parent environment. The benefits of this approach to the previous"
-" ones should be clear. Note that because we operate at the level of language"
-" objects, and don't have to resort to string manipulation, we refer to this "
-"as *computing on the language*. There is a dedicated chapter on *Computing "
-"on the language* in [R language "
-"manual](https://cran.r-project.org/doc/manuals/r-release/R-lang.html). "
-"Although it is not necessary for *programming on data.table*, we encourage "
-"readers to read this chapter for the sake of better understanding this "
-"powerful and unique feature of R language."
-msgstr ""
-
-msgid ""
-"Starting from version 1.15.0, data.table provides a robust mechanism for "
-"parameterizing expressions passed to the `i`, `j`, and `by` (or `keyby`) "
-"arguments of `[.data.table`. It is built upon the base R `substitute` "
-"function, and mimics its interface. Here, we introduce `substitute2` as a "
-"more robust and more user-friendly version of base R's `substitute`. For a "
-"complete list of differences between `base::substitute` and "
-"`data.table::substitute2` please read the [`substitute2` "
-"manual](https://rdatatable.gitlab.io/data.table/library/data.table/html/substitute2.html)."
-msgstr ""
-
-msgid ""
-"In data.table, we make it easier by automatically *enlist*-ing a list of "
-"objects into a list call with those objects. This means that any `list` "
-"object inside the `env` list argument will be turned into list `call`, "
-"making the API for that use case as simple as presented below."
-msgstr ""
-
-msgid "Let's explore *enlist*-ing in more detail."
-msgstr ""
-
-msgid ""
-"Now let's try to pass a list of symbols, rather than list call to those "
-"symbols. We'll use `I()` to escape automatic *enlist*-ing but, as this will "
-"also turn off character to symbol conversion, we also have to use `as.name`."
-msgstr ""
-
-msgid ""
-"For more detailed explanation on that matter, please see the examples in the"
-" [`substitute2` "
-"documentation](https://rdatatable.gitlab.io/data.table/library/data.table/html/substitute2.html)."
-msgstr ""
-
-msgid ""
-"It takes arbitrary number of variables on input, but now we cannot just "
-"*splice* a list of arguments into a list call because each of those "
-"arguments have to be wrapped in a `square` call. In this case, we have to "
-"*splice* by hand rather than relying on data.table's automatic *enlist*."
-msgstr ""

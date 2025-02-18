@@ -1,1 +1,0 @@
-=====* The query JFK, XNA doesn’t match any rows in flights and therefore is skipped.=====

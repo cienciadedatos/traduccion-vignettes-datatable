@@ -235,13 +235,14 @@ combinar_plain_txt_en_po <- function(po_txt_files, po_files) {
   }
 }
 
-
+#TODO: solo devuelve el Last-translator!!
+#Falta todo lo demás (debería usar get_po_msg para msgid=="")
 obtener_po_metadata <- function(po_files) {
   result <- vapply(po_files, character(2), FUN = \(i) {
     lines <- readLines(i)
     matches <- regexec("\"Last-Translator: ([^<]*)<([^>]*)>\\\\n\"", lines)
-    c(name = regmatches(lines, matches) |> Filter(f=length) |> _[[1]][2] |> trimws(), 
-      email = regmatches(lines, matches) |> Filter(f=length) |> _[[1]][3] |> trimws()) 
+    c(name = regmatches(lines, matches) |> Filter(f=length) |> append("") |> _[[1]][2] |> trimws(), 
+      email = regmatches(lines, matches) |> Filter(f=length) |> append("") |> _[[1]][3] |> trimws()) 
   })
   fmt <- sprintf("%s <%s>", result[1,], result[2, ])
   if (all(fmt == fmt[1])) result[,1] else result
@@ -424,18 +425,9 @@ extraer_traducciones_con_chromote <- function(files, files_es, wait = .8) {
   invisible()
 }
 
-# ---- Inicio ----
-run <- function() {
-  
-  ## ---- paso (0) setup ----
-
-  messagef("Inicio ...")
-  
+setup <- function() {
   if (basename(getwd()) == "vignettes" && !"./vignettes" %in% list.dirs()) 
     setwd("..")
-  
-  basedir <- getwd()
-  
   if (!file.exists("rmd2po.R")) {
     stopf("No se encuentra rmd2po.R. Chequee que su directorio actual sea traduccion-vignettes-datatable, la ubicación de rutinas.R y rmd2po.R.")
   } else source("rmd2po.R")
@@ -461,13 +453,91 @@ run <- function() {
   
   if (basename(getwd()) == "vignettes") {
     setwd("..")
-    basedir <- getwd()
   }
+}
+# Auxiliar
+
+cambiar_rutas_en_Rmd <- function(lang = "es", debug = FALSE) {
+  # el "./" es necesario par comparar
+  rmd_files <- dir(file.path(".", lang), pattern = ".Rmd$", full.names = TRUE)
+  rg_other_files <- basename(setdiff(
+    dir(".", recursive = TRUE, full.names = TRUE),
+    c(dir(".", ".Rmd$", full.names = TRUE), 
+      dir(file.path(".", lang), recursive = TRUE, full.names = TRUE)))) |> 
+    gsub(pattern = "([].\\*?[])", replacement = "\\\\\\1") |>
+    sub(pattern = "(.*)", replacement = "^\\1$")
+  
+  paths <- lapply(setNames(nm=rmd_files),  \(f) {
+    message(f)
+    lines <- readLines(f)
+    cb_start <- grep("^```\\{?\\s*[rR]", lines)  
+    cb_end <- grep("^```\\s*(#|$)", lines)
+    cb_end <- vapply(cb_start, \(i) cb_end[cb_end > i][1], 1L )
+    if (anyNA(cb_end)) stop("error al parsear codeblocks" )
+
+    cblks <- 
+      Map(cb_start, cb_end, f = \(i, j) seq.int(from = i + 1L, length = j - i - 1L)) |> 
+      Map(f = \(i) lines[i]) |> 
+      Map(f = \(i) tryCatch(parse(text = i), error = as.null)) 
+    
+    valid <- which(!vapply(cblks, is.null, FALSE))
+    
+    pdata <- cblks[valid] |>  
+      Map(f = getParseData) |> 
+      Map(f = \(d) d[d$terminal == TRUE & d$token == "STR_CONST",]) |> 
+      Map(cb_start[valid], f = \(d, s) d |> transform(
+        row = line1 + s - 0L, 
+        str = as.character(parse(text = text)))) |> 
+      do.call(what = rbind)
+    
+    rg_other_files |> 
+      Map(f = grepl, x = list(as.character(parse(text = pdata$text)))) |> 
+      Map(f = subset, x = list(pdata)) |>
+      Filter(f = nrow) |> 
+      do.call(what = rbind)
+    
+  }) |> Filter(f = NROW)
+  if (debug) { print(paths) } 
+  
+  for (i in seq_along(paths)) {
+    lines <- readLines(names(paths)[i])
+    matches <- Map(
+      f = structure,
+      paths[[i]]$col1, 
+      index.type = "chars", 
+      match.length = with(paths[[i]], col2 - col1 + 1L), 
+      useBytes = TRUE)
+    if (debug) { cat("====matches\n");    print(matches) }
+    if (debug) { cat("====lines\n");    print(lines[paths[[i]]$row]) }
+    # asume line1 = line2 
+    for (j in seq_along(matches)) {
+      # normalmente la traducción se encuentra en una subcarpeta de las viñetas
+      rpl <- file.path("..", paths[[i]]$str[j])
+      regmatches(lines[paths[[i]]$row[j]], matches[j]) <- list(deparse1(rpl))
+    }
+    if (debug) { cat("====lines modif\n"); print(lines[paths[[i]]$row]) }
+    
+    writeLines(lines, names(paths)[i])
+  }
+  invisible()
+}
+
+# ---- Inicio ----
+start_translation <- function() {
+  
+  ## ---- paso (0) setup ----
+
+  messagef("Inicio ...")
+  
+  basedir <- getwd()
+  on.exit({
+    setwd(basedir)
+    message("Gracias por usar este script (q() para salir de R)")
+  })
   
   message("Cambiando a directorio «./vignettes»")
   setwd(file.path(basedir, "vignettes"))
-  
-  
+
   # Acá empieza el script.
   # ~~~~~~~~~~~~~~~~~~~~~~
   
@@ -508,11 +578,12 @@ run <- function() {
   #      gitcreds::gitcreds_cache_envvar()
   
   message("Paso (4) subir estos txt al repo")
+  cat("=====\n")
   catfln("El resto del proceso es subir a repo los archivos txt y scrapear ese archivo traducido por google.")
-  catfln("algunas librerías usan llamadas web a google directamente, o scrapean las claves de la API.")
+#  catfln("algunas librerías usan llamadas web a google directamente, o scrapean las claves de la API.")
   catfln("Aunque no es lo más elegante, este método puede ser un poco más portable.")
-  catfln("Google podría cambiar detalles de la API sin demasiada explicación ¯\\_:)_/¯.")
-  
+#  catfln("Google podría cambiar detalles de la API sin demasiada explicación ¯\\_:)_/¯.")
+  cat("=====\n")
   {
     GITHUB_PAT_prev <- Sys.getenv("GITHUB_PAT", unset = NA)
     PAT <- Sys.getenv("GITHUB_PAT_GITHUB_COM", unset = Sys.getenv("GITHUB_PAT"))
@@ -625,9 +696,7 @@ run <- function() {
   message("paso (5) scraping de traducciones")
   catfln("Este paso utiliza web scraping para traducir el texto extraído (peor es nada)")
   {
-    
     files.txt.es <- sub("-en[.]txt$", paste0("-", "es", ".txt"), files.txt)
-  
     for (i in 1:3) {
       switch (i,
         message("Probar con chromote (requiere google chrome)"),
@@ -653,12 +722,17 @@ run <- function() {
   
   ## ---- paso (6) combinar traducción en el PO ----
   message("paso (6) combinar traducciones en PO")
+  cat("====\n")
+  catfln("NOTA: En este paso es que también puede modificar algo en los txt antes de continuar. Luego sólo se puede actualizar los .PO.")
+  if (interactive() && menu("Continuar", "Salir") == 2) return(1)
+  
   {
     # función hace el trabajo de msgcat, etc.
     # analizar si potools tiene algo similar...
     combinar_plain_txt_en_po(files.txt.es, files.po)    
     
     # Actualiza metadata ej: name = "Ricardo Villalba", mail = "rikivillalba@gmail.com"
+    # TODO: arreglar la función. por ahora no hace nada
     md <- try(obtener_po_metadata(files.po))
     #if (!inherits(md, "try-error")) 
       
@@ -671,10 +745,14 @@ run <- function() {
   message("paso (7) generar .Rmd traducidos")
   for (f in rmd_files) {
     rmd <- po2rmd(f, lang = "es", verbose = T)
-    #post processing adicional del rmd
   }
   
-  message("paso (8) subir a repo.")
+  ## ---- paso (8) cambiar rutas en código R de subcarpeta del idioma ----
+  message("paso (8) cambiar rutas en código R de subcarpeta del idioma")
+  cambiar_rutas_en_Rmd(lang = "es")
+  
+  ## ---- paso (9) subir a repo. ----
+  message("paso (9) subir a repo.")
   {
     switch(
       menu(title = gettextf("¿Desea actualizar el repo con estas traducciones (se incluyen en la carpeta '%s')?", "es"), c(
@@ -695,14 +773,14 @@ run <- function() {
     )
   }
   
-  message("Gracias por usar este script")
-
 }
 
-if (interactive()) local({
+local({
   startmsg <- gettext("Script para tradución automática de viñetas .Rmd")
   cat(startmsg, "\n")
   catfln(strrep("=", nchar(startmsg)))
   catfln("Utiliza partes del proyecto rmdpo - https://github.com/SciViews/rmdpo")
-  cat("*** Ejecute `run()` para iniciar ***\n")
+  setup()
+  catfln("Sesión interactiva, puede haber algunas preguntas")
+  cat("*** Ejecute `start_translation()` para iniciar (q() para salir) ***\n")
 })

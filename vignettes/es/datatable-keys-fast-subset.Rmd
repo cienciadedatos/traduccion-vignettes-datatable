@@ -9,6 +9,10 @@ vignette: >
   \usepackage[utf8]{inputenc}
 ---
 
+Las traducciones de este documento están disponibles en
+
+* [Francés](https://rdatatable.gitlab.io/data.table/articles/fr/datatable-keys-fast-subset.html)
+
 ```{r, echo = FALSE, message = FALSE}
 require(data.table)
 knitr::opts_chunk$set(
@@ -20,20 +24,20 @@ knitr::opts_chunk$set(
 .old.th = setDTthreads(1)
 ```
 
-Esta viñeta está dirigida a aquellos que ya están familiarizados con la sintaxis de *data.table*, su forma general, cómo crear subconjuntos de filas en `i`, seleccionar y calcular columnas, agregar/modificar/eliminar columnas *por referencia* en `j` y agrupar utilizando `by`. Si no está familiarizado con estos conceptos, lea primero las viñetas *"Introducción a data.table"* y *"Semántica de referencia"*.
+Esta viñeta está dirigida a aquellos que ya están familiarizados con la sintaxis de *data.table*, su forma general, cómo crear subconjuntos de filas en `i`, seleccionar y calcular columnas, agregar/modificar/eliminar columnas *por referencia* en `j` y agrupar utilizando `by`. Si no está familiarizado con estos conceptos, lea primero las viñetas [`vignette("datatable-intro", package="data.table")`](datatable-intro.html) y [`vignette("datatable-reference-semantics", package="data.table")`](datatable-reference-semantics.html).
 
 ***
 
 ## Datos {#data}
 
-Utilizaremos los mismos datos de "vuelos" que en la viñeta *"Introducción a data.table"*.
+Utilizaremos los mismos datos de "flights" que en la viñeta [`vignette("datatable-intro", package="data.table")`](datatable-intro.html).
 
 ```{r echo = FALSE}
 options(width = 100L)
 ```
 
 ```{r}
-flights <- fread("flights14.csv")
+flights <- fread("../flights14.csv")
 head(flights)
 dim(flights)
 ```
@@ -42,21 +46,21 @@ dim(flights)
 
 En esta viñeta, vamos a
 
-* primero introduzca el concepto de `clave` en *data.table*, y establezca y use claves para realizar *búsquedas binarias rápidas* basadas en subconjuntos en `i`,
+* primero, introducir el concepto de `clave` en *data.table*, y establezca y use claves para realizar *búsquedas binarias rápidas* basadas en subconjuntos en `i`,
 
-* observa que podemos combinar subconjuntos basados en clave junto con `j` y `by` exactamente de la misma manera que antes,
+* observar que podemos combinar subconjuntos basados en clave junto con `j` y `by` exactamente de la misma manera que antes,
 
-* mira otros argumentos útiles adicionales: `mult` y `nomatch`,
+* mirar otros argumentos útiles adicionales: `mult` y `nomatch`,
 
-* y finalmente concluimos mirando la ventaja de configurar claves: realizar *búsquedas binarias rápidas basadas en subconjuntos* y compararlas con el enfoque de escaneo vectorial tradicional.
+* y finalmente concluimos mirando la ventaja de configurar claves: realizar *búsquedas binarias rápidas basadas en subconjuntos* y comparar con el enfoque de escaneo vectorial tradicional.
 
 ## 1. Llaves
 
 ### a) ¿Qué es una *clave*?
 
-En la viñeta *"Introducción a data.table"*, vimos cómo crear subconjuntos de filas en `i` utilizando expresiones lógicas, números de fila y el uso de `order()`. En esta sección, veremos otra forma de crear subconjuntos increíblemente rápido: utilizando *claves*.
+En la viñeta [`vignette("datatable-intro", package="data.table")`](datatable-intro.html), vimos cómo crear subconjuntos de filas en `i` usando expresiones lógicas, números de fila y el uso de `order()`. En esta sección, veremos otra forma de crear subconjuntos increíblemente rápido: usando *claves*.
 
-Pero primero, comencemos por analizar los *data.frames*. Todos los *data.frames* tienen un atributo de nombre de fila. Considere el *data.frame* `DF` a continuación.
+Pero primero, comencemos por analizar los *data.frames*. Todos los *data.frames* tienen un atributo de nombre de fila. Considera el *data.frame* `DF` que se muestra a continuación.
 
 ```{r}
 set.seed(1L)
@@ -99,13 +103,13 @@ DT
 rownames(DT)
 ```
 
-* Tenga en cuenta que los nombres de las filas se han restablecido.
+* Ten en cuenta que los nombres de las filas se han restablecido.
 
 * *data.tables* nunca utiliza nombres de fila. Dado que *data.tables* **hereda** de *data.frames*, aún tiene el atributo de nombres de fila, pero nunca los utiliza. En un momento veremos por qué.
 
     If you would like to preserve the row names, use `keep.rownames = TRUE` in `as.data.table()` - this will create a new column called `rn` and assign row names to this column.
 
-En cambio, en *data.tables*, establecemos y usamos `keys`. Piense en una `key` como si fuera un conjunto de **nombres de fila supercargados**.
+En cambio, en *data.tables*, establecemos y usamos `keys`. Piensa en una `key` como si fuera un conjunto de **nombres de fila supercargados**.
 
 #### Claves y sus propiedades {#key-properties}
 
@@ -116,16 +120,16 @@ En cambio, en *data.tables*, establecemos y usamos `keys`. Piense en una `key` c
 3. Establecer una `clave` hace *dos* cosas:
 
     a. physically reorders the rows of the *data.table* by the column(s) provided *by reference*, always in *increasing* order.
-
+    
     b. marks those columns as *key* columns by setting an attribute called `sorted` to the *data.table*.
-
+    
     Since the rows are reordered, a *data.table* can have at most one key because it can not be sorted in more than one way.
 
-Para el resto de la viñeta, trabajaremos con el conjunto de datos "vuelos".
+Para el resto de la viñeta, trabajaremos con el conjunto de datos "flights".
 
 ### b) Establecer, obtener y utilizar claves en una *data.table*
 
-#### -- ¿Cómo podemos establecer la columna `origen` como clave en la *tabla de datos* `vuelos`?
+#### -- ¿Cómo podemos establecer la columna `origin` como clave en la *data.table* `flights`?
 
 ```{r}
 setkey(flights, origin)
@@ -135,23 +139,23 @@ head(flights)
 # setkeyv(flights, "origin") # useful to program with
 ```
 
-* Puede utilizar la función `setkey()` y proporcionar los nombres de las columnas (sin comillas). Esto resulta útil durante el uso interactivo.
+* Puedes utilizar la función `setkey()` y proporcionar los nombres de las columnas (sin comillas). Esto resulta útil durante el uso interactivo.
 
-* Alternativamente, puede pasar un vector de caracteres de nombres de columnas a la función `setkeyv()`. Esto es particularmente útil al diseñar funciones para pasar columnas a las que se les asignará una clave como argumentos de función.
+* Alternativamente, puedes pasar un vector de caracteres de nombres de columnas a la función `setkeyv()`. Esto es particularmente útil al diseñar funciones para pasar columnas a las que se les asignará una clave como argumentos de función.
 
-* Tenga en cuenta que no tuvimos que asignar el resultado a una variable. Esto se debe a que, al igual que la función `:=` que vimos en la viñeta *"Semántica de referencia"*, `setkey()` y `setkeyv()` modifican la entrada *data.table* *por referencia*. Devuelven el resultado de forma invisible.
+* Ten en cuenta que no tuvimos que asignar el resultado a una variable. Esto se debe a que, al igual que la función `:=` que vimos en la viñeta [`vignette("datatable-reference-semantics", package="data.table")`](datatable-reference-semantics.html), `setkey()` y `setkeyv()` modifican la entrada *data.table* *por referencia*. Devuelven el resultado de forma invisible.
 
 * La *data.table* ahora está reordenada (u ordenada) por la columna que proporcionamos: `origin`. Como reordenamos por referencia, solo necesitamos memoria adicional de una columna de longitud igual a la cantidad de filas en la *data.table* y, por lo tanto, es muy eficiente en el uso de la memoria.
 
-* También puede establecer claves directamente al crear *data.tables* utilizando la función `data.table()` con el argumento `key`. Toma un vector de caracteres de nombres de columnas.
+* También puedes establecer claves directamente al crear *data.tables* utilizando la función `data.table()` con el argumento `key`. Toma un vector de caracteres de nombres de columnas.
 
 #### establecer* y `:=`:
 
 En *data.table*, el operador `:=` y todas las funciones `set*` (por ejemplo, `setkey`, `setorder`, `setnames` etc.) son las únicas que modifican el objeto de entrada *por referencia*.
 
-Una vez que se *identifica* una *tabla de datos* por determinadas columnas, se puede crear un subconjunto consultando esas columnas clave utilizando la notación `.()` en `i`. Recuerde que `.()` es un *alias* de `list()`.
+Una vez que se *identifica* una *data.table* por determinadas columnas, se puede crear un subconjunto consultando esas columnas clave utilizando la notación `.()` en `i`. Recuerda que `.()` es un *alias* de `list()`.
 
-#### -- Utilice la columna clave `origen` para crear un subconjunto de todas las filas donde el aeropuerto de origen coincida con *"JFK"*
+#### -- Utiliza la columna clave `origen` para crear un subconjunto de todas las filas donde el aeropuerto de origen coincida con *"JFK"*
 
 ```{r}
 flights[.("JFK")]
@@ -176,7 +180,7 @@ flights[.("JFK")]
     ```{r eval = FALSE}
     flights[c("JFK", "LGA")]    ## same as flights[.(c("JFK", "LGA"))]
     ```
-
+    
     This returns all columns corresponding to those rows where `origin` column matches either *"JFK"* or *"LGA"*.
 
 #### -- ¿Cómo podemos obtener las columnas por las que se codifica una *data.table*?
@@ -217,7 +221,7 @@ flights[.("JFK", "MIA")]
 
 #### ¿Cómo funciona el subconjunto aquí? {#multiple-key-point}
 
-* Es importante entender cómo funciona esto internamente. *"JFK"* primero se compara con la primera columna de clave `origin`. Y *dentro de esas filas coincidentes*, *"MIA"* se compara con la segunda columna de clave `dest` para obtener *índices de fila* donde tanto `origin` como `dest` coinciden con los valores dados.
+* Es importante entender cómo funciona esto internamente. *"JFK"* se compara primero con la primera columna de clave `origin`. Y *dentro de esas filas coincidentes*, *"MIA"* se compara con la segunda columna de clave `dest` para obtener *índices de fila* donde tanto `origin` como `dest` coinciden con los valores dados.
 
 * Dado que no se proporciona ninguna `j`, simplemente devolvemos *todas las columnas* correspondientes a esos índices de fila.
 
@@ -258,7 +262,7 @@ flights[.("LGA", "TPA"), .(arr_delay)]
 
 * Los *índices de fila* correspondientes a `origin == "LGA"` y `dest == "TPA"` se obtienen utilizando un *subconjunto basado en clave*.
 
-* Una vez que tenemos los índices de fila, observamos `j`, que requiere solo la columna `arr_delay`. Por lo tanto, simplemente seleccionamos la columna `arr_delay` para esos *índices de fila* de la misma manera que hemos visto en la viñeta *Introducción a data.table*.
+* Una vez que tenemos los índices de fila, observamos `j`, que requiere solo la columna `arr_delay`. Por lo tanto, simplemente seleccionamos la columna `arr_delay` para esos *índices de fila* de la misma manera que hemos visto en la viñeta [`vignette("datatable-intro", package="data.table")`](datatable-intro.html).
 
 * Podríamos haber devuelto el resultado usando `with = FALSE` también.
 
@@ -268,7 +272,7 @@ flights[.("LGA", "TPA"), .(arr_delay)]
 
 ### b) Encadenamiento
 
-#### -- Sobre el resultado obtenido anteriormente, utilice el encadenamiento para ordenar la columna en orden decreciente.
+#### -- Sobre el resultado obtenido anteriormente, utilice el encadenamiento (chaining) para ordenar la columna en orden decreciente.
 
 ```{r}
 flights[.("LGA", "TPA"), .(arr_delay)][order(-arr_delay)]
@@ -286,7 +290,7 @@ flights[.("LGA", "TPA"), max(arr_delay)]
 
 ### d) *sub-asignar* por referencia usando `:=` en `j`
 
-Ya hemos visto este ejemplo en la viñeta *Semántica de referencia*. Echemos un vistazo a todas las `horas` disponibles en la *tabla de datos* `vuelos`:
+Ya hemos visto este ejemplo en la viñeta [`vignette("datatable-reference-semantics", package="data.table")`](datatable-reference-semantics.html). Echemos un vistazo a todas las `horas` disponibles en la *tabla de datos* `vuelos`:
 
 ```{r}
 # get all 'hours' in flights
@@ -304,7 +308,7 @@ key(flights)
 
 * Primero establecemos `key` en `hour`. Esto reordena `flights` por la columna `hour` y marca esa columna como la columna `key`.
 
-* Ahora podemos crear un subconjunto en `hora` usando la notación `.()`. Creamos un subconjunto para el valor *24* y obtenemos los *índices de fila* correspondientes.
+* Ahora podemos crear un subconjunto de `hora` utilizando la notación `.()`. Creamos un subconjunto para el valor *24* y obtenemos los *índices de fila* correspondientes.
 
 * Y en esos índices de fila, reemplazamos la columna `key` con el valor `0`.
 
@@ -333,7 +337,7 @@ head(ans)
 key(ans)
 ```
 
-* Creamos un subconjunto de la columna `clave` *origen* para obtener los *índices de fila* correspondientes a *"JFK"*.
+* Creamos un subconjunto de la columna `clave` *origin* para obtener los *índices de fila* correspondientes a *"JFK"*.
 
 * Una vez que obtenemos los índices de fila, solo necesitamos dos columnas: `month` para agrupar y `dep_delay` para obtener `max()` para cada grupo. Por lo tanto, la optimización de consultas de *data.table* subconjunto solo aquellas dos columnas correspondientes a los *índices de fila* obtenidos en `i`, para mayor velocidad y eficiencia de memoria.
 
@@ -361,7 +365,7 @@ flights[.(c("LGA", "JFK", "EWR"), "XNA"), mult = "last"]
 
 * La consulta *"JFK", "XNA"* no coincide con ninguna fila en `vuelos` y, por lo tanto, devuelve `NA`.
 
-* Una vez más, la consulta para la segunda columna de clave `dest`, *"XNA"*, se recicla para ajustarse a la longitud de la consulta para la primera columna de clave `origin`, que tiene una longitud 3.
+* Una vez más, la consulta para la segunda columna clave `dest`, *"XNA"*, se recicla para ajustarse a la longitud de la consulta para la primera columna clave `origin`, que tiene una longitud 3.
 
 ### b) El argumento *nomatch*
 
@@ -392,10 +396,9 @@ Podríamos haber hecho:
 flights[origin == "JFK" & dest == "MIA"]
 ```
 
-Una de las ventajas más probables es que la sintaxis es más corta. Pero, además, los *subconjuntos basados en búsqueda binaria* son **increíblemente rápidos**.
+Una de las ventajas más probables es que la sintaxis es más corta. Pero, además, los *subconjuntos basados en búsquedas binarias* son **increíblemente rápidos**.
 
-A medida que pasa el tiempo, `data.table` obtiene una nueva optimización y actualmente la última llamada se optimiza automáticamente para usar *búsqueda binaria*.\
-Para usar un *escaneo vectorial* lento, se debe eliminar la clave.
+A medida que pasa el tiempo, `data.table` obtiene una nueva optimización y actualmente la última llamada se optimiza automáticamente para usar *búsqueda binaria*. Para usar *escaneo vectorial* lento, se debe eliminar la clave.
 
 ```{r eval = FALSE}
 setkey(flights, NULL)
@@ -458,7 +461,7 @@ Para entender esto, veamos primero qué hace el *enfoque de escaneo vectorial* (
 
 Esto es lo que llamamos un "enfoque de escaneo vectorial", y es bastante ineficiente, especialmente en tablas más grandes y cuando se necesita crear subconjuntos repetidamente, porque se deben escanear todas las filas cada vez.
 
-Ahora veamos el enfoque de búsqueda binaria (método 2). Recordemos de [Propiedades de la clave](#key-properties): *la configuración de claves reordena la tabla de datos por columnas de clave*. Dado que los datos están ordenados, no tenemos que *explorar toda la longitud de la columna*. En cambio, podemos utilizar la *búsqueda binaria* para buscar un valor en `O(log n)` en lugar de `O(n)` en el caso del *enfoque de exploración vectorial*, donde `n` es el número de filas en la *tabla de datos*.
+Ahora veamos el enfoque de búsqueda binaria (método 2). Recordemos de [Propiedades de clave](#key-properties): *establecer claves reordena la tabla de datos por columnas de clave*. Dado que los datos están ordenados, no tenemos que *escanear a través de toda la longitud de la columna*. En cambio, podemos usar *búsqueda binaria* para buscar un valor en `O(log n)` en lugar de `O(n)` en el caso del *enfoque de escaneo vectorial*, donde `n` es el número de filas en la *tabla de datos*.
 
 #### Enfoque de búsqueda binaria
 
@@ -494,10 +497,8 @@ En esta viñeta, hemos aprendido otro método para crear subconjuntos de filas e
 
 * combinar subconjuntos basados en claves con `j` y `by`. Tenga en cuenta que las operaciones `j` y `by` son exactamente las mismas que antes.
 
-Los subconjuntos basados en claves son **increíblemente rápidos** y son particularmente útiles cuando la tarea implica *subconjuntos repetidos*. Pero puede que no siempre sea deseable establecer la clave y reordenar físicamente la *tabla de datos*. En el siguiente artículo, abordaremos este tema utilizando una *nueva* característica: *índices secundarios*.
-
+Los subconjuntos basados en claves son **increíblemente rápidos** y son particularmente útiles cuando la tarea implica *subconjuntos repetidos*. Pero puede que no siempre sea deseable establecer la clave y reordenar físicamente la *tabla de datos*. En la siguiente [próxima viñeta (`vignette("datatable-secondary-indices-and-auto-indexing", package="data.table")`)](datatable-secondary-indices-and-auto-indexing.html), abordaremos este problema utilizando una *nueva* característica: *índices secundarios*.
 
 ```{r, echo=FALSE}
 setDTthreads(.old.th)
 ```
-
