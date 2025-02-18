@@ -1,5 +1,5 @@
 ---
-title: "Introduction to data.table"
+title: "Introducción a data.table"
 date: "`r Sys.Date()`"
 output:
   markdown::html_format

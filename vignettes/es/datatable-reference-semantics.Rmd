@@ -1,5 +1,5 @@
 ---
-title: "Reference semantics"
+title: "Semántica de referencia"
 date: "`r Sys.Date()`"
 output:
   markdown::html_format

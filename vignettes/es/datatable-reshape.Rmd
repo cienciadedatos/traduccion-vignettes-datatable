@@ -1,5 +1,5 @@
 ---
-title: "Efficient reshaping using data.tables"
+title: "Remodelado eficiente con data.table"
 date: "`r Sys.Date()`"
 output:
   markdown::html_format

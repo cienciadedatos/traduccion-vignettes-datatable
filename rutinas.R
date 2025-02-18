@@ -266,10 +266,6 @@ actualizar_po_metadata <- function(po_files, name, email) {
 
 # Aquí: Script provisorio para traducir los títulos
 traducir_titulos_rmd <- function() {
-  pwd <- getwd()
-  on.exit(setwd(pwd))
-  setwd("es")
-  
   titles_en <-
     c(`datatable-benchmarking.Rmd` = "Benchmarking data.table", 
       `datatable-faq.Rmd` = "Frequently Asked Questions about data.table", 
@@ -280,7 +276,8 @@ traducir_titulos_rmd <- function() {
       `datatable-reference-semantics.Rmd` = "Reference semantics", 
       `datatable-reshape.Rmd` = "Efficient reshaping using data.tables", 
       `datatable-sd-usage.Rmd` = "Using .SD for Data Analysis", 
-      `datatable-secondary-indices-and-auto-indexing.Rmd` = "Secondary indices and auto indexing"
+      `datatable-secondary-indices-and-auto-indexing.Rmd` = "Secondary indices and auto indexing",
+      `datatable-joins.Rmd` = "Joins in data.table"
     )
   titles_es <- 
     c(`datatable-benchmarking.Rmd` = "Benchmarking con data.table", 
@@ -292,19 +289,29 @@ traducir_titulos_rmd <- function() {
       `datatable-reference-semantics.Rmd` = "Semántica de referencia", 
       `datatable-reshape.Rmd` = "Remodelado eficiente con data.table", 
       `datatable-sd-usage.Rmd` = "Uso de .SD para Análisis de datos", 
-      `datatable-secondary-indices-and-auto-indexing.Rmd` = "Índices secundarios y auto indexación"
+      `datatable-secondary-indices-and-auto-indexing.Rmd` = "Índices secundarios y auto indexación",
+      `datatable-joins.Rmd` = "Uniones «join» en data.table"
     )
   title_missing <- 
     c("joins and rolling joins", "data.table internals")
   
-  rmd_files  <- dir(pattern=".Rmd$")
-  lapply(rmd_files, \(i) {
+  rmd_files  <- dir("es", pattern=".Rmd$", full.names = TRUE)
+  lapply(rmd_files, \(f, i = basename(f)) {
     if (i %in% names(titles_es)) {
-      lines <- readLines(i) |>
-        regex_sub("title: \"(.*)\"", titles_es[i]) 
-      writeLines(lines, i)
+      lines <- readLines(f) 
+      if ((length(n <- grep("title: \"(.*)\"", lines))) == 1) {
+        prev <- sub(".*title: \"(.*)\".*", "\\1", lines[n])
+        if (prev == titles_es[i])
+          messagef("Título no se cambia: %s", prev)
+        else {
+          writeLines(
+            regex_sub(lines, "title: \"(.*)\"", titles_es[i]), f)
+          messagef("Título cambiado de %s a %s", prev, titles_es[i])
+        }
+      } else warningf("no se puede individualizar \"title:\" (%d coincidencias)", length(n))
     } else warningf("título para %s no en titles_es", i)
   })
+  invisible()
 }
 
 # usa SELENIUM para traducir con google desde github
@@ -724,7 +731,7 @@ start_translation <- function() {
   message("paso (6) combinar traducciones en PO")
   cat("====\n")
   catfln("NOTA: En este paso es que también puede modificar algo en los txt antes de continuar. Luego sólo se puede actualizar los .PO.")
-  if (interactive() && menu("Continuar", "Salir") == 2) return(1)
+  if (interactive() && menu(c("Continuar", "Salir")) == 2) return(1)
   
   {
     # función hace el trabajo de msgcat, etc.
@@ -751,8 +758,13 @@ start_translation <- function() {
   message("paso (8) cambiar rutas en código R de subcarpeta del idioma")
   cambiar_rutas_en_Rmd(lang = "es")
   
-  ## ---- paso (9) subir a repo. ----
-  message("paso (9) subir a repo.")
+  message("paso (9) cambiar títulos")
+  #TODO: este paso está HARCODEADO. rmd2po no tiene en cuenta los títulos
+  # habríoa que generar un PO con los títulos y usar ese.
+  traducir_titulos_rmd()
+
+  ## ---- paso (10) subir a repo. ----
+  message("paso (10) subir a repo.")
   {
     switch(
       menu(title = gettextf("¿Desea actualizar el repo con estas traducciones (se incluyen en la carpeta '%s')?", "es"), c(
@@ -772,7 +784,6 @@ start_translation <- function() {
       }
     )
   }
-  
 }
 
 local({

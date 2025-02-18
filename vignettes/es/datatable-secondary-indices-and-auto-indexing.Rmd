@@ -1,5 +1,5 @@
 ---
-title: "Secondary indices and auto indexing"
+title: "Índices secundarios y auto indexación"
 date: "`r Sys.Date()`"
 output:
   markdown::html_format

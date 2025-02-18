@@ -1,5 +1,5 @@
 ---
-title: "Using .SD for Data Analysis"
+title: "Uso de .SD para Análisis de datos"
 date: "`r Sys.Date()`"
 output:
   markdown::html_format:
