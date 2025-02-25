@@ -8,5 +8,7 @@ El repo incluye:
   * El script trabaja con rmd2po que a su vez instala y usa md2po para lo que requiere python. Los resultados se pueden cargar como un push en este repo (opcional) usando [gert](https://github.com/r-lib/gert)
   * script en estado alpha o beta
 * para generar los html a partir de los Rmd: `lapply(dir(,"Rmd$"),\(i) knitr::knit2html(i))`
-
- 
+---
+### >> Los archivos para traducir (que hay que revisar) están en [vignettes/es](https://github.com/cienciadedatos/traduccion-vignettes-datatable/tree/main/vignettes/es) se pueden editar ahí mismo.<<
+---
+En este [issue](https://github.com/cienciadedatos/traduccion-vignettes-datatable/issues/1) hacemos el seguimiento del estado de traducción.
