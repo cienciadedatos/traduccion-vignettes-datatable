@@ -21,7 +21,6 @@
 #    3) traducir_titulos_rmd()
 #    4) generar_viñetas_html()
 #
-
 # # TODO: en windows requiere msgcat, por ejemplo el que viene con git.
 # if (.Platform$OS.type == "windows") Sys.setenv("PATH" = paste0(
 #   sep = .Platform$file.sep, Sys.getenv("PATH"), 
@@ -32,7 +31,6 @@
 # ---- funciones auxiliares ----
 
 if (!exists("%||%")) `%||%` <- function(x, y) {if (is.null(x)) y else x}
-
 
 condf.generator <- function(fname = c("warning", "stop")) {
   fname <- match.arg(fname)
@@ -87,28 +85,252 @@ regex_sub <- function(x, pattern, ...) {
       attr(x, 'match.length') <- if(is.matrix(ml)) ml[-1,] else ml[-1]
       x 
     } else x
-  
   regmatches(x, lapply(matches, drop_first)) <- Map(f = c, ...)
   x
 }
 
-# Obtiene los nro de lineas o el valor de las líneas de una entrada de un PO
-get_po_msgs <- function(lines_po, type = c("msgid", "msgstr"), ret = c("position", "value")) {
+# En .PO, una <entrada> consiste en la secuencia 
+# msgid{"texto"}+msgstr{"texto"}+   con cualquier número de espacios o saltos 
+# de línea entre medio. o bien una secuencia 
+# msgid "texto" msgid_plural "texto" { msgstr[n] "texto"}+ donde n = 0..N
+# Entradas válidas son:
+#   msgid "texto"
+#   msgstr "texto"
+#
+#   msgid"texto"msgstr"texto"
+#
+#   msgid 
+#   "texto" msgstr "texto\n""texto\n"  # comment
+#
+#   msgid "" 
+#   "texto" msgid_plural "texto\""
+#    msgstr[0] "" msgstr[01] "akgo"
+#  msgstr [ 2  ]"other" 
+#
+# No válidas:
+#
+# # msgstr or msgid_plural or string expected (but comment found): 
+# msgid "texto" # comment
+# msgstr "text"
+#
+# # msgstr or msgid_plural or string expected (but msgid found): 
+# msgid "" msgid ""
+#
+# # en of line while in string
+# msgid "texto
+#   más texto" 
+#
+# # invalid msgstr index 2 (expected 1):
+# msgid "" msgid_plural "" msgstr[0] "" msgstr[2] "" 
+#
+#
+# etc.
+# no se permiten comentarios entre líneas de una misma entrada (pero la última
+# línea de la entrada puede tener comentarios en la misma línea)
+# https://www.gnu.org/software/gettext/manual/html_node/PO-Files.html
+# 
+# TODO: Esta función asume el formato de salida de msgtext por lo que es PROVISORIA
+get_po_msgs <- function(lines_po, type = c("msgid", "msgstr")) {
   type <- match.arg(type)
-  ret <- match.arg(ret)
   EOF <- length(lines_po) + 1
+  # msgid_pos: posisción de msgid o msgstr
+  # no_str_pos: comandos y EOF. todo excepto #s, o cadenas (incl. msgid_pos)
+  # str_pos: cadenas sin comandos ni #s
   msgid_pos <- c(grep(paste0("^\\s*", type, "\\s+\""), lines_po), EOF)
-  str_pos <- grep("\\s*\"", lines_po)
   no_str_pos <- c(grep("^\\s*[^\"#]", lines_po), EOF) 
-  .mapply(
-    list(head(msgid_pos, -1), tail(msgid_pos, -1)),
-    FUN = \(d, h) ({
-      l <- str_pos[str_pos >= d & str_pos < min(h, no_str_pos[no_str_pos > d])]
-      if (ret == "position") l else 
-        paste0(collapse = "", sub(
-          "^\\s*(msg(id(_plural)?|str( *\\[ *\\d+ *\\])?))?\\s*\"(([^\"]|([\\]\"))*)\"\\s*(#.*)?$",
-          "\\5", lines_po[l])) }),
-    MoreArgs = NULL)
+  str_pos <- grep("\\s*[\"]", lines_po)
+  pos <- Map(
+       head(msgid_pos, -1L), tail(msgid_pos, -1L),
+    f = \(d, h) union(
+      d, str_pos[str_pos >= d & str_pos < min(h, no_str_pos[no_str_pos > d])]))
+  structure(
+    vapply(pos, "", FUN = \(l) (
+      paste0(collapse = "", sub(
+        "^\\s*(msg(id(_plural)?|str( *\\[ *\\d+ *\\])?))?\\s*\"(([^\"]|([\\]\"))*)\"\\s*(#.*)?$",
+        "\\5", lines_po[l])))),
+    pos = pos)
+}
+
+
+#    bad_ctrlseq = '"([^\\"]|[\\].)*([\\]$|")', # captura lo q no captura string
+#    eol_string = '"([^\\"]|[\\].)*$', 
+
+# versión más ajustada a la sintaxis real
+# https://www.gnu.org/software/gettext/manual/html_node/PO-Files.html
+# "Each of untranslated-string and translated-string respects the C syntax for 
+# a character string, including the surrounding quotes and embedded backslashed 
+# escape sequences, except that universal character escape sequences 
+# (\u and \U) are not allowed."
+# ejemplo:
+# sample(dir("R\\traduccion-vignettes-datatable\\vignettes\\es\\po", full=T, "\\.po$"), 1) |>
+#   (\(x) {cat(x);x})() |>
+#   readLines() |> parse_PO()  |> jsonlite::toJSON(pretty = T, auto_unbox = T) |> clipr::write_clip()
+# readLines("a.po") |> parse_PO()  |> jsonlite::toJSON(pretty = T, auto_unbox = T) |> clipr::write_clip()
+# strings:
+# hasta donde puedo ver las secuencias \xhh.. toman sólo los dos últimos 
+# dígitos y sólo son válidos hasta 7f, pero igual se parsean. Quizás 
+# depende de charset. no puedo usar str2lang directamente. Además,
+# se acepta \x00 con el efecto de terminar la cadena (R no acepta).
+parse_PO <- function(lines_po, literal.strings = FALSE) {
+  # tokenizer
+  re_str <- '([^\\"]|[\\][\\"abfnrtv"]|[\\][0-7]{1,3}|[\\]x[[:xdigit:]]+)*'
+  re_kw <- paste0(c(letters, LETTERS, "_"), collapse = "")
+  re_classes <- c(
+    msgid = "msgid", msgid_plural = "msgid_plural", msgstr = "msgstr",
+    index.open = "[[]", index.close = "[]]", index = "\\d+",
+    comment = "#.*", 
+    keyword = paste0("[", re_kw, "]", "[0-9", re_kw, "]*"),
+    string = paste0('"', re_str, '"'),
+    bad_ctrlseq = paste0('"', re_str, '\\\\'), 
+    eol_string =  paste0('"', re_str, '$'), 
+    space = "\\s+", unknown = ".")        
+  classes <- c(names(re_classes), "EOF")  # el orden es importante!
+  id_classes <- setNames(seq_along(classes), classes)
+
+  # generar tokens  
+  all_matches <- gregexpr(paste0(re_classes, collapse = "|"), lines_po) 
+  no_empty <- which(vapply(all_matches, `[`, 0L, 1L) > 0L)
+  matches <- all_matches[no_empty] 
+  token_value <- unlist(regmatches(lines_po[no_empty], matches))
+  token_class_id <- paste0("^", re_classes, "$") |> 
+    vapply(grepl, logical(length(token_value)), token_value, USE.NAMES = FALSE) |> 
+    structure(dim = c(length(token_value), length(re_classes))) |>
+    apply(1, match, x = TRUE, nomatch = 0) |>
+    c(as.integer(id_classes["EOF"]))
+  token_row <- rep(no_empty, lengths(matches))
+  token_col <- unlist(matches) 
+  token_length <- unlist(lapply(matches, attr, "match.length"))
+
+  # check léxico
+  if (p <- match(id_classes["bad_ctrlseq"], token_class_id, 0L)) stopf(
+    "secuencia de control errónea, fila %s, col %s...", 
+    token_row[p], token_col[p] + token_length[p] - 1L)
+  if (p <- match(id_classes["eol_string"], token_class_id, 0L)) stopf(
+    "fin de línea dentro de la cadena, fila %s, col %s...",
+    token_row[p], token_col[p])
+  if (p <- match(id_classes["keyword"], token_class_id, 0L)) stopf(
+    "palabra clave desconocida '%s' fila %s, col %s...", 
+    token_value[p], token_row[p], token_col[p])
+  if (p <- match(id_classes["unknown"], token_class_id, 0L)) stopf(
+    "error de sintaxis '%s', fila %s, col %s...", 
+    token_value[p], token_row[p], token_col[p])
+  
+  # opciones - parsear cadenas de caracteres
+  if (!literal.strings) 
+    token_value[token_class_id == id_classes["string"]] <- 
+      token_value[token_class_id == id_classes["string"]] |> 
+        sub(pattern = "\\\\x[[:xdigit:]]*([[:xdigit:]]{2})", replacement = "\\\\x\\1") |>
+        sub(pattern = "\\\\x0+($|[^[:xdigit:]]).*", replacement = "") |>
+        sub(pattern = "\\\\(000|00?($|[^0-7])).*", replacement = "") |> 
+        vapply(str2lang, "")
+
+  # auxiliar mini parser 
+  `c<-` <- \(tmp, value) {
+    c(tmp, value)  # concatenar in situ (sin 'value')
+  }
+  stop_position <- function() {
+    if (i == length(token_class_id[i])) gettext("<fin de archivo>") 
+    else gettextf("fila %d, col %d", token_row[i], token_col[i])
+  }
+  new_entry <- function() {
+    c(entries) <<- list(entry) 
+    entry <<- list()
+    switch(
+      classes[token_class_id[i]], 
+      msgid = "msgid", 
+      comment = consume("comment"),
+      EOF = "end",
+      stopf(
+        "se esperaba <msgid> o <comment> en %s", stop_position()))
+  }
+  switch_class <- function(..., default) {
+    switch(
+      classes[token_class_id[i]], 
+      ...,
+      if (!missing(default)) default
+      else if (...length() == 1L)
+        switch(
+          ...names(),
+          index.open = stopf("se esperaba '[' en %s", stop_position()),
+          index.close = stopf("se esperaba ']' en %s", stop_position()),
+          stopf("se esperaba <%s> en %s", ...names(), stop_position()))
+      else {
+        cls <- paste0(...names(), collapse = " | ")
+        stopf("se esperaba <%s> en %s", cls, stop_position())
+      }
+    )
+  }
+  consume <- function(class = c(
+    "msgid", "msgstr", "msgid_plural", "msgstr_with_index", "comment")) { 
+    class <- match.arg(class)
+    if (class == "msgstr_with_index")
+      c(entry$msgstr[[id + 1L]]$value) <<- token_value[i]
+    else if (class == "comment") 
+      c(entry[[class]]) <<- substr(token_value[i], 2L, nchar(token_value[i]))
+    else 
+      c(entry[[class]]) <<- token_value[i]
+    switch(
+      class, msgid = "msgid.string", msgstr = "msgstr.string", 
+      msgid_plural = "msgid_plural.string", 
+      msgstr_with_index = "msgstr_with_index.string", 
+      comments = "ready", 
+      stop()) 
+  }
+  set_index <- function(value = id + 1L) {
+    id <<- value
+    if (value == 0) entry$msgstr <<- list()
+    "msgstr_with_index"
+  }
+  check_index <- function() {
+    if (as.integer(token_value[i]) != id) 
+      stopf("índice erróneo en fila %d, col %d: ", token_row[i], token_col[i]) 
+    entry$msgstr[[id + 1L]] <<- list(id = id)
+    "msgstr_with_index.index" 
+  }
+  
+  # inicio mini parser
+  entries <- entry <- list()
+  state <- "ready"
+  id <- NULL
+  for (i in seq_along(token_class_id)[token_class_id != id_classes["space"]]) {
+    state <- switch(
+      state,
+      ready = switch_class(
+        msgid = "msgid", 
+        comment = consume("comment"),
+        default = new_entry()),
+      msgid = switch_class(
+        string = consume("msgid")),
+      msgid.string = switch_class(
+        string = consume("msgid"),
+        msgid_plural = "msgid_plural", 
+        msgstr = "msgstr"),
+      msgstr = switch_class(
+        string = consume("msgstr")),
+      msgstr.string = switch_class(
+        string = consume("msgstr"),
+        default = new_entry()),
+      msgid_plural = switch_class(
+        string = consume("msgid_plural")),
+      msgid_plural.string = switch_class(
+        string = consume("msgid_plural.string"),
+        msgstr = set_index(0L)),
+      msgstr_with_index = switch_class(
+        index.open = "msgstr_with_index.open") ,
+      msgstr_with_index.open = switch_class(
+        index = check_index()),
+      msgstr_with_index.index = switch_class(
+        index.close = "msgstr_with_index.close"),
+      msgstr_with_index.close = switch_class(
+        string = consume("msgstr_with_index")),
+      msgstr_with_index.string = switch_class(
+        string = consume("msgstr_with_index"),
+        msgstr = set_index(),
+        default = new_entry()),
+      stop("bad state")
+    )
+  }
+  entries
 }
 
 # Script para cargar los archivos .txt generados en los po originales
@@ -163,38 +385,38 @@ extrae_msgid_de_po <- function(files.po, files.txt) {
 # toma los archivos txt linea por linea y los incorpora a las
 # entradas "msgstr" del PO, partiendo lineas largas si es necesario
 #debugonce(combinar_plain_txt_en_po)
-combinar_plain_txt_en_po <- function(po_txt_files, po_files) {
+combinar_plain_txt_en_po <- function(po_txt_files, po_files, overwrite = FALSE) {
   for (i in seq_along(po_files)) {
     messagef("Combinando %s en %s", 
       basename(po_txt_files[i]), basename(po_files[i]))
     tryCatch(
       {
+        # Si la primera linea en txt está vacía la suprime
         lines_po <- readLines(po_files[i])
         lines_txt <- readLines(po_txt_files[i]) |>
-          # escapa las comillas
           gsub(pattern = "(?<!\\\\)\"", replacement = "\\\\\"", perl = TRUE) |>
-          # Si la primera linea está vacía la suprime
           (\(l) subset(l, nzchar(l[1]) | seq_along(l) > 1))()
 
         # msgstr_pos es la posición de los msgstr en el po
         # other_pos es la posición de todo el resto
-        
         # la primera línea de msgstr es el encabezado del PO. No se incluye.
-        msgstr_pos <- get_po_msgs(lines_po, "msgstr", "position")[-1]
-        other_pos <- .mapply(seq, MoreArgs = NULL, list(
-          c(0, vapply(msgstr_pos, max, 0L) + 1L),
-          c(vapply(msgstr_pos, min, 0L) - 1L, length(lines_po) + 1L)))
+        msgs <- get_po_msgs(lines_po, "msgstr")[-1]
+        msgstr_pos <- attr(msgs, "pos")
+        other_pos <- Map(
+          f = seq, 
+          c(0, vapply(msgstr_pos, tail, 0L, 1L) + 1L),
+          c(vapply(msgstr_pos, head, 0L, 1L) - 1L, length(lines_po) + 1L))
 
-        # los .po y los archivos planos deben tener el mismo nro de elementos
-        n <- length(msgstr_pos)
-        if (n != length(lines_txt)) {
+        # los .po y los archivos txt planos deben tener el mismo nro de elementos
+        if ((n <- length(msgstr_pos)) != (m <- length(lines_txt))) {
           stopf(
             "el archivo %s tiene %d líneas, mientras que %s tiene %d líneas",
-            po_files[i], n, po_txt_files[i], length(lines_txt),
+            po_files[i], n, po_txt_files[i], m,
             class = "length.mismatch"
           )
         }
         
+        #TODO: esta parte formatea lines_txt aunque overwrite=FALSe (innecesario)
         # saltos de línea en lineas largas wd <- 80
         msgstr <- lapply(lines_txt, FUN = \(x) ({
           m <- gregexpr("\\s(?=\\S)|$", x, perl = T)[[1]]
@@ -206,14 +428,19 @@ combinar_plain_txt_en_po <- function(po_txt_files, po_files) {
               '"', substring(x, cuts[-length(cuts)] + 1, cuts[-1]), '"'))
           }
         }))
-
+        
+        if (overwrite) {
+          if ((n <- length(which(lines_txt[nzchar(msgs)] != msgs[nzchar(msgs)]))) > 0)
+            warningf("AVISO: %d mensajes ya traducidos se reemplazan por nueva versión de google", n)
+        } else {
+          msgstr[nzchar(msgs)] <- lapply(msgstr_pos[nzchar(msgs)], \(l) lines_po[l])
+        }
+        
         other <- lapply(other_pos, \(s) lines_po[s[s <= length(lines_po)]])
         
-        # intercalar n elementos con m=n+1 elementos.
-        # 1, m+1, 2, m+2, 3, m+3 ... 
-        ord <- seq(0, (n+1) * (2*n), n+1) %% (2*n+1) + 1
-        lines_po <- c(other, msgstr)[ord]
-        #browser()
+        lines_po <- vector("list", length(msgstr) + length(other))
+        lines_po[seq(2, length(msgstr), by = 2)] <- msgstr
+        lines_po[seq(1, length(other), by = 2)] <- other
         writeLines(unlist(lines_po), po_files[i])
       },
       length.mismatch = (function(e) {
@@ -249,23 +476,25 @@ obtener_po_metadata <- function(po_files) {
 }
 
 # Actualiza la metadata en PO (fecha de revisión, Last translator...)
-actualizar_po_metadata <- function(po_files, name, email) {
+actualizar_po_metadata <- function(po_files, name, email, lang_code) {
   lapply(po_files, \(i) {
     lines <- readLines(i)
     lines |> 
       regex_sub("\"Project-Id-Version: (.*)\\\\n\"", "0.0.1") |>
       regex_sub("\"PO-Revision-Date: (.*)\\\\n\"", format(Sys.time(), format = "%Y-%m-%d %H:%M%z")) |>
       regex_sub("\"Last-Translator: (.*)\\\\n\"",  sprintf("%s <%s>", name, email)) |>
-      regex_sub("\"Language-Team: (.*)\\\\n\"", "es")  |> 
-      append("\"Language: es\\n\"", after = grep("\"Language-Team: (.*)\\\\n\"", lines)) |>
+      regex_sub("\"Language-Team: (.*)\\\\n\"", lang_code)  |> 
+      append(
+        sprintf("\"Language: %s\\n\"", lang_code), 
+        after = grep("\"Language-Team: (.*)\\\\n\"", lines)) |>
       writeLines(i)
   })
   invisible()
 }
 
 
-# Aquí: Script provisorio para traducir los títulos
-traducir_titulos_rmd <- function() {
+# TODO: Script provisorio para traducir los títulos
+traducir_titulos_rmd <- function(lang_code="es") {
   titles_en <-
     c(`datatable-benchmarking.Rmd` = "Benchmarking data.table", 
       `datatable-faq.Rmd` = "Frequently Asked Questions about data.table", 
@@ -295,7 +524,7 @@ traducir_titulos_rmd <- function() {
   title_missing <- 
     c("joins and rolling joins", "data.table internals")
   
-  rmd_files  <- dir("es", pattern=".Rmd$", full.names = TRUE)
+  rmd_files  <- dir(lang_code, pattern=".Rmd$", full.names = TRUE)
   lapply(rmd_files, \(f, i = basename(f)) {
     if (i %in% names(titles_es)) {
       lines <- readLines(f) 
@@ -309,13 +538,14 @@ traducir_titulos_rmd <- function() {
           messagef("Título cambiado de %s a %s", prev, titles_es[i])
         }
       } else warningf("no se puede individualizar \"title:\" (%d coincidencias)", length(n))
-    } else warningf("título para %s no en titles_es", i)
+    } else warningf("título para %s no en titles_es (lista de traducidos)", i)
   })
   invisible()
 }
 
 # usa SELENIUM para traducir con google desde github
-extraer_traducciones_con_selenium <- function(files, files_es, wait = .8) {
+extraer_traducciones_con_selenium <- function(
+    files, files_es, wait = .8, lang_code, branch_name) {
   errors <- list()
   for (i in 1:3) {
     result <- switch(
@@ -337,11 +567,19 @@ extraer_traducciones_con_selenium <- function(files, files_es, wait = .8) {
   }
 
   # Estos links vinculan a las traducciones de google
-  google_urls <- paste0(
+  google_urls <- sprintf(
     "https://raw.githubusercontent.com.translate.goog/cienciadedatos/",
-    "traduccion-vignettes-datatable/refs/heads/main/vignettes/",
-    URLencode(files), "?_x_tr_sl=en&_x_tr_tl=es&_x_tr_hl=es&_x_tr_pto=wapp")
-
+    "traduccion-vignettes-datatable/refs/heads/%s/vignettes/%s?%s",
+    branch_name,
+    URLencode(files), 
+    sprintf("_x_tr_sl=%s&_x_tr_tl=%s", "en", lang_code))
+  
+  raw_urls <- sprintf(
+    "https://raw.githubusercontent.com/cienciadedatos/",
+    "traduccion-vignettes-datatable/refs/heads/%s/vignettes/",
+    branch_name,
+    URLencode(files))
+  
   tryCatch(
     error = \(e) message(e),
     finally = selenium_driver$server$stop,
@@ -365,7 +603,8 @@ extraer_traducciones_con_selenium <- function(files, files_es, wait = .8) {
 }
 
 # client$view() # para verlo en chrome
-extraer_traducciones_con_chromote <- function(files, files_es, wait = .8) {
+extraer_traducciones_con_chromote <- function(
+    files, files_es, wait = .8, lang_code, branch_name) {
   options("chromote.launch.echo_cmd" = TRUE)
   tryCatch(
     client <- chromote::ChromoteSession$new(),
@@ -376,15 +615,19 @@ extraer_traducciones_con_chromote <- function(files, files_es, wait = .8) {
       call = sys.call())
   )
   # Estos links vinculan a las traducciones de google
-  google_urls <- paste0(
-    "https://raw-githubusercontent-com.translate.goog/cienciadedatos/",
-    "traduccion-vignettes-datatable/refs/heads/main/vignettes/",
-    URLencode(files), sprintf("?_x_tr_sl=%s&_x_tr_tl=%s", "en", "es")) # &_x_tr_hl=%s&_x_tr_pto=wapp
-  raw_urls <- paste0(
+  google_urls <- sprintf(
+    "https://raw.githubusercontent.com.translate.goog/cienciadedatos/",
+    "traduccion-vignettes-datatable/refs/heads/%s/vignettes/%s?%s",
+    branch_name,
+    URLencode(files), 
+    sprintf("_x_tr_sl=%s&_x_tr_tl=%s", "en", lang_code))
+
+  raw_urls <- sprintf(
     "https://raw.githubusercontent.com/cienciadedatos/",
-    "traduccion-vignettes-datatable/refs/heads/main/vignettes/",
+    "traduccion-vignettes-datatable/refs/heads/%s/vignettes/",
+    branch_name,
     URLencode(files))
-  
+
   # por las dudas, quizá en background no traduce
   # client$view()
   
@@ -464,7 +707,7 @@ setup <- function() {
 }
 # Auxiliar
 
-cambiar_rutas_en_Rmd <- function(lang = "es", debug = FALSE) {
+cambiar_rutas_en_Rmd <- function(lang, debug = FALSE) {
   # el "./" es necesario par comparar
   rmd_files <- dir(file.path(".", lang), pattern = ".Rmd$", full.names = TRUE)
   rg_other_files <- basename(setdiff(
@@ -529,8 +772,30 @@ cambiar_rutas_en_Rmd <- function(lang = "es", debug = FALSE) {
   invisible()
 }
 
+update_PO <- function() {
+  basedir <- getwd()
+  on.exit({
+    setwd(basedir)
+  })
+  message("Cambiando a directorio «./vignettes»")
+  setwd(file.path(basedir, "vignettes"))
+
+  message("identificar viñetas...")
+  rmd_files <- dir(,".Rmd$")
+  if (!length(rmd_files)) {
+    stopf("No se encontraron archivos para traducir")
+  } else {
+    for (i in rmd_files) catfln("* %s", i)
+  }
+  
+  message("generar/actualizar PO a partir de viñetas en inglés...")
+  for (f in rmd_files) 
+    rmd2po(f, lang = lang_code, verbose = TRUE)
+  message("Listo")
+}
+
 # ---- Inicio ----
-start_translation <- function() {
+start_translation <- function(lang_code = "es") {
   
   ## ---- paso (0) setup ----
 
@@ -548,30 +813,36 @@ start_translation <- function() {
   # Acá empieza el script.
   # ~~~~~~~~~~~~~~~~~~~~~~
   
-  ## ---- paso (1) generar PO's en inglés ----
+  ## ---- paso (1) generar/actualizar PO a partir de viñetas en inglés ----
+  messagef("Paso (%d): ", 1L, gettext("identificar viñetas..."))
+  rmd_files <- dir(,".Rmd$")
+  if (!length(rmd_files)) {
+    stopf("No se encontraron archivos para traducir")
+  } else {
+    for (i in rmd_files) catfln("* %s", i)
+  }
+  
   
   ## ---- paso (2) generar po desde rmd en ingles ----
-  message("Paso (2) generar_po_desde_rmd_en_ingles")
+  messagef("Paso (%d): %s", 2L, gettext("generar/actualizar PO a partir de viñetas en inglés..."))
+  
   {
-    rmd_files <- dir(,".Rmd$")
-    if (!length(rmd_files)) {
-      stopf("No se encontraron archivos para traducir")
-    }
     for (f in rmd_files) 
-      rmd2po(f, lang = "es", verbose = TRUE)
+      rmd2po(f, lang = lang_code, verbose = TRUE)
   }
   
   ## ---- paso (3) extrae texto de archivos PO ----
-  message("Paso (3) extrae texto de archivos PO")
+  messagef("Paso (%d): %s", 3L, gettext("extrae texto de archivos PO..."))
+  
   if (get0("DEBUG", ifnotfound = FALSE)) readline("presione [Enter]")
   {
     # extrae directo del PO para evitar msgcat, msggrep y programas
     # similares de gettext
     message("Extraer mensajes originales (inglés) de archivos PO y generar .txt ...")
-    dir.create(file.path("es", "google-translations"), showWarnings = FALSE)
-    files.po <- dir(file.path("es", "po"), "[.]po$", full.names = TRUE) 
+    dir.create(file.path(lang_code, "google-translations"), showWarnings = FALSE)
+    files.po <- dir(file.path(lang_code, "po"), "[.]po$", full.names = TRUE) 
     files.txt <- file.path(
-      "es", "google-translations", basename(sub(paste0("-", "es", "[.]po$"), "-en.txt", files.po)))
+      lang_code, "google-translations", basename(sub(paste0("-", lang_code, "[.]po$"), "-en.txt", files.po)))
     extrae_msgid_de_po(files.po, files.txt)
   }
   
@@ -584,7 +855,7 @@ start_translation <- function() {
   #      usethis::gh_token_help()
   #      gitcreds::gitcreds_cache_envvar()
   
-  message("Paso (4) subir estos txt al repo")
+  messagef("Paso (%d): %s", 4L, gettext("subir estos txt al repo..."))
   cat("=====\n")
   catfln("El resto del proceso es subir a repo los archivos txt y scrapear ese archivo traducido por google.")
 #  catfln("algunas librerías usan llamadas web a google directamente, o scrapean las claves de la API.")
@@ -626,9 +897,18 @@ start_translation <- function() {
         else Sys.setenv("GITHUB_PAT" = GITHUB_PAT_prev) }, 
       error = \(e) stopf("%s", conditionMessage(e)),
       {
+        current_branch <- gert::git_branch()
+        conf <- gert::git_config()
+        user.name <- conf[match("user.name", conf$name, NA), "value"]
+        user.name <- if (is.na(user.name)) "anonymous" else make.names(user.name)
+        branch_name <- get0("branch_name") %||% sprintf(
+          "transl_%s_%s", user.name, format(Sys.time(), "%Y%m%dT%H%m%z")
+        )
+        gert::git_branch_create(branch_name)
+        gert::git_branch_set_upstream(branch_name)
         gert::git_add(file.path("vignettes", files.txt))
         if (NROW(gert::git_status(staged = TRUE, file.path("vignettes", files.txt)))) {
-          message("Actualizando (commit) repo local")
+          messagef("Actualizando (commit) repo local, rama %s", gert::git_branch())
           gert::git_commit(gettext("Actualizar txt para traducir"))
         } else {
           message("Sin modificaciones en repo local")
@@ -690,6 +970,11 @@ start_translation <- function() {
           message("Actualización exitosa")
           break
         }
+      
+        # vuelve a main
+        gert::git_branch_checkout(current_branch)
+        gert::git_branch_delete(branch_name)
+        # branch_name se preserva para el próximo paso.
       }
     )
   }
@@ -700,10 +985,10 @@ start_translation <- function() {
   ## ---- paso (5) scraping de traducciones ----
   # Todo esto se evitaría con una buena api de traducción gratuita.
   # pero NO EXISTE!
-  message("paso (5) scraping de traducciones")
+  messagef("Paso (%d): %s", 5L, gettext("scraping de traducciones..."))
   catfln("Este paso utiliza web scraping para traducir el texto extraído (peor es nada)")
   {
-    files.txt.es <- sub("-en[.]txt$", paste0("-", "es", ".txt"), files.txt)
+    files.txt.es <- sub("-en[.]txt$", paste0("-", lang_code, ".txt"), files.txt)
     for (i in 1:3) {
       switch (i,
         message("Probar con chromote (requiere google chrome)"),
@@ -711,10 +996,12 @@ start_translation <- function() {
         stopf("no fue posible extraer traducciones."))
       result <- switch (i,
         tryCatch(
-          extraer_traducciones_con_chromote(files.txt, files.txt.es, wait = 1.5),
+          extraer_traducciones_con_chromote(
+            files.txt, files.txt.es, wait = 1.5, lang_code = lang_code, branch_name = branch_name),
           web.driver.error = \(e) (e)),
         tryCatch(
-          extraer_traducciones_con_selenium(files.txt, files.txt.es, wait = 1.5),
+          extraer_traducciones_con_selenium(
+            files.txt, files.txt.es, wait = 1.5, , lang_code = lang_code, branch_name = branch_name),
           web.driver.error = \(e) (e)))
       if (!inherits(result, "web.driver.error")) break
     }
@@ -728,36 +1015,36 @@ start_translation <- function() {
   
   
   ## ---- paso (6) combinar traducción en el PO ----
-  message("paso (6) combinar traducciones en PO")
+  messagef("Paso (%d): %s", 6L, gettext("combinar traducciones en PO..."))
   cat("====\n")
   catfln("NOTA: En este paso es que también puede modificar algo en los txt antes de continuar. Luego sólo se puede actualizar los .PO.")
+  catfln("Las traducciones existentes no se modifican")
   if (interactive() && menu(c("Continuar", "Salir")) == 2) return(1)
   
   {
     # función hace el trabajo de msgcat, etc.
     # analizar si potools tiene algo similar...
-    combinar_plain_txt_en_po(files.txt.es, files.po)    
+    combinar_plain_txt_en_po(files.txt.es, files.po, overwrite = FALSE)    
     
     # Actualiza metadata ej: name = "Ricardo Villalba", mail = "rikivillalba@gmail.com"
     # TODO: arreglar la función. por ahora no hace nada
     md <- try(obtener_po_metadata(files.po))
     #if (!inherits(md, "try-error")) 
       
-    # actualizar_po_metadata(
+    # actualizar_po_metadata( lang_code = "es",
     #   name = "Ricardo Villalba", 
     #   email = "rikivillalba@gmail.com") 
   }
   
   ## ---- paso (7) generar .Rmd traducidos ----
-  message("paso (7) generar .Rmd traducidos")
+  messagef("Paso (%d): %s", 7L, gettext("generar .Rmd traducidos..."))
   for (f in rmd_files) {
-    rmd <- po2rmd(f, lang = "es", verbose = T)
+    rmd <- po2rmd(f, lang = lang_code, verbose = T)
   }
   
   ## ---- paso (8) cambiar rutas en código R de subcarpeta del idioma ----
-  message("paso (8) cambiar rutas en código R de subcarpeta del idioma")
-  cambiar_rutas_en_Rmd(lang = "es")
-  
+  messagef("Paso (%d): %s", 7L, gettext("cambiar rutas en código R de subcarpeta del idioma..."))
+  cambiar_rutas_en_Rmd(lang = lang_code)
   message("paso (9) cambiar títulos")
   #TODO: este paso está HARCODEADO. rmd2po no tiene en cuenta los títulos
   # habríoa que generar un PO con los títulos y usar ese.
@@ -767,9 +1054,12 @@ start_translation <- function() {
   message("paso (10) subir a repo.")
   {
     switch(
-      menu(title = gettextf("¿Desea actualizar el repo con estas traducciones (se incluyen en la carpeta '%s')?", "es"), c(
-        gettext("Intentar `git pull` desde R"),
-        gettext("Continuar sin actualizar el repo"))),
+      menu(
+        title = gettextf(
+          "¿Desea actualizar el repo con estas traducciones (se incluyen en la carpeta '%s')?", 
+          lang_code), 
+        c(gettext("Intentar `git pull` desde R"),
+          gettext("Continuar sin actualizar el repo"))),
       {
         message("Intentando `git push`...")
         tryCatch(
@@ -793,5 +1083,7 @@ local({
   catfln("Utiliza partes del proyecto rmdpo - https://github.com/SciViews/rmdpo")
   setup()
   catfln("Sesión interactiva, puede haber algunas preguntas")
-  cat("*** Ejecute `start_translation()` para iniciar (q() para salir) ***\n")
+  cat("*** Ejecute `start_translation()` para iniciar traducción automática\n")
+  cat("*** Ejecute `update_PO()` para solamente actualizar el catálogo .PO con los cambios en los .Rmd más recientes\n")
+  cat("*** Ejecute `q()` para salir de R\n")
 })

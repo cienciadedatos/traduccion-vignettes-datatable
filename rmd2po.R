@@ -319,7 +319,9 @@ rmd2po <- function(rmdfile, lang = "fr", podir = "po",
         { exit_code <- system2(
             command = md2po, 
             args = c(
-              "--quiet", "--save", "--merge-pofiles", "--remove-not-found", 
+              "--quiet", "--save", 
+              "--merge-pofiles",         # Mantiene traducciones existentes 
+              "--remove-not-found",      
               "--metadata", shQuote(sprintf("Language: %s", lang)),
               "--metadata", shQuote(
                 sprintf("PO-Revision-Date: %s", format(Sys.time(), "%Y-%m-%d %H:%M%z"))),
