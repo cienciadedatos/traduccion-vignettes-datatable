@@ -5,8 +5,8 @@ output:
   markdown::html_format
 vignette: >
   %\VignetteIndexEntry{Joins in data.table}
-  %\VignetteEngine{knitr::knitr}
   \usepackage[utf8]{inputenc}
+  %\VignetteEngine{knitr::knitr}
 editor_options: 
   chunk_output_type: console
 ---

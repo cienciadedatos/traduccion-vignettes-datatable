@@ -46,7 +46,7 @@ dim(flights)
 
 En esta viñeta, vamos a
 
-* primero, introducir el concepto de `clave` en *data.table*, y establezca y use claves para realizar *búsquedas binarias rápidas* basadas en subconjuntos en `i`,
+* primero, introducir el concepto de `clave` en *data.table*, y establecer y usar claves para realizar *búsquedas binarias rápidas* basadas en subconjuntos en `i`,
 
 * observar que podemos combinar subconjuntos basados en clave junto con `j` y `by` exactamente de la misma manera que antes,
 
@@ -84,7 +84,7 @@ Es decir, los nombres de fila son más o menos *un índice* de las filas de un *
 
 1. Cada fila está limitada a *exactamente un* nombre de fila.
 
-    But, a person (for example) has at least two names - a *first* and a *second* name. It is useful to organise a telephone directory by *surname* then *first name*.
+    Pero, una persona (por ejemplo) tiene al menos dos nombres: - uno *primero* y un *segundo*. Esto es útil para organizar una guía telefónica por *apellido* y luego por su *primer nombre*.
 
 2. Y los nombres de las filas deben ser *únicos*.
 
@@ -105,11 +105,11 @@ rownames(DT)
 
 * Ten en cuenta que los nombres de las filas se han restablecido.
 
-* *data.tables* nunca utiliza nombres de fila. Dado que *data.tables* **hereda** de *data.frames*, aún tiene el atributo de nombres de fila, pero nunca los utiliza. En un momento veremos por qué.
+* *data.tables* nunca utilices nombres de fila. Dado que *data.tables* **hereda** de *data.frames*, aún tiene el atributo de nombres de fila, pero nunca los utiliza. En un momento veremos por qué.
 
-    If you would like to preserve the row names, use `keep.rownames = TRUE` in `as.data.table()` - this will create a new column called `rn` and assign row names to this column.
+    Si deseas conservar los nombres de las filas, usa `keep.rownames = TRUE` en `as.data.table()` - Esto creará una nueva columna llamada`rn` y asignará los nombres de las filas a esta columna.
 
-En cambio, en *data.tables*, establecemos y usamos `keys`. Piensa en una `key` como si fuera un conjunto de **nombres de fila supercargados**.
+En cambio, en *data.tables*, establecemos y usamos `keys`. Pensa en una `key` como si fuera un conjunto de **nombres de fila supercargados**.
 
 #### Claves y sus propiedades {#key-properties}
 
@@ -119,11 +119,11 @@ En cambio, en *data.tables*, establecemos y usamos `keys`. Piensa en una `key` c
 
 3. Establecer una `clave` hace *dos* cosas:
 
-    a. physically reorders the rows of the *data.table* by the column(s) provided *by reference*, always in *increasing* order.
+    a. Reordena físicamente las filas del  *data.table* por las columna(s) proporcionada(s) *por refefencia*, siempre en orden *creciente*.
     
-    b. marks those columns as *key* columns by setting an attribute called `sorted` to the *data.table*.
+    b. Marca esas columnas como columnas *keys* al establecer un atributo llamado `sorted` en el *data.table*.
     
-    Since the rows are reordered, a *data.table* can have at most one key because it can not be sorted in more than one way.
+    Dado que las filas se reordenan, un *data.table* puede tener como máximo una clave, ya que no se puede ordenar de más de una manera.
 
 Para el resto de la viñeta, trabajaremos con el conjunto de datos "flights".
 
@@ -145,7 +145,7 @@ head(flights)
 
 * Ten en cuenta que no tuvimos que asignar el resultado a una variable. Esto se debe a que, al igual que la función `:=` que vimos en la viñeta [`vignette("datatable-reference-semantics", package="data.table")`](datatable-reference-semantics.html), `setkey()` y `setkeyv()` modifican la entrada *data.table* *por referencia*. Devuelven el resultado de forma invisible.
 
-* La *data.table* ahora está reordenada (u ordenada) por la columna que proporcionamos: `origin`. Como reordenamos por referencia, solo necesitamos memoria adicional de una columna de longitud igual a la cantidad de filas en la *data.table* y, por lo tanto, es muy eficiente en el uso de la memoria.
+* *data.table* ahora está reordenada (u ordenada) por la columna que proporcionamos: `origin`. Como reordenamos por referencia, solo necesitamos memoria adicional de una columna de longitud igual a la cantidad de filas en la *data.table* y, por lo tanto, es muy eficiente en el uso de la memoria.
 
 * También puedes establecer claves directamente al crear *data.tables* utilizando la función `data.table()` con el argumento `key`. Toma un vector de caracteres de nombres de columnas.
 
@@ -181,7 +181,7 @@ flights[.("JFK")]
     flights[c("JFK", "LGA")]    ## same as flights[.(c("JFK", "LGA"))]
     ```
     
-    This returns all columns corresponding to those rows where `origin` column matches either *"JFK"* or *"LGA"*.
+    Esto devuelve todas las columnas correspondientes a aquellas filas donde la columna origin coincide con *"JFK"* or *"LGA"*.
 
 #### -- ¿Cómo podemos obtener las columnas por las que se codifica una *data.table*?
 
@@ -272,7 +272,7 @@ flights[.("LGA", "TPA"), .(arr_delay)]
 
 ### b) Encadenamiento
 
-#### -- Sobre el resultado obtenido anteriormente, utilice el encadenamiento (chaining) para ordenar la columna en orden decreciente.
+#### -- Sobre el resultado obtenido anteriormente, utiliza el encadenamiento (chaining) para ordenar la columna en orden decreciente.
 
 ```{r}
 flights[.("LGA", "TPA"), .(arr_delay)][order(-arr_delay)]

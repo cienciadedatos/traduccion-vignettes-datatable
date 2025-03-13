@@ -126,7 +126,7 @@ Tenga en cuenta que el código anterior explica cómo se puede utilizar `:=`. No
 
 # 
 
-En las dos formas de `:=` que se muestran arriba, tenga en cuenta que no asignamos el resultado a una variable, porque no es necesario. La entrada *data.table* se modifica por referencia. Veamos algunos ejemplos para entender lo que queremos decir con esto.
+En las dos formas de `:=` que se muestran arriba, tene en cuenta que no asignamos el resultado a una variable, porque no es necesario. La entrada *data.table* se modifica por referencia. Veamos algunos ejemplos para entender lo que queremos decir con esto.
 
 Para el resto de la viñeta, trabajaremos con la tabla de datos *flights*.
 
@@ -306,7 +306,7 @@ head(flights)
 head(ans)
 ```
 
-* Tenga en cuenta que se ha añadido la nueva columna `speed` a la tabla de datos `flights`. Esto se debe a que `:=` realiza operaciones por referencia. Dado que `DT` (el argumento de la función) y `flights` hacen referencia al mismo objeto en la memoria, la modificación de `DT` también se refleja en `flights`.
+* Tene en cuenta que se ha añadido la nueva columna `speed` a la tabla de datos `flights`. Esto se debe a que `:=` realiza operaciones por referencia. Dado que `DT` (el argumento de la función) y `flights` hacen referencia al mismo objeto en la memoria, la modificación de `DT` también se refleja en `flights`.
 
 * Y `ans` contiene la velocidad máxima para cada mes.
 
@@ -322,12 +322,12 @@ Hay dos lugares particulares donde la función `copy()` es esencial:
 
 1. Contrariamente a la situación que hemos visto en el punto anterior, es posible que no queramos que la tabla de datos de entrada de una función se modifique *por referencia*. Como ejemplo, consideremos la tarea de la sección anterior, excepto que no queremos modificar `vuelos` por referencia.
 
-    Let's first delete the `speed` column we generated in the previous section.
+    Primero, eliminemos la columna speed que generamos en la sección anterior.
     
     ```{r}
     flights[, speed := NULL]
     ```
-    Now, we could accomplish the task as follows:
+    Ahora, podríamos realizar la tarea de la siguiente manera:
     
     ```{r}
     foo <- function(DT) {

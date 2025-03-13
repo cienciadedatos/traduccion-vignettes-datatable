@@ -20,7 +20,7 @@ Las traducciones de este documento están disponibles en
 * [Francés](https://rdatatable.gitlab.io/data.table/articles/fr/datatable-importing.html)
 * [Ruso](https://rdatatable.gitlab.io/data.table/articles/ru/datatable-importing.html)
 
-Este documento se centra en el uso de `data.table` como dependencia en otros paquetes R. Si estás interesado en utilizar el código C de `data.table` desde una aplicación que no sea R, o en llamar a sus funciones C directamente, salte a la [última sección](#non-r-api) de esta viñeta.
+Este documento se centra en el uso de `data.table` como dependencia en otros paquetes R. Si estás interesado en utilizar el código C de `data.table` desde una aplicación que no sea R, o en llamar a sus funciones C directamente, salta a la [última sección](#non-r-api) de esta viñeta.
 
 Importar `data.table` no es diferente a importar otros paquetes R. Esta viñeta tiene como objetivo responder las preguntas más comunes que surgen en torno a ese tema; las lecciones presentadas aquí se pueden aplicar a otros paquetes R.
 
@@ -143,13 +143,13 @@ El mecanismo de opciones en R es *global*. Lo que significa que si un usuario es
 
 Si enfrenta algún problema al crear un paquete que usa data.table, confirme que el problema se pueda reproducir en una sesión R limpia usando la consola R: `R CMD check package.name`.
 
-Algunos de los problemas más comunes a los que se enfrentan los desarrolladores suelen estar relacionados con herramientas auxiliares que están pensadas para automatizar algunas tareas de desarrollo de paquetes, por ejemplo, usar `roxygen` para generar el archivo `NAMESPACE` a partir de los metadatos de los archivos de código R. Otros están relacionados con las herramientas auxiliares que compilan y comprueban el paquete. Desafortunadamente, estas herramientas auxiliares a veces tienen efectos secundarios no deseados u ocultos que pueden ocultar el origen de los problemas. Por lo tanto, asegúrate de volver a comprobarlo usando la consola R (ejecuta R en la línea de comandos) y Asegúrate de que la importación esté definida en los archivos `DESCRIPTION` y `NAMESPACE` siguiendo las [instrucciones](#DESCRIPTION) [arriba](#NAMESPACE).
+Algunos de los problemas más comunes a los que se enfrentan los desarrolladores suelen estar relacionados con herramientas auxiliares que están pensadas para automatizar algunas tareas de desarrollo de paquetes, por ejemplo, usar `roxygen` para generar el archivo `NAMESPACE` a partir de los metadatos de los archivos de código R. Otros están relacionados con las herramientas auxiliares que compilan y comprueban el paquete. Desafortunadamente, estas herramientas auxiliares a veces tienen efectos secundarios no deseados u ocultos que pueden ocultar el origen de los problemas. Por lo tanto, asegúrate de volver a comprobarlo usando la consola R (ejecuta R en la línea de comandos) y asegúrate de que la importación esté definida en los archivos `DESCRIPTION` y `NAMESPACE` siguiendo las [instrucciones](#DESCRIPTION) [arriba](#NAMESPACE).
 
 Si no puedes reproducir los problemas que tienes al usar la compilación y verificación de la consola R simple, puedes intentar obtener ayuda en función de los problemas anteriores que hemos encontrado con la interacción de `data.table` con las herramientas auxiliares: [devtools#192](https://github.com/r-lib/devtools/issues/192) o [devtools#1472](https://github.com/r-lib/devtools/issues/1472).
 
 ## Licencia
 
-Desde la versión 1.10.5, `data.table` tiene licencia de Mozilla Public License (MPL). Las razones del cambio de GPL se deben leer en su totalidad [aquí](https://github.com/Rdatatable/data.table/pull/2456) y puede leer más sobre MPL en Wikipedia [aquí](https://en.wikipedia.org/wiki/Mozilla_Public_License) y [aquí](https://en.wikipedia.org/wiki/Comparison_of_free_and_open-source_software_licenses).
+Desde la versión 1.10.5, `data.table` tiene licencia de Mozilla Public License (MPL). Las razones del cambio de GPL se deben leer en su totalidad [aquí](https://github.com/Rdatatable/data.table/pull/2456) y puedes leer más sobre MPL en Wikipedia [aquí](https://en.wikipedia.org/wiki/Mozilla_Public_License) y [aquí](https://en.wikipedia.org/wiki/Comparison_of_free_and_open-source_software_licenses).
 
 ## Importe opcionalmente `data.table`: Sugiere
 
