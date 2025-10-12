@@ -772,7 +772,7 @@ cambiar_rutas_en_Rmd <- function(lang, debug = FALSE) {
   invisible()
 }
 
-update_PO <- function() {
+update_PO <- function(lang_code = "es") {
   basedir <- getwd()
   on.exit({
     setwd(basedir)
@@ -1084,6 +1084,6 @@ local({
   setup()
   catfln("Sesión interactiva, puede haber algunas preguntas")
   cat("*** Ejecute `start_translation()` para iniciar traducción automática\n")
-  cat("*** Ejecute `update_PO()` para solamente actualizar el catálogo .PO con los cambios en los .Rmd más recientes\n")
+  cat("*** Ejecute `update_PO()` para solamente actualizar el catálogo .PO con los cambios en los .Rmd en inglés más recientes\n")
   cat("*** Ejecute `q()` para salir de R\n")
 })
