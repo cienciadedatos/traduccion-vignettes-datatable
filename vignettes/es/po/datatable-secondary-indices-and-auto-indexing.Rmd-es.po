@@ -1,7 +1,7 @@
 #
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2025-02-18 14:28-0300\n"
+"PO-Revision-Date: 2025-10-12 02:25-0300\n"
 "Language: es\n"
 
 #: es/datatable-secondary-indices-and-auto-indexing.Rmd.tmp:block 2
@@ -17,8 +17,8 @@ msgid ""
 "secondary-indices-and-auto-indexing.html)====="
 msgstr ""
 "=====* "
-"[Francés](https://rdatatable.gitlab.io/data.table/articles/fr/datatable-second"
-"ary-indices-and-auto-indexing.html)====="
+"[Francés](https://rdatatable.gitlab.io/data.table/articles/fr/datatable-"
+"secondary-indices-and-auto-indexing.html)====="
 
 #: es/datatable-secondary-indices-and-auto-indexing.Rmd.tmp:block 5
 #: (paragraph)
@@ -35,9 +35,8 @@ msgstr ""
 "Esta viñeta supone que el lector está familiarizado con la sintaxis `[i, j, "
 "by]` de data.table y con la forma de realizar subconjuntos rápidos basados "
 "en claves. Si no estás familiarizado con estos conceptos, lea primero las "
-"viñetas [`vignette(\"datatable-intro\", "
-"package=\"data.table\")`](datatable-intro.html), "
-"[`vignette(\"datatable-reference-semantics\", "
+"viñetas [`vignette(\"datatable-intro\", package=\"data.table\")`](datatable-"
+"intro.html), [`vignette(\"datatable-reference-semantics\", "
 "package=\"data.table\")`](datatable-reference-semantics.html) y "
 "[`vignette(\"datatable-keys-fast-subset\", "
 "package=\"data.table\")`](datatable-keys-fast-subset.html)."
@@ -53,8 +52,8 @@ msgid ""
 "intro\", package=\"data.table\")`](datatable-intro.html) vignette."
 msgstr ""
 "Utilizaremos los mismos datos de `flights` que en la viñeta "
-"[`vignette(\"datatable-intro\", "
-"package=\"data.table\")`](datatable-intro.html)."
+"[`vignette(\"datatable-intro\", package=\"data.table\")`](datatable-"
+"intro.html)."
 
 #: es/datatable-secondary-indices-and-auto-indexing.Rmd.tmp:block 10 (header)
 msgid "Introduction"
@@ -122,8 +121,8 @@ msgid ""
 "stores that *order vector* in an additional attribute called `index`.====="
 msgstr ""
 "=====* No reordena físicamente toda la tabla de datos en la RAM. En cambio, "
-"solo calcula el orden para el conjunto de columnas proporcionadas y almacena "
-"ese *vector de orden* en un atributo adicional llamado `index`.====="
+"solo calcula el orden para el conjunto de columnas proporcionadas y almacena"
+" ese *vector de orden* en un atributo adicional llamado `index`.====="
 
 #: es/datatable-secondary-indices-and-auto-indexing.Rmd.tmp:block 19
 #: (paragraph)
@@ -131,8 +130,8 @@ msgid ""
 "=====* There can be more than one secondary index for a data.table (as we "
 "will see below).====="
 msgstr ""
-"=====* Puede haber más de un índice secundario para una tabla de datos (como "
-"veremos a continuación).====="
+"=====* Puede haber más de un índice secundario para una tabla de datos (como"
+" veremos a continuación).====="
 
 #: es/datatable-secondary-indices-and-auto-indexing.Rmd.tmp:block 20 (header)
 msgid "b) Set and get secondary indices"
@@ -143,8 +142,8 @@ msgid ""
 "-- How can we set the column `origin` as a secondary index in the "
 "*data.table* `flights`?"
 msgstr ""
-"-- ¿Cómo podemos establecer la columna `origen` como un índice secundario en "
-"la *tabla de datos* `vuelos`?"
+"-- ¿Cómo podemos establecer la columna `origen` como un índice secundario en"
+" la *tabla de datos* `vuelos`?"
 
 #: es/datatable-secondary-indices-and-auto-indexing.Rmd.tmp:block 23
 #: (paragraph)
@@ -236,8 +235,8 @@ msgid ""
 "a) computing the order vector for the column(s) provided, here, `origin`, "
 "and"
 msgstr ""
-"a) calcular el vector de orden para la(s) columna(s) proporcionada(s), aquí, "
-"`origen`, y"
+"a) calcular el vector de orden para la(s) columna(s) proporcionada(s), aquí,"
+" `origen`, y"
 
 #: es/datatable-secondary-indices-and-auto-indexing.Rmd.tmp:block 37
 #: (paragraph)
@@ -256,10 +255,10 @@ msgid ""
 "reordering the data.table could be time consuming (depending on the number "
 "of rows and columns)."
 msgstr ""
-"Calcular el orden no es la parte que consume mucho tiempo, ya que data.table "
-"utiliza un ordenamiento por base real en vectores de números enteros, "
-"caracteres y números. Sin embargo, reordenar data.table puede consumir mucho "
-"tiempo (según la cantidad de filas y columnas)."
+"Calcular el orden no es la parte que consume mucho tiempo, ya que data.table"
+" utiliza un ordenamiento por base real en vectores de números enteros, "
+"caracteres y números. Sin embargo, reordenar data.table puede consumir mucho"
+" tiempo (según la cantidad de filas y columnas)."
 
 #: es/datatable-secondary-indices-and-auto-indexing.Rmd.tmp:block 40
 #: (paragraph)
@@ -269,8 +268,8 @@ msgid ""
 "depending on our data.table dimensions."
 msgstr ""
 "A menos que nuestra tarea implique la creación repetida de subconjuntos en "
-"la misma columna, la creación rápida de subconjuntos basada en claves podría "
-"anularse efectivamente al momento de reordenar, dependiendo de las "
+"la misma columna, la creación rápida de subconjuntos basada en claves podría"
+" anularse efectivamente al momento de reordenar, dependiendo de las "
 "dimensiones de nuestra tabla de datos."
 
 #: es/datatable-secondary-indices-and-auto-indexing.Rmd.tmp:block 41 (header)
@@ -293,8 +292,8 @@ msgid ""
 " to be able to perform the fast subsetting by eliminating the reordering "
 "step."
 msgstr ""
-"Y esto reordena los vuelos por \"destino\", *de nuevo*. Lo que realmente nos "
-"gustaría es poder realizar la subdivisión rápida eliminando el paso de "
+"Y esto reordena los vuelos por \"destino\", *de nuevo*. Lo que realmente nos"
+" gustaría es poder realizar la subdivisión rápida eliminando el paso de "
 "reordenación."
 
 #: es/datatable-secondary-indices-and-auto-indexing.Rmd.tmp:block 45
@@ -382,8 +381,8 @@ msgstr "a) Subconjuntos rápidos en `i`"
 #: es/datatable-secondary-indices-and-auto-indexing.Rmd.tmp:block 58 (header)
 msgid "-- Subset all rows where the origin airport matches *\"JFK\"* using `on`"
 msgstr ""
-"-- Subconjunto de todas las filas donde el aeropuerto de origen coincide con "
-"*\"JFK\"* usando `on`"
+"-- Subconjunto de todas las filas donde el aeropuerto de origen coincide con"
+" *\"JFK\"* usando `on`"
 
 #: es/datatable-secondary-indices-and-auto-indexing.Rmd.tmp:block 60
 #: (paragraph)
@@ -475,8 +474,8 @@ msgid ""
 "-- On the result obtained above, use chaining to order the column in "
 "decreasing order."
 msgstr ""
-"-- Sobre el resultado obtenido anteriormente, utilice el encadenamiento para "
-"ordenar la columna en orden decreciente."
+"-- Sobre el resultado obtenido anteriormente, utilice el encadenamiento para"
+" ordenar la columna en orden decreciente."
 
 #: es/datatable-secondary-indices-and-auto-indexing.Rmd.tmp:block 75 (header)
 msgid "d) Compute or *do* in `j`"
@@ -503,10 +502,9 @@ msgid ""
 "package=\"data.table\")`](datatable-keys-fast-subset.html). Let's take a "
 "look at all the `hours` available in the `flights` *data.table*:"
 msgstr ""
-"Ya hemos visto este ejemplo en las viñetas "
-"[`vignette(\"datatable-reference-semantics\", "
-"package=\"data.table\")`](datatable-reference-semantics.html) y "
-"[`vignette(\"datatable-keys-fast-subset\", "
+"Ya hemos visto este ejemplo en las viñetas [`vignette(\"datatable-reference-"
+"semantics\", package=\"data.table\")`](datatable-reference-semantics.html) y"
+" [`vignette(\"datatable-keys-fast-subset\", "
 "package=\"data.table\")`](datatable-keys-fast-subset.html). Echemos un "
 "vistazo a todas las `horas` disponibles en la tabla de datos `vuelos`:"
 
@@ -517,14 +515,15 @@ msgid ""
 "*24* hours seem to be present. Let's go ahead and replace *24* with *0*, but"
 " this time using `on` instead of setting keys."
 msgstr ""
-"Vemos que hay un total de `25` valores únicos en los datos. Parece que están "
-"presentes tanto *0* como *24* horas. Reemplacemos *24* por *0*, pero esta "
+"Vemos que hay un total de `25` valores únicos en los datos. Parece que están"
+" presentes tanto *0* como *24* horas. Reemplacemos *24* por *0*, pero esta "
 "vez usemos `on` en lugar de claves de configuración."
 
 #: es/datatable-secondary-indices-and-auto-indexing.Rmd.tmp:block 83
 #: (paragraph)
 msgid "Now, let's check if `24` is replaced with `0` in the `hour` column."
-msgstr "Ahora, verifiquemos si `24` se reemplaza con `0` en la columna `hora`."
+msgstr ""
+"Ahora, verifiquemos si `24` se reemplaza con `0` en la columna `hora`."
 
 #: es/datatable-secondary-indices-and-auto-indexing.Rmd.tmp:block 85
 #: (paragraph)
@@ -538,8 +537,8 @@ msgstr ""
 "=====* Esta es una gran ventaja de los índices secundarios. Antes, para "
 "actualizar unas pocas filas de `hour`, teníamos que ejecutar `setkey()` "
 "sobre él, lo que inevitablemente reordenaba toda la tabla de datos. Con "
-"`on`, se conserva el orden y la operación es mucho más rápida. Si observamos "
-"el código, la tarea que queríamos realizar también es bastante clara.====="
+"`on`, se conserva el orden y la operación es mucho más rápida. Si observamos"
+" el código, la tarea que queríamos realizar también es bastante clara.====="
 
 #: es/datatable-secondary-indices-and-auto-indexing.Rmd.tmp:block 86 (header)
 msgid "f) Aggregation using `by`"
@@ -588,8 +587,8 @@ msgid ""
 "-- Subset only the first matching row where `dest` matches *\"BOS\"* and "
 "*\"DAY\"*"
 msgstr ""
-"-- Subconjunto solo de la primera fila coincidente donde `dest` coincide con "
-"*\"BOS\"* y *\"DAY\"*"
+"-- Subconjunto solo de la primera fila coincidente donde `dest` coincide con"
+" *\"BOS\"* y *\"DAY\"*"
 
 #: es/datatable-secondary-indices-and-auto-indexing.Rmd.tmp:block 94 (header)
 msgid ""
@@ -688,9 +687,9 @@ msgstr ""
 "El tiempo necesario para crear el subconjunto la primera vez es el tiempo "
 "necesario para crear el índice + el tiempo necesario para crear el "
 "subconjunto. Dado que crear un índice secundario implica únicamente la "
-"creación del vector de orden, esta operación combinada es más rápida que los "
-"escaneos de vectores en muchos casos. Pero la verdadera ventaja se encuentra "
-"en los subconjuntos sucesivos, ya que son extremadamente rápidos."
+"creación del vector de orden, esta operación combinada es más rápida que los"
+" escaneos de vectores en muchos casos. Pero la verdadera ventaja se "
+"encuentra en los subconjuntos sucesivos, ya que son extremadamente rápidos."
 
 #: es/datatable-secondary-indices-and-auto-indexing.Rmd.tmp:block 110
 #: (paragraph)
@@ -720,8 +719,8 @@ msgid ""
 "setting global argument `options(datatable.use.index = FALSE)`.====="
 msgstr ""
 "=====* Deshabilitar la indexación automática aún permite usar índices "
-"creados explícitamente con `setindex` o `setindexv`. Puedes deshabilitar los "
-"índices por completo configurando el argumento global "
+"creados explícitamente con `setindex` o `setindexv`. Puedes deshabilitar los"
+" índices por completo configurando el argumento global "
 "`options(datatable.use.index = FALSE)`.====="
 
 #: es/datatable-secondary-indices-and-auto-indexing.Rmd.tmp:block 114
@@ -732,8 +731,8 @@ msgid ""
 "extend binary search to work with more binary operators like `<`, `<=`, `>` "
 "and `>=`."
 msgstr ""
-"En la versión reciente, ampliamos la indexación automática a expresiones que "
-"involucran más de una columna (combinadas con el operador `&`). En el "
+"En la versión reciente, ampliamos la indexación automática a expresiones que"
+" involucran más de una columna (combinadas con el operador `&`). En el "
 "futuro, planeamos ampliar la búsqueda binaria para que funcione con más "
 "operadores binarios como `<`, `<=`, `>` y `>=`."
 
@@ -744,8 +743,8 @@ msgid ""
 "in the [next vignette (`vignette(\"datatable-joins\", "
 "package=\"data.table\")`)](datatable-joins.html)."
 msgstr ""
-"Discutiremos *subconjuntos* rápidos usando claves e índices secundarios para "
-"*uniones* en la [siguiente viñeta (`vignette(\"datatable-joins\", "
+"Discutiremos *subconjuntos* rápidos usando claves e índices secundarios para"
+" *uniones* en la [siguiente viñeta (`vignette(\"datatable-joins\", "
 "package=\"data.table\")`)](datatable-joins.html)."
 
 #: es/datatable-secondary-indices-and-auto-indexing.Rmd.tmp:block 117
