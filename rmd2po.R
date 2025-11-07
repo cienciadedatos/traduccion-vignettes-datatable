@@ -283,11 +283,18 @@ rmd2po <- function(rmdfile, lang = "fr", podir = "po",
   rmdfilename <- basename(rmdfile)
   odir <- setwd(rmddir)     # see NOTE above
   tmpfile <- file.path(lang, paste0(basename(rmdfile), ".tmp"))
-  
+  exit_code <- 0
   tryCatch(
     finally = {
       setwd(odir) 
       unlink(tmpfile)
+      if (exit_code) {
+        message(
+          "Nota: en Windows, la instalación de mdpo requiere compilación (MSVC) para python>3.8\n",
+          "Específicamente el componente md4c sólo tiene binarios (whl) hasta python 3.8\n",
+          "En caso de errores, reiniciar arrancando previamente un entorno virtual con esa versión de python (use_virtualenv())"
+        )
+      }
     },  { 
       if (isTRUE(verbose)) 
         messagef("Procesando %s", rmdfilename)

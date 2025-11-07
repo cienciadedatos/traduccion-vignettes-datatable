@@ -27,7 +27,6 @@
 #   "c:\\apps\\git\\mingw64\\bin",
 #   "c:\\apps\\git\\bin"))
 
-
 # ---- funciones auxiliares ----
 
 if (!exists("%||%")) `%||%` <- function(x, y) {if (is.null(x)) y else x}
@@ -676,6 +675,10 @@ extraer_traducciones_con_chromote <- function(
 }
 
 setup <- function() {
+  if (getOption("rutinas_traduccion.setup", FALSE)) {
+    return()
+  }
+  options("rutinas_traduccion.setup" = TRUE)
   if (basename(getwd()) == "vignettes" && !"./vignettes" %in% list.dirs()) 
     setwd("..")
   if (!file.exists("rmd2po.R")) {
@@ -773,6 +776,7 @@ cambiar_rutas_en_Rmd <- function(lang, debug = FALSE) {
 }
 
 update_PO <- function(lang_code = "es") {
+  setup()
   basedir <- getwd()
   on.exit({
     setwd(basedir)
@@ -798,23 +802,29 @@ update_PO <- function(lang_code = "es") {
 start_translation <- function(lang_code = "es") {
   
   ## ---- paso (0) setup ----
-
+  
   messagef("Inicio ...")
+  setup()
   
   basedir <- getwd()
   on.exit({
     setwd(basedir)
-    message("Gracias por usar este script (q() para salir de R)")
   })
   
   message("Cambiando a directorio «./vignettes»")
-  setwd(file.path(basedir, "vignettes"))
+  tryCatch(
+    setwd(file.path(basedir, "vignettes")),
+    error = \(e) {
+      e$message <- paste(e$message, "(¿su directorio actual es ./traduccion-vignettes-datatable?)")
+      stop(e)
+    }
+  )
 
   # Acá empieza el script.
   # ~~~~~~~~~~~~~~~~~~~~~~
   
   ## ---- paso (1) generar/actualizar PO a partir de viñetas en inglés ----
-  messagef("Paso (%d): ", 1L, gettext("identificar viñetas..."))
+  catfln("Paso (%d): %s", 1L, gettext("identificar viñetas..."))
   rmd_files <- dir(,".Rmd$")
   if (!length(rmd_files)) {
     stopf("No se encontraron archivos para traducir")
@@ -824,7 +834,7 @@ start_translation <- function(lang_code = "es") {
   
   
   ## ---- paso (2) generar po desde rmd en ingles ----
-  messagef("Paso (%d): %s", 2L, gettext("generar/actualizar PO a partir de viñetas en inglés..."))
+  catfln("Paso (%d): %s", 2L, gettext("generar/actualizar PO a partir de viñetas en inglés..."))
   
   {
     for (f in rmd_files) 
@@ -832,7 +842,7 @@ start_translation <- function(lang_code = "es") {
   }
   
   ## ---- paso (3) extrae texto de archivos PO ----
-  messagef("Paso (%d): %s", 3L, gettext("extrae texto de archivos PO..."))
+  catfln("Paso (%d): %s", 3L, gettext("extrae texto de archivos PO..."))
   
   if (get0("DEBUG", ifnotfound = FALSE)) readline("presione [Enter]")
   {
@@ -855,24 +865,17 @@ start_translation <- function(lang_code = "es") {
   #      usethis::gh_token_help()
   #      gitcreds::gitcreds_cache_envvar()
   
-  messagef("Paso (%d): %s", 4L, gettext("subir estos txt al repo..."))
+  #algunas librerías usan llamadas web a google directamente, o scrapean las claves de la API
+  #Google podría cambiar detalles de la API sin demasiada explicación ¯\\_:)_/¯.
+  catfln("Paso (%d): %s", 4L, gettext("subir estos txt al repo..."))
   cat("=====\n")
   catfln("El resto del proceso es subir a repo los archivos txt y scrapear ese archivo traducido por google.")
-#  catfln("algunas librerías usan llamadas web a google directamente, o scrapean las claves de la API.")
   catfln("Aunque no es lo más elegante, este método puede ser un poco más portable.")
-#  catfln("Google podría cambiar detalles de la API sin demasiada explicación ¯\\_:)_/¯.")
   cat("=====\n")
   {
-    GITHUB_PAT_prev <- Sys.getenv("GITHUB_PAT", unset = NA)
-    PAT <- Sys.getenv("GITHUB_PAT_GITHUB_COM", unset = Sys.getenv("GITHUB_PAT"))
-    Sys.setenv(GITHUB_PAT = PAT)  
-    
-    git_version <- try(silent = T, system2(
-      "git", "--version", stdout = TRUE, stderr = nullfile()))
-    
     # función personalizada de askpass. Guarda la contraseña provista 
     # en la variable PAT como side-effect.
-    custom_askpass <- (function (prompt) {
+    custom_askpass <- function (prompt) {
       if (grepl("Please enter username for", prompt)) {
         prompt <- gettextf(
           "Ingrese el nombre de usuario de %s", 
@@ -889,8 +892,15 @@ start_translation <- function(lang_code = "es") {
         }
       }
       resp
-    })
+    }
     
+    
+    git_version <- try(silent = T, system2(
+      "git", "--version", stdout = TRUE, stderr = nullfile()))
+    
+    PAT <- Sys.getenv("GITHUB_PAT_GITHUB_COM", unset = Sys.getenv("GITHUB_PAT"))
+    GITHUB_PAT_prev <- Sys.getenv("GITHUB_PAT", unset = NA)
+    Sys.setenv(GITHUB_PAT = PAT)  
     tryCatch(
       finally = {
         if(is.na(GITHUB_PAT_prev)) Sys.unsetenv("GITHUB_PAT") 
@@ -904,7 +914,11 @@ start_translation <- function(lang_code = "es") {
         branch_name <- get0("branch_name") %||% sprintf(
           "transl_%s_%s", user.name, format(Sys.time(), "%Y%m%dT%H%m%z")
         )
+        remote <- "origin"  # si no es este poner el que corresponde
+        stopifnot(remote %in% gert::git_remote_list()$name)
+        catfln("create branch %s", branch_name)
         gert::git_branch_create(branch_name)
+        catfln("set upstream branch %s", branch_name)
         gert::git_branch_set_upstream(branch_name)
         gert::git_add(file.path("vignettes", files.txt))
         if (NROW(gert::git_status(staged = TRUE, file.path("vignettes", files.txt)))) {
@@ -985,8 +999,8 @@ start_translation <- function(lang_code = "es") {
   ## ---- paso (5) scraping de traducciones ----
   # Todo esto se evitaría con una buena api de traducción gratuita.
   # pero NO EXISTE!
-  messagef("Paso (%d): %s", 5L, gettext("scraping de traducciones..."))
-  catfln("Este paso utiliza web scraping para traducir el texto extraído (peor es nada)")
+  catfln("Paso (%d): %s", 5L, gettext("scraping de traducciones..."))
+  catfln("Este paso utiliza web scraping para traducir el texto extraído (o al menos lo intenta)")
   {
     files.txt.es <- sub("-en[.]txt$", paste0("-", lang_code, ".txt"), files.txt)
     for (i in 1:3) {
@@ -1015,9 +1029,9 @@ start_translation <- function(lang_code = "es") {
   
   
   ## ---- paso (6) combinar traducción en el PO ----
-  messagef("Paso (%d): %s", 6L, gettext("combinar traducciones en PO..."))
+  catfln("Paso (%d): %s", 6L, gettext("combinar traducciones en PO..."))
   cat("====\n")
-  catfln("NOTA: En este paso es que también puede modificar algo en los txt antes de continuar. Luego sólo se puede actualizar los .PO.")
+  catfln("NOTA: En este paso también se puede modificar algo en los txt antes de continuar. Luego sólo se puede actualizar los .PO.")
   catfln("Las traducciones existentes no se modifican")
   if (interactive() && menu(c("Continuar", "Salir")) == 2) return(1)
   
@@ -1025,7 +1039,10 @@ start_translation <- function(lang_code = "es") {
     # función hace el trabajo de msgcat, etc.
     # analizar si potools tiene algo similar...
     combinar_plain_txt_en_po(files.txt.es, files.po, overwrite = FALSE)    
-    
+    #TODO: después de este paso habría que correr un "update_PO()" porque
+    # rmd2po altera un poco la disposición de las traducciones.
+    update_PO()
+    #
     # Actualiza metadata ej: name = "Ricardo Villalba", mail = "rikivillalba@gmail.com"
     # TODO: arreglar la función. por ahora no hace nada
     md <- try(obtener_po_metadata(files.po))
@@ -1077,11 +1094,11 @@ start_translation <- function(lang_code = "es") {
 }
 
 local({
+  
   startmsg <- gettext("Script para tradución automática de viñetas .Rmd")
   cat(startmsg, "\n")
   catfln(strrep("=", nchar(startmsg)))
   catfln("Utiliza partes del proyecto rmdpo - https://github.com/SciViews/rmdpo")
-  setup()
   catfln("Sesión interactiva, puede haber algunas preguntas")
   cat("*** Ejecute `start_translation()` para iniciar traducción automática\n")
   cat("*** Ejecute `update_PO()` para solamente actualizar el catálogo .PO con los cambios en los .Rmd en inglés más recientes\n")
