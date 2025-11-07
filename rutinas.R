@@ -567,15 +567,14 @@ extraer_traducciones_con_selenium <- function(
 
   # Estos links vinculan a las traducciones de google
   google_urls <- sprintf(
-    "https://raw.githubusercontent.com.translate.goog/cienciadedatos/",
+    "https://raw-githubusercontent-com.translate.goog/cienciadedatos/",
     "traduccion-vignettes-datatable/refs/heads/%s/vignettes/%s?%s",
     branch_name,
     URLencode(files), 
     sprintf("_x_tr_sl=%s&_x_tr_tl=%s", "en", lang_code))
   
   raw_urls <- sprintf(
-    "https://raw.githubusercontent.com/cienciadedatos/",
-    "traduccion-vignettes-datatable/refs/heads/%s/vignettes/",
+    "https://raw.githubusercontent.com/cienciadedatos/traduccion-vignettes-datatable/refs/heads/%s/vignettes/%s",
     branch_name,
     URLencode(files))
   
@@ -615,15 +614,13 @@ extraer_traducciones_con_chromote <- function(
   )
   # Estos links vinculan a las traducciones de google
   google_urls <- sprintf(
-    "https://raw.githubusercontent.com.translate.goog/cienciadedatos/",
-    "traduccion-vignettes-datatable/refs/heads/%s/vignettes/%s?%s",
+    "https://raw-githubusercontent-com.translate.goog/cienciadedatos/traduccion-vignettes-datatable/refs/heads/%s/vignettes/%s?%s",
     branch_name,
     URLencode(files), 
     sprintf("_x_tr_sl=%s&_x_tr_tl=%s", "en", lang_code))
 
   raw_urls <- sprintf(
-    "https://raw.githubusercontent.com/cienciadedatos/",
-    "traduccion-vignettes-datatable/refs/heads/%s/vignettes/",
+    "https://raw.githubusercontent.com/cienciadedatos/traduccion-vignettes-datatable/refs/heads/%s/vignettes/%s",
     branch_name,
     URLencode(files))
 
@@ -916,6 +913,9 @@ start_translation <- function(lang_code = "es") {
           "transl_%s_%s", user.name, format(Sys.time(), "%Y%m%dT%H%m%z")
         )
         catfln("crear rama %s", branch_name)
+        if (branch_name %in% gert::git_branch_list()$name) {
+          gert::git_branch_delete(branch_name)
+        }
         gert::git_branch_create(branch_name, checkout = TRUE)
         tryCatch(
           finally = {
@@ -1013,11 +1013,11 @@ start_translation <- function(lang_code = "es") {
       result <- switch (i,
         tryCatch(
           extraer_traducciones_con_chromote(
-            files.txt, files.txt.es, wait = 1.5, lang_code = lang_code, branch_name = branch_name),
+            files.txt, files.txt.es, wait = 3, lang_code = lang_code, branch_name = branch_name),
           web.driver.error = \(e) (e)),
         tryCatch(
           extraer_traducciones_con_selenium(
-            files.txt, files.txt.es, wait = 1.5, , lang_code = lang_code, branch_name = branch_name),
+            files.txt, files.txt.es, wait = 3, , lang_code = lang_code, branch_name = branch_name),
           web.driver.error = \(e) (e)))
       if (!inherits(result, "web.driver.error")) break
     }
