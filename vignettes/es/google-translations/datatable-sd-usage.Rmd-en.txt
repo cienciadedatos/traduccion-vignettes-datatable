@@ -1,5 +1,3 @@
-Translations of this document are available in
-=====* [French](https://rdatatable.gitlab.io/data.table/articles/fr/datatable-sd-usage.html)=====
 This vignette will explain the most common ways to use the `.SD` variable in your `data.table` analyses. It is an adaptation of [this answer](https://stackoverflow.com/a/47406952/3576984) given on StackOverflow.
 What is `.SD`?
 In the broadest sense, `.SD` is just shorthand for capturing a variable that comes up frequently in the context of data analysis. It can be understood to stand for *S*ubset, *S*elfsame, or *S*elf-reference of the *D*ata. That is, `.SD` is in its most basic guise a *reflexive reference* to the `data.table` itself -- as we'll see in examples below, this is particularly helpful for chaining together \"queries\" (extractions/subsets/etc using `[`). In particular, this also means that `.SD` is *itself a `data.table`* (with the caveat that it does not allow assignment with `:=`).
@@ -54,3 +52,4 @@ Grouped Regression
 Returning to the inquiry above regarding the relationship between `ERA` and `W`, suppose we expect this relationship to differ by team (i.e., there's a different slope for each team). We can easily re-run this regression to explore the heterogeneity in this relationship as follows (noting that the standard errors from this approach are generally incorrect -- the specification `ERA ~ W*teamID` will be better -- this approach is easier to read and the *coefficients* are OK):
 While there is indeed a fair amount of heterogeneity, there's a distinct concentration around the observed overall value.
 The above is just a short introduction of the power of `.SD` in facilitating beautiful, efficient code in `data.table`!
+`r .write.translation.links(\"Translations of this document are available in: %s\")`

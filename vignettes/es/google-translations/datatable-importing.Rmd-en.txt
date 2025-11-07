@@ -1,5 +1,3 @@
-Translations of this document are available in
-=====* [French](https://rdatatable.gitlab.io/data.table/articles/fr/datatable-importing.html)===== =====* [Russian](https://rdatatable.gitlab.io/data.table/articles/ru/datatable-importing.html)=====
 This document is focused on using `data.table` as a dependency in other R packages. If you are interested in using `data.table` C code from a non-R application, or in calling its C functions directly, jump to the [last section](#non-r-api) of this vignette.
 Importing `data.table` is no different from importing other R packages. This vignette is meant to answer the most common questions arising around that subject; the lessons presented here can be applied to other R packages.
 Why to import `data.table`
@@ -16,7 +14,6 @@ Usage
 As an example we will define two functions in `a.pkg` package that uses `data.table`. One function, `gen`, will generate a simple `data.table`; another, `aggr`, will do a simple aggregation of it.
 Testing
 Be sure to include tests in your package. Before each major release of `data.table`, we check reverse dependencies. This means that if any changes in `data.table` would break your code, we will be able to spot breaking changes and inform you before releasing the new version. This of course assumes you will publish your package to CRAN or Bioconductor. The most basic test can be a plaintext R script in your package directory `tests/test.R`:
-When testing your package, you may want to use `R CMD check --no-stop-on-test-error`, which will continue after an error and run all your tests (as opposed to stopping on the first line of script that failed) NB this requires R 3.4.0 or greater.
 Testing using `testthat`
 It is very common to use the `testthat` package for purpose of tests. Testing a package that imports `data.table` is no different from testing other packages. An example test script `tests/testthat/test-pkg.R`:
 If `data.table` is in Suggests (but not Imports) then you need to declare `.datatable.aware=TRUE` in one of the R/* files to avoid \"object not found\" errors when testing via `testthat::test_package` or `testthat::test_check`.
@@ -72,3 +69,5 @@ When you move a package from `Depends` to `Imports`, it will no longer be automa
 **After (with `Imports`):**
 Benefits of using `Imports`
 =====- **User-Friendliness**: `Depends` alters your users' `search()` path, possibly without their wanting to do so.===== =====- **Namespace Management**: Only the functions your package explicitly imports are available, reducing the risk of function name clashes.===== =====- **Cleaner Package Loading**: Your package's dependencies are not attached to the search path, making the loading process cleaner and potentially faster.===== =====- **Easier Maintenance**: It simplifies maintenance tasks as upstream dependencies' APIs evolve. Depending too much on `Depends` can lead to conflicts and compatibility issues over time.=====
+`r .write.translation.links(\"Translations of this document are available in: %s\")`
+When testing your package, you may want to use `R CMD check --no-stop-on-test-error`, which will continue after an error and run all your tests (as opposed to stopping on the first line of script that failed).
