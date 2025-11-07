@@ -645,8 +645,9 @@ extraer_traducciones_con_chromote <- function(
           nodeId = doc.nodeId, selector = "html > body > pre")[[1]]
         if (sel.nodeId == 0) {
           client$view()
-          stopf(
-            "Problema al analizar el documento con chromote: no fue posible interpretar html de la traducción, pruebe mayor wait.")
+          if (!askYesNo("Problema al analizar el documento con chromote: no fue posible interpretar html de la traducción ¿desea continuar?", prompts = "S/N/C")) {
+            stopf("cancelado")
+          }
         }
         lines <- DOM$getOuterHTML(sel.nodeId)[[1]] |>
           xml2::as_xml_document() |> xml2::xml_text() |>
@@ -914,80 +915,81 @@ start_translation <- function(lang_code = "es") {
         branch_name <- get0("branch_name") %||% sprintf(
           "transl_%s_%s", user.name, format(Sys.time(), "%Y%m%dT%H%m%z")
         )
-        remote <- "origin"  # si no es este poner el que corresponde
-        stopifnot(remote %in% gert::git_remote_list()$name)
-        catfln("create branch %s", branch_name)
-        gert::git_branch_create(branch_name)
-        catfln("set upstream branch %s", branch_name)
-        gert::git_branch_set_upstream(branch_name)
-        gert::git_add(file.path("vignettes", files.txt))
-        if (NROW(gert::git_status(staged = TRUE, file.path("vignettes", files.txt)))) {
-          messagef("Actualizando (commit) repo local, rama %s", gert::git_branch())
-          gert::git_commit(gettext("Actualizar txt para traducir"))
-        } else {
-          message("Sin modificaciones en repo local")
-        }
-        
-        attempt <- 0
-        catfln("Debe actualizar el repo subiendo los .txt en inglés a ../google-translations")
-        catfln("Luego se intentará traducir los txt desde la web, usando google")
-        catfln("El script puede actualizar el repo por usted")
-        catfln("Si no actualiza el repo, la traducción se hará con los mensajes del repo, que pueden estar obsoletos")
-        
-        while((attempt <- attempt + 1L) <= 3) {
-          if (inherits(git_version, "try-error") && !nzchar(PAT) || attempt > 1L) {
-            catfln("NOTA: Probablemente deba generar un Personal Access Token de Github")
-          }
-          switch(
-            menu(title = gettext("Elija una opción"), c(
-              gettext("Intentar `git pull` desde R. Es posible que se le solicite nombre de usuario y PAT de github si no tiene uno configurado"),
-              gettext("Generar y/o copiar un token PAT via github (elija esta opción si no funcionó la opción 1)"),
-              gettext("Continuar sin actualizar el repo (o bien actualice manualmente y luego seleccione opción 3 para continuar)"))),
-            {
-              # Caso 1: no hace nada e intenta git push normalmente
-            },{
-              # Caso 2: va a github para generar una clave token. La copia y la actualiza.
-              utils::browseURL(sprintf(
-                "https://github.com/settings/tokens/new?scopes=%s&description=%s",
-                paste0( c("repo", "user", "gist", "workflow"), collapse = ","),
-                URLencode("traducción vignettes data table")))
-              readline("Copie el Personal Access Token (PAT) generado en github y presione [Enter]")
-              PAT_generated <- scan("clipboard", "", 1)
-              if (grepl("^gh[pousr]_[a-zA-Z0-9]{36}$", PAT_generated)) {
-                PAT <- PAT_generated
-                Sys.setenv("GITHUB_PAT" = PAT)
-              } else
-                stopf("Error: no se pudo identificar el token PAT")
-            },{     
-              # caso 3: sale del loop de intentos. continuar sin actualizar.
-              break;  
+        catfln("crear rama %s", branch_name)
+        gert::git_branch_create(branch_name, checkout = TRUE)
+        tryCatch(
+          finally = {
+            # vuelve a main
+            gert::git_branch_checkout(current_branch)
+            gert::git_branch_delete(branch_name)
+            catfln("rama %s eliminada", branch_name)
+          },{
+            gert::git_add(file.path("vignettes", files.txt))
+            if (NROW(gert::git_status(staged = TRUE, file.path("vignettes", files.txt)))) {
+              messagef("Actualizando (commit) repo local, rama %s", gert::git_branch())
+              gert::git_commit(gettext("Actualizar txt para traducir"))
+            } else {
+              message("Sin modificaciones en repo local")
             }
-          )
-          
-          # intento de git push
-          message("Intentando `git push`...")
-          tryCatch(
-            gert::git_push(password = custom_askpass),
-            error = (\(e) {
-              message(e)
-              if (attempt < 3) {
-                messagef("Nuevo intento (%d)...", attempt + 1L)
-                next
-              } else {
-                catfln("Demasiados intentos fallidos")
-                catfln("Debe actualizar manualmente el repo subiendo los .txt en inglés a ../google-translations")
-                catfln("Si no actualiza el repo, la traducción se hará con los mensajes del repo, que pueden estar obsoletos")
-                stopf("Demasiados intentos fallidos")
+            
+            attempt <- 0
+            catfln("Debe actualizar el repo subiendo los .txt en inglés a ../google-translations")
+            catfln("Luego se intentará traducir los txt desde la web, usando google")
+            catfln("El script puede actualizar el repo por usted")
+            catfln("Si no actualiza el repo, la traducción se hará con los mensajes del repo, que pueden estar obsoletos")
+            
+            while((attempt <- attempt + 1L) <= 3) {
+              if (inherits(git_version, "try-error") && !nzchar(PAT) || attempt > 1L) {
+                catfln("NOTA: Probablemente deba generar un Personal Access Token de Github")
               }
-            })
-          )
-          message("Actualización exitosa")
-          break
-        }
-      
-        # vuelve a main
-        gert::git_branch_checkout(current_branch)
-        gert::git_branch_delete(branch_name)
+              switch(
+                menu(title = gettext("Elija una opción"), c(
+                  gettext("Intentar `git pull` desde R. Es posible que se le solicite nombre de usuario y PAT de github si no tiene uno configurado"),
+                  gettext("Generar y/o copiar un token PAT via github (elija esta opción si no funcionó la opción 1)"),
+                  gettext("Continuar sin actualizar el repo (o bien actualice manualmente y luego seleccione opción 3 para continuar)"))),
+                {
+                  # Caso 1: no hace nada e intenta git push normalmente
+                },{
+                  # Caso 2: va a github para generar una clave token. La copia y la actualiza.
+                  utils::browseURL(sprintf(
+                    "https://github.com/settings/tokens/new?scopes=%s&description=%s",
+                    paste0( c("repo", "user", "gist", "workflow"), collapse = ","),
+                    URLencode("traducción vignettes data table")))
+                  readline("Copie el Personal Access Token (PAT) generado en github y presione [Enter]")
+                  PAT_generated <- scan("clipboard", "", 1)
+                  if (grepl("^gh[pousr]_[a-zA-Z0-9]{36}$", PAT_generated)) {
+                    PAT <- PAT_generated
+                    Sys.setenv("GITHUB_PAT" = PAT)
+                  } else
+                    stopf("Error: no se pudo identificar el token PAT")
+                },{     
+                  # caso 3: sale del loop de intentos. continuar sin actualizar.
+                  break;  
+                }
+              )
+              
+              # intento de git push
+              message("Intentando `git push`...")
+              tryCatch(
+                gert::git_push(password = custom_askpass),
+                error = (\(e) {
+                  message(e)
+                  if (attempt < 3) {
+                    messagef("Nuevo intento (%d)...", attempt + 1L)
+                    next
+                  } else {
+                    catfln("Demasiados intentos fallidos")
+                    catfln("Debe actualizar manualmente el repo subiendo los .txt en inglés a ../google-translations")
+                    catfln("Si no actualiza el repo, la traducción se hará con los mensajes del repo, que pueden estar obsoletos")
+                    stopf("Demasiados intentos fallidos")
+                  }
+                })
+              )
+              message("Actualización exitosa")
+              break
+            }
+          }
+        )
         # branch_name se preserva para el próximo paso.
       }
     )
