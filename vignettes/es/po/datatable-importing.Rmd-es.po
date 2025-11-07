@@ -1,26 +1,8 @@
 #
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2025-10-12 02:25-0300\n"
+"PO-Revision-Date: 2025-11-06 23:16-0300\n"
 "Language: es\n"
-
-#: es/datatable-importing.Rmd.tmp:block 3 (paragraph)
-msgid "Translations of this document are available in"
-msgstr "Las traducciones de este documento están disponibles en"
-
-#: es/datatable-importing.Rmd.tmp:block 4 (paragraph)
-msgid ""
-"=====* "
-"[French](https://rdatatable.gitlab.io/data.table/articles/fr/datatable-"
-"importing.html)===== =====* "
-"[Russian](https://rdatatable.gitlab.io/data.table/articles/ru/datatable-"
-"importing.html)====="
-msgstr ""
-"=====* "
-"[Francés](https://rdatatable.gitlab.io/data.table/articles/fr/datatable-"
-"importing.html)===== =====* "
-"[Ruso](https://rdatatable.gitlab.io/data.table/articles/ru/datatable-"
-"importing.html)====="
 
 #: es/datatable-importing.Rmd.tmp:block 5 (paragraph)
 msgid ""
@@ -213,18 +195,6 @@ msgstr ""
 "lanzar la nueva versión. Por supuesto, esto supone que publicará tu paquete "
 "en CRAN o Bioconductor. La prueba más básica puede ser un script R de texto "
 "simple en el directorio de tu paquete `tests/test.R`:"
-
-#: es/datatable-importing.Rmd.tmp:block 23 (paragraph)
-msgid ""
-"When testing your package, you may want to use `R CMD check --no-stop-on-"
-"test-error`, which will continue after an error and run all your tests (as "
-"opposed to stopping on the first line of script that failed) NB this "
-"requires R 3.4.0 or greater."
-msgstr ""
-"Al probar tu paquete, puedes utilizar `R CMD check --no-stop-on-test-error`,"
-" que continuará después de un error y ejecutará todas tus pruebas (en lugar "
-"de detenerse en la primera línea del script que falló). NB esto requiere R "
-"3.4.0 o superior."
 
 #: es/datatable-importing.Rmd.tmp:block 24 (header)
 msgid "Testing using `testthat`"
@@ -832,4 +802,17 @@ msgstr ""
 "mantenimiento a medida que evolucionan las API de las dependencias "
 "ascendentes. Depender demasiado de `Depends` puede provocar conflictos y "
 "problemas de compatibilidad con el tiempo.====="
+
+#: es/datatable-importing.Rmd.tmp:block 4 (paragraph)
+msgid ""
+"`r .write.translation.links(\"Translations of this document are available "
+"in: %s\")`"
+msgstr ""
+
+#: es/datatable-importing.Rmd.tmp:block 23 (paragraph)
+msgid ""
+"When testing your package, you may want to use `R CMD check --no-stop-on-"
+"test-error`, which will continue after an error and run all your tests (as "
+"opposed to stopping on the first line of script that failed)."
+msgstr ""
 

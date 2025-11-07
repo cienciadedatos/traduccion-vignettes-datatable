@@ -1,26 +1,8 @@
 #
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2025-10-12 02:25-0300\n"
+"PO-Revision-Date: 2025-11-06 23:16-0300\n"
 "Language: es\n"
-
-#: es/datatable-reshape.Rmd.tmp:block 2 (paragraph)
-msgid "Translations of this document are available in"
-msgstr "Las traducciones de este documento están disponibles en"
-
-#: es/datatable-reshape.Rmd.tmp:block 3 (paragraph)
-msgid ""
-"=====* "
-"[French](https://rdatatable.gitlab.io/data.table/articles/fr/datatable-"
-"reshape.html)===== =====* "
-"[Russian](https://rdatatable.gitlab.io/data.table/articles/ru/datatable-"
-"reshape.html)====="
-msgstr ""
-"=====* "
-"[Francés](https://rdatatable.gitlab.io/data.table/articles/fr/datatable-"
-"reshape.html)===== =====* "
-"[Ruso](https://rdatatable.gitlab.io/data.table/articles/ru/datatable-"
-"reshape.html)====="
 
 #: es/datatable-reshape.Rmd.tmp:block 5 (paragraph)
 msgid ""
@@ -292,30 +274,9 @@ msgstr ""
 "operación deseada que no se expresa de manera sencilla. Por ejemplo, "
 "considere la tabla `data.table` que se muestra a continuación:"
 
-#: es/datatable-reshape.Rmd.tmp:block 49 (paragraph)
-msgid ""
-"And you'd like to combine (`melt`) all the `dob` columns together, and "
-"`gender` columns together. Using the current functionality, we can do "
-"something like this:"
-msgstr ""
-"Y desea combinar (`melt`) todas las columnas `dob` y `gender`. Con la "
-"funcionalidad actual, podemos hacer algo como esto:"
-
 #: es/datatable-reshape.Rmd.tmp:block 51 (header)
 msgid "Issues"
 msgstr "Asuntos"
-
-#: es/datatable-reshape.Rmd.tmp:block 52 (paragraph)
-msgid ""
-"=====1. What we wanted to do was to combine all the `dob` and `gender` type "
-"columns together respectively. Instead, we are combining *everything* "
-"together, and then splitting them again. I think it's easy to see that it's "
-"quite roundabout (and inefficient).====="
-msgstr ""
-"=====1. Lo que queríamos hacer era combinar todas las columnas de tipo `dob`"
-" y `gender` respectivamente. En lugar de eso, estamos combinando *todo* y "
-"luego dividiendo todo. Creo que es fácil ver que es bastante indirecto (e "
-"ineficiente).====="
 
 #: es/datatable-reshape.Rmd.tmp:block 54 (paragraph)
 msgid ""
@@ -518,21 +479,6 @@ msgstr ""
 "necesitamos definir los grupos usando una expresión regular en lugar de un "
 "separador."
 
-#: es/datatable-reshape.Rmd.tmp:block 84 (paragraph)
-msgid ""
-"When using the `pattern` argument, it must be a Perl-compatible regular "
-"expression containing the same number of capture groups (parenthesized sub-"
-"expressions) as the number other arguments (group names). The code below "
-"shows how to use a more complex regex with five groups, two numeric output "
-"columns, and an anonymous type conversion function,"
-msgstr ""
-"Al utilizar el argumento `patrón`, debe ser una expresión regular compatible"
-" con Perl que contenga la misma cantidad de grupos de captura "
-"(subexpresiones entre paréntesis) que la cantidad de otros argumentos "
-"(nombres de grupos). El código siguiente muestra cómo utilizar una expresión"
-" regular más compleja con cinco grupos, dos columnas de salida numérica y "
-"una función de conversión de tipo anónima."
-
 #: es/datatable-reshape.Rmd.tmp:block 86 (header)
 msgid "b) Enhanced `dcast`"
 msgstr "b) `dcast` mejorado"
@@ -598,4 +544,34 @@ msgstr ""
 "También puede proporcionar *múltiples funciones* a `fun.agregate` para "
 "`dcast` para *data.tables*. Consulte los ejemplos en `?dcast` que ilustran "
 "esta funcionalidad."
+
+#: es/datatable-reshape.Rmd.tmp:block 3 (paragraph)
+msgid ""
+"`r .write.translation.links(\"Translations of this document are available "
+"in: %s\")`"
+msgstr ""
+
+#: es/datatable-reshape.Rmd.tmp:block 49 (paragraph)
+msgid ""
+"And you'd like to combine (`melt`) all the `name` columns together, and "
+"`gender` columns together. Using the old functionality, we could do "
+"something like this:"
+msgstr ""
+
+#: es/datatable-reshape.Rmd.tmp:block 52 (paragraph)
+msgid ""
+"=====1. What we wanted to do was to combine all the `name` and `gender` type"
+" columns together respectively. Instead, we are combining *everything* "
+"together, and then splitting them again. I think it's easy to see that it's "
+"quite roundabout (and inefficient).====="
+msgstr ""
+
+#: es/datatable-reshape.Rmd.tmp:block 84 (paragraph)
+msgid ""
+"When using the `pattern` argument, it must be a Perl-compatible regular "
+"expression containing the same number of capture groups (parenthesized sub-"
+"expressions) as the number of other arguments (group names). The code below "
+"shows how to use a more complex regex with five groups, two numeric output "
+"columns, and an anonymous type conversion function,"
+msgstr ""
 

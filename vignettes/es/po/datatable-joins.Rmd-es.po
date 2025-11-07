@@ -1,7 +1,7 @@
 #
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2025-10-12 02:25-0300\n"
+"PO-Revision-Date: 2025-11-06 23:16-0300\n"
 "Language: es\n"
 
 #: es/datatable-joins.Rmd.tmp:block 3 (paragraph)
@@ -38,52 +38,6 @@ msgstr ""
 msgid "1. Defining example data"
 msgstr "1. Definición de datos de ejemplo"
 
-#: es/datatable-joins.Rmd.tmp:block 7 (paragraph)
-msgid ""
-"To illustrate how to use the method available with real life examples, let's"
-" simulate a **normalized database** from a little supermarket by performing "
-"the following steps:"
-msgstr ""
-"Para ilustrar cómo utilizar el método disponible con ejemplos de la vida "
-"real, simulemos una **base de datos normalizada** de un pequeño supermercado"
-" realizando los siguientes pasos:"
-
-#: es/datatable-joins.Rmd.tmp:block 8 (paragraph)
-msgid ""
-"=====1. Defining a `data.table` where each product is represented by a row "
-"with some qualities, but leaving one product without `id` to show how the "
-"framework deals with ***missing values***.====="
-msgstr ""
-"=====1. Definir una `data.table` donde cada producto esté representado por "
-"una fila con algunas cualidades, pero dejando un producto sin `id` para "
-"mostrar cómo el marco maneja los ***valores faltantes***.====="
-
-#: es/datatable-joins.Rmd.tmp:block 10 (paragraph)
-msgid ""
-"=====2. Defining a `data.table` showing the proportion of taxes to be "
-"applied for processed products based on their units.====="
-msgstr ""
-"=====2. Definir una `data.table` que muestre la proporción de impuestos a "
-"aplicar a los productos procesados en función de sus unidades.====="
-
-#: es/datatable-joins.Rmd.tmp:block 12 (paragraph)
-msgid ""
-"=====3. Defining a `data.table` simulating the products received every "
-"Monday with a `product_id` that is not present in the `Products` table.====="
-msgstr ""
-"=====3. Definir una `data.table` que simule los productos recibidos cada "
-"lunes con un `product_id` que no está presente en la tabla `Products`.====="
-
-#: es/datatable-joins.Rmd.tmp:block 14 (paragraph)
-msgid ""
-"=====4. Defining a `data.table` to show some sales that can take place on "
-"weekdays with another `product_id` that is not present in the `Products` "
-"table.====="
-msgstr ""
-"=====4. Definir una `data.table` para mostrar algunas ventas que pueden "
-"tener lugar en días laborables con otro `product_id` que no está presente en"
-" la tabla `Products`.====="
-
 #: es/datatable-joins.Rmd.tmp:block 16 (header)
 msgid "2. `data.table` joining syntax"
 msgstr "2. Sintaxis de unión de `data.table`"
@@ -107,18 +61,6 @@ msgstr ""
 "El siguiente diagrama muestra una descripción de cada argumento básico. En "
 "las siguientes secciones mostraremos cómo utilizar cada uno de ellos y "
 "agregaremos más complejidad poco a poco."
-
-#: es/datatable-joins.Rmd.tmp:block 20 (quote)
-msgid ""
-"Please keep in mind that the standard argument order in `data.table` is "
-"`dt[i, j, by]`. For join operations, it is recommended to pass the `on` and "
-"`nomatch` arguments by name to avoid using `j` and `by` when they are not "
-"needed."
-msgstr ""
-"Ten en cuenta que el orden estándar de los argumentos en `data.table` es "
-"`dt[i, j, by]`. Para las operaciones de unión, se recomienda pasar los "
-"argumentos `on` y `nomatch` por nombre para evitar usar `j` y `by` cuando no"
-" son necesarios."
 
 #: es/datatable-joins.Rmd.tmp:block 21 (header)
 msgid "3. Equi joins"
@@ -253,14 +195,6 @@ msgid ""
 msgstr ""
 "=====- Envolver las columnas relacionadas en la función base R `list`.====="
 
-#: es/datatable-joins.Rmd.tmp:block 38 (paragraph)
-msgid ""
-"=====- Wrapping the related columns in the `data.table` `list` alias "
-"`.`.====="
-msgstr ""
-"=====- Envolver las columnas relacionadas en el alias `data.table` `list` "
-"`.`.====="
-
 #: es/datatable-joins.Rmd.tmp:block 40 (header)
 msgid "3.1.2. Alternatives to define the `on` argument"
 msgstr "3.1.2. Alternativas para definir el argumento `on`"
@@ -301,25 +235,6 @@ msgstr ""
 msgid "3.1.3. Operations after joining"
 msgstr "3.1.3. Operaciones posteriores a \"join\""
 
-#: es/datatable-joins.Rmd.tmp:block 47 (paragraph)
-msgid ""
-"Most of the time after a join is complete we need to make some additional "
-"transformations. To make so we have the following alternatives:"
-msgstr ""
-"La mayoría de las veces, después de completar una unión (join), necesitamos "
-"realizar algunas transformaciones adicionales. Para ello, tenemos las "
-"siguientes alternativas:"
-
-#: es/datatable-joins.Rmd.tmp:block 48 (paragraph)
-msgid ""
-"=====- Chaining a new instruction by adding a pair of brakes `[]`.===== "
-"=====- Passing a list with the columns that we want to keep or create to the"
-" `j` argument.====="
-msgstr ""
-"=====- Encadenar una nueva instrucción añadiendo un par de corchetes "
-"`[]`.===== =====- Pasar una lista con las columnas que queremos conservar o "
-"crear al argumento `j`.====="
-
 #: es/datatable-joins.Rmd.tmp:block 49 (paragraph)
 msgid ""
 "Our recommendation is to use the second alternative if possible, as it is "
@@ -347,56 +262,13 @@ msgstr ""
 "para usar cualquier columna de la tabla declarada en el argumento `i` de la "
 "tabla `x`."
 
-#: es/datatable-joins.Rmd.tmp:block 52 (paragraph)
-msgid ""
-"Going back to the little supermarket, after updating the `ProductReceived` "
-"table with the `Products` table, it seems convenient apply the following "
-"changes:"
-msgstr ""
-"Volviendo al pequeño supermercado, luego de actualizar la tabla "
-"`ProductReceived` con la tabla `Products`, parece conveniente aplicar los "
-"siguientes cambios:"
-
-#: es/datatable-joins.Rmd.tmp:block 53 (paragraph)
-msgid ""
-"=====- Changing the columns names from `id` to `product_id` and from `i.id` "
-"to `received_id`.===== =====- Adding the `total_value`.====="
-msgstr ""
-"=====- Cambiar los nombres de las columnas de `id` a `product_id` y de "
-"`i.id` a `received_id`.===== =====- Agregar `total_value`.====="
-
 #: es/datatable-joins.Rmd.tmp:block 55 (header)
 msgid "Summarizing with `on` in `data.table`"
 msgstr "Resumiendo con `on` en `data.table`"
 
-#: es/datatable-joins.Rmd.tmp:block 56 (paragraph)
-msgid ""
-"We can also use this alternative to return aggregated results based columns "
-"present in the `x` table."
-msgstr ""
-"También podemos utilizar esta alternativa para devolver resultados agregados"
-" basados en columnas presentes en la tabla `x`."
-
-#: es/datatable-joins.Rmd.tmp:block 57 (paragraph)
-msgid ""
-"For example, we might interested in how much money we expend buying products"
-" each date regardless the products."
-msgstr ""
-"Por ejemplo, podríamos estar interesados en cuánto dinero gastamos comprando"
-" productos cada fecha, independientemente de los productos."
-
 #: es/datatable-joins.Rmd.tmp:block 59 (header)
 msgid "3.1.4. Joining based on several columns"
 msgstr "3.1.4. Join basado en varias columnas"
-
-#: es/datatable-joins.Rmd.tmp:block 60 (paragraph)
-msgid ""
-"So far we have just joined `data.table` base on 1 column, but it's important"
-" to know that the package can join tables matching several columns."
-msgstr ""
-"Hasta ahora solo hemos unido la base de `data.table` en 1 columna, pero es "
-"importante saber que el paquete puede hacer join de tablas que coincidan con"
-" varias columnas."
 
 #: es/datatable-joins.Rmd.tmp:block 61 (paragraph)
 msgid ""
@@ -419,15 +291,6 @@ msgstr ""
 "de una o más referencias pero ***manteniendo solo las filas coincidentes en "
 "ambas tablas***."
 
-#: es/datatable-joins.Rmd.tmp:block 65 (paragraph)
-msgid ""
-"To perform this operation we just need to add `nomatch = NULL` or `nomatch ="
-" 0` to any of the prior join operations to return the same results."
-msgstr ""
-"Para realizar esta operación solo necesitamos agregar `nomatch = NULL` o "
-"`nomatch = 0` a cualquiera de las operaciones de unión anteriores para "
-"devolver los mismos resultados."
-
 #: es/datatable-joins.Rmd.tmp:block 67 (paragraph)
 msgid ""
 "Despite both tables having the same information, there are some relevant "
@@ -449,10 +312,6 @@ msgstr ""
 "primera tabla tiene la misma información que `product_id` en la segunda "
 "tabla.===== ===== - La columna `i.id` en la primera tabla tiene la misma "
 "información que `id` en la segunda tabla.====="
-
-#: es/datatable-joins.Rmd.tmp:block 69 (header)
-msgid "3.3. Not join"
-msgstr "3.3 Anti-Join"
 
 #: es/datatable-joins.Rmd.tmp:block 70 (paragraph)
 msgid ""
@@ -670,21 +529,6 @@ msgid ""
 msgstr ""
 "Una vez que entendemos el resultado, podemos aplicar el mismo proceso para "
 "**todos los productos**."
-
-#: es/datatable-joins.Rmd.tmp:block 111 (quote)
-msgid ""
-"`allow.cartesian` is defaulted to FALSE as this is seldom what the user "
-"wants, and such a cross join can lead to a very large number of rows in the "
-"result. For example, if Table A has 100 rows and Table B has 50 rows, their "
-"Cartesian product would result in 5000 rows (100 * 50). This can quickly "
-"become memory-intensive for large datasets."
-msgstr ""
-"`allow.cartesian` tiene el valor predeterminado FALSE, ya que rara vez es lo"
-" que el usuario desea y una combinación cruzada de este tipo puede generar "
-"una cantidad muy grande de filas en el resultado. Por ejemplo, si la Tabla A"
-" tiene 100 filas y la Tabla B tiene 50 filas, su producto cartesiano daría "
-"como resultado 5000 filas (100 * 50). Esto puede consumir rápidamente mucha "
-"memoria para conjuntos de datos grandes."
 
 #: es/datatable-joins.Rmd.tmp:block 112 (header)
 msgid "3.6.1. Selecting one match"
@@ -933,14 +777,6 @@ msgstr ""
 "Si solo queremos ver los casos coincidentes, solo necesitamos agregar el "
 "argumento `nomatch = NULL` para realizar una unión interna."
 
-#: es/datatable-joins.Rmd.tmp:block 155 (header)
-msgid "7. Taking advantage of joining speed"
-msgstr "7. Aprovechar la velocidad de incorporación"
-
-#: es/datatable-joins.Rmd.tmp:block 156 (header)
-msgid "7.1. Subsets as joins"
-msgstr "7.1. Subconjuntos a partir de un join"
-
 #: es/datatable-joins.Rmd.tmp:block 157 (paragraph)
 msgid ""
 "As we just saw in the prior section the `x` table gets filtered by the "
@@ -1002,58 +838,6 @@ msgstr ""
 "Si solo desea filtrar un valor para una sola **columna de caracteres**, "
 "puede omitir la llamada a la función `list()` y pasar el valor a filtrar en "
 "el argumento `i`."
-
-#: es/datatable-joins.Rmd.tmp:block 167 (header)
-msgid "7.2. Updating by reference"
-msgstr "7.2. Actualización por referencia"
-
-#: es/datatable-joins.Rmd.tmp:block 168 (paragraph)
-msgid ""
-"The `:=` operator in `data.table` is used for updating or adding columns by "
-"reference. This means it modifies the original `data.table` without creating"
-" a copy, which is very memory-efficient, especially for large datasets. When"
-" used inside a `data.table`, `:=` allows you to **add new columns** or "
-"**modify existing ones** as part of your query."
-msgstr ""
-"El operador `:=` en `data.table` se utiliza para actualizar o agregar "
-"columnas por referencia. Esto significa que modifica el `data.table` "
-"original sin crear una copia, lo que hace un uso muy eficiente de la "
-"memoria, especialmente para conjuntos de datos grandes. Cuando se utiliza "
-"dentro de un `data.table`, `:=` le permite **agregar nuevas columnas** o "
-"**modificar las existentes** como parte de su consulta."
-
-#: es/datatable-joins.Rmd.tmp:block 169 (paragraph)
-msgid ""
-"Let's update our `Products` table with the latest price from "
-"`ProductPriceHistory`:"
-msgstr ""
-"Actualicemos nuestra tabla \"Productos\" con el último precio de "
-"\"ProductPriceHistory\":"
-
-#: es/datatable-joins.Rmd.tmp:block 171 (paragraph)
-msgid "In this operation:"
-msgstr "En esta operación:"
-
-#: es/datatable-joins.Rmd.tmp:block 172 (paragraph)
-msgid ""
-"=====- The function copy creates a ***deep*** copy of the `Products` table, "
-"preventing modifications made by `:=` from changing the original table by "
-"reference.===== =====- We join `Products` with `ProductPriceHistory` based "
-"on `id` and `product_id`.===== =====- We update the `price` column with the "
-"latest price from `ProductPriceHistory`.===== =====- We add a new "
-"`last_updated` column to track when the price was last changed.===== =====- "
-"The `by = .EACHI` ensures that the `tail` function is applied for each "
-"product in `ProductPriceHistory`.====="
-msgstr ""
-"=====- La función copy crea una copia ***profunda*** de la tabla `Products`,"
-" evitando que las modificaciones realizadas por `:=` cambien la tabla "
-"original por referencia.===== =====- Unimos `Products` con "
-"`ProductPriceHistory` en función de `id` y `product_id`.===== =====- "
-"Actualizamos la columna `price` con el último precio de "
-"`ProductPriceHistory`.===== =====- Agregamos una nueva columna "
-"`last_updated` para rastrear cuándo se modificó el precio por última "
-"vez.===== =====- `by = .EACHI` garantiza que la función `tail` se aplique "
-"para cada producto en `ProductPriceHistory`.====="
 
 #: es/datatable-joins.Rmd.tmp:block 173 (header)
 msgid "Reference"
@@ -1141,15 +925,6 @@ msgid ""
 "i_int_plus_one)`."
 msgstr ""
 
-#: es/datatable-joins.Rmd.tmp:block 150 (paragraph)
-msgid ""
-"Key Takeaways: =====- The name of the output column (`x_int`) comes from "
-"`x`, but the values come from `i_int` in `i`.===== =====- The last row "
-"contains `NA` because no rows in `x` match the last row in `i` (`UPPER == "
-"\"C\"`).===== =====- Multiple rows in `x` are returned to match the first "
-"row in `i` with `UPPER == \"A\"`.====="
-msgstr ""
-
 #: es/datatable-joins.Rmd.tmp:block 151 (paragraph)
 msgid ""
 "If you want to keep the `i_int` column from `i`, you need to explicitly "
@@ -1167,5 +942,192 @@ msgstr ""
 msgid ""
 "If you want to exclude unmatched rows (an *inner join*), use `nomatch = "
 "NULL`:"
+msgstr ""
+
+#: es/datatable-joins.Rmd.tmp:block 4 (paragraph)
+msgid ""
+"`r .write.translation.links(\"Translations of this document are available "
+"in: %s\")`"
+msgstr ""
+
+#: es/datatable-joins.Rmd.tmp:block 9 (paragraph)
+msgid ""
+"To illustrate how to use the method available with real life examples, let's"
+" simulate a **normalized database** from a little supermarket by defining "
+"the following tables in a database:"
+msgstr ""
+
+#: es/datatable-joins.Rmd.tmp:block 10 (paragraph)
+msgid ""
+"=====1. `Products`, a table with rows giving characteristics of various "
+"products. To show how the framework deals with ***missing values***, one "
+"`id` is `NA`.====="
+msgstr ""
+
+#: es/datatable-joins.Rmd.tmp:block 12 (paragraph)
+msgid ""
+"=====2. `NewTax`, a table with rows defining some taxes associated with "
+"processed products based on their units.====="
+msgstr ""
+
+#: es/datatable-joins.Rmd.tmp:block 14 (paragraph)
+msgid ""
+"=====3. `ProductReceived`, a table with rows simulating weekly incoming "
+"inventory.====="
+msgstr ""
+
+#: es/datatable-joins.Rmd.tmp:block 16 (paragraph)
+msgid ""
+"=====4. `ProductSales`, a table with rows simulating customer "
+"transactions.====="
+msgstr ""
+
+#: es/datatable-joins.Rmd.tmp:block 22 (paragraph)
+msgid ""
+"**Note**: Please keep in mind that the standard argument order in "
+"`data.table` is `dt[i, j, by]`. For join operations, it is recommended to "
+"pass the `on` and `nomatch` arguments by name to avoid using `j` and `by` "
+"when they are not needed."
+msgstr ""
+
+#: es/datatable-joins.Rmd.tmp:block 40 (paragraph)
+msgid "=====- Wrapping the related columns in the `list` alias `.`.====="
+msgstr ""
+
+#: es/datatable-joins.Rmd.tmp:block 49 (paragraph)
+msgid ""
+"Most of the time after joining we need to make some additional "
+"transformations. To do so we have the following alternatives:"
+msgstr ""
+
+#: es/datatable-joins.Rmd.tmp:block 50 (paragraph)
+msgid ""
+"=====- Chaining a new instruction by adding a pair of brackets `[]`.===== "
+"=====- Passing a list with the columns that we want to keep or create to the"
+" `j` argument.====="
+msgstr ""
+
+#: es/datatable-joins.Rmd.tmp:block 54 (paragraph)
+msgid ""
+"Going back to the little supermarket, after updating the `ProductReceived` "
+"table with the `Products` table, suppose we want to apply the following "
+"changes:"
+msgstr ""
+
+#: es/datatable-joins.Rmd.tmp:block 55 (paragraph)
+msgid ""
+"=====- Change the columns names from `id` to `product_id` and from `i.id` to"
+" `received_id`.===== =====- Add the `total_value`.====="
+msgstr ""
+
+#: es/datatable-joins.Rmd.tmp:block 58 (paragraph)
+msgid ""
+"We can also use this alternative to return aggregated results based on the "
+"columns present in the `x` table."
+msgstr ""
+
+#: es/datatable-joins.Rmd.tmp:block 59 (paragraph)
+msgid ""
+"For example, we might be interested in how much money we spend buying each "
+"product across days."
+msgstr ""
+
+#: es/datatable-joins.Rmd.tmp:block 62 (paragraph)
+msgid ""
+"So far we have just joined `data.table`s based on 1 column, but it's "
+"important to know that the package can join tables matching several columns."
+msgstr ""
+
+#: es/datatable-joins.Rmd.tmp:block 67 (paragraph)
+msgid ""
+"To perform this operation we just need to add `nomatch = NULL` to any of the"
+" prior join operations to return the same results."
+msgstr ""
+
+#: es/datatable-joins.Rmd.tmp:block 71 (header)
+msgid "3.3. Anti-join"
+msgstr ""
+
+#: es/datatable-joins.Rmd.tmp:block 113 (paragraph)
+msgid ""
+"**Note**: `allow.cartesian` is defaulted to FALSE as this is seldom what the"
+" user wants, and such a cross join can lead to a very large number of rows "
+"in the result. For example, if Table A has 100 rows and Table B has 50 rows,"
+" their Cartesian product would result in 5000 rows (100 * 50). This can "
+"quickly become memory-intensive for large datasets."
+msgstr ""
+
+#: es/datatable-joins.Rmd.tmp:block 152 (paragraph)
+msgid "Key Takeaways:"
+msgstr ""
+
+#: es/datatable-joins.Rmd.tmp:block 153 (paragraph)
+msgid ""
+"=====- The name of the output column (`x_int`) comes from `x`, but the "
+"values come from `i_int` in `i`.===== =====- The last row contains `NA` "
+"because no rows in `x` match the last row in `i` (`UPPER == \"C\"`).===== "
+"=====- Multiple rows in `x` are returned to match the first row in `i` with "
+"`UPPER == \"A\"`.====="
+msgstr ""
+
+#: es/datatable-joins.Rmd.tmp:block 170 (header)
+msgid "6. Taking advantage of joining speed"
+msgstr ""
+
+#: es/datatable-joins.Rmd.tmp:block 171 (header)
+msgid "6.1. Subsets as joins"
+msgstr ""
+
+#: es/datatable-joins.Rmd.tmp:block 182 (header)
+msgid "6.2. Updating by reference"
+msgstr ""
+
+#: es/datatable-joins.Rmd.tmp:block 183 (paragraph)
+msgid ""
+"Use `:=` to modify columns **by reference** (no copy) during joins. General "
+"syntax: `x[i, on=, (cols) := val]`."
+msgstr ""
+
+#: es/datatable-joins.Rmd.tmp:block 184 (paragraph)
+msgid "**Simple One-to-One Update**"
+msgstr ""
+
+#: es/datatable-joins.Rmd.tmp:block 185 (paragraph)
+msgid "Update `Products` with prices from `ProductPriceHistory`:"
+msgstr ""
+
+#: es/datatable-joins.Rmd.tmp:block 187 (paragraph)
+msgid ""
+"=====- `i.price` refers to price from `ProductPriceHistory`.===== =====- "
+"Modifies `Products` in-place.====="
+msgstr ""
+
+#: es/datatable-joins.Rmd.tmp:block 188 (paragraph)
+msgid "**Grouped Updates with `.EACHI`**"
+msgstr ""
+
+#: es/datatable-joins.Rmd.tmp:block 189 (paragraph)
+msgid "Get last price/date for each product:"
+msgstr ""
+
+#: es/datatable-joins.Rmd.tmp:block 191 (paragraph)
+msgid ""
+"=====- `by = .EACHI` groups by i's rows (1 group per ProductPriceHistory "
+"row).===== =====- `last()` returns last value====="
+msgstr ""
+
+#: es/datatable-joins.Rmd.tmp:block 192 (paragraph)
+msgid "**Efficient Right Join Update**"
+msgstr ""
+
+#: es/datatable-joins.Rmd.tmp:block 193 (paragraph)
+msgid "Add product details to `ProductPriceHistory` without copying:"
+msgstr ""
+
+#: es/datatable-joins.Rmd.tmp:block 195 (paragraph)
+msgid ""
+"=====- In `i`, `.SD` refers to `ProductPriceHistory`.===== =====- In `j`, "
+"`.SD` refers to `Products`.===== =====- `:=` and `setnafill()` both update "
+"`ProductPriceHistory` by reference.====="
 msgstr ""
 

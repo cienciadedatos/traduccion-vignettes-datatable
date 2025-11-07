@@ -1,22 +1,8 @@
 #
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2025-10-12 02:25-0300\n"
+"PO-Revision-Date: 2025-11-06 23:16-0300\n"
 "Language: es\n"
-
-#: es/datatable-faq.Rmd.tmp:block 3 (paragraph)
-msgid "Translations of this document are available in"
-msgstr "Las traducciones de este documento están disponibles en"
-
-#: es/datatable-faq.Rmd.tmp:block 4 (paragraph)
-msgid ""
-"=====* "
-"[French](https://rdatatable.gitlab.io/data.table/articles/fr/datatable-"
-"faq.html)====="
-msgstr ""
-"=====* "
-"[Francés](https://rdatatable.gitlab.io/data.table/articles/fr/datatable-"
-"faq.html)====="
 
 #: es/datatable-faq.Rmd.tmp:block 6 (paragraph)
 msgid ""
@@ -110,22 +96,6 @@ msgstr ""
 "profesionales de SQL: nunca use `select *`, siempre seleccione "
 "explícitamente por nombre de columna para al menos intentar ser robusto ante"
 " cambios futuros."
-
-#: es/datatable-faq.Rmd.tmp:block 13 (paragraph)
-msgid ""
-"Say column 5 is named `\"region\"` and you really must extract that column "
-"as a vector not a data.table. It is more robust to use the column name and "
-"write `DT$region` or `DT[[\"region\"]]`; i.e., the same as base R. Using "
-"base R's `$` and `[[` on data.table is encouraged. Not when combined with "
-"`<-` to assign (use `:=` instead for that) but just to select a single "
-"column by name they are encouraged."
-msgstr ""
-"Digamos que la columna 5 se llama `\"region\"` y realmente debe extraer esa "
-"columna como un vector, no como data.table. Es más robusto usar el nombre de"
-" la columna y escribir `DT$region` o `DT[[\"region\"]]`; es decir, lo mismo "
-"que la base R. Se recomienda usar `$` y `[[` de la base R en data.table. No "
-"cuando se combina con `<-` para asignar (use `:=` en su lugar para eso) sino"
-" solo para seleccionar una sola columna por nombre, se recomiendan."
 
 #: es/datatable-faq.Rmd.tmp:block 14 (paragraph)
 msgid ""
@@ -2228,23 +2198,6 @@ msgstr "Para generarlo, prueba:"
 msgid "Reading data.table from RDS or RData file"
 msgstr "Lectura de data.table desde un archivo RDS o RData"
 
-#: es/datatable-faq.Rmd.tmp:block 218 (paragraph)
-msgid ""
-"`*.RDS` and `*.RData` are file types which can store in-memory R objects on "
-"disk efficiently. However, storing data.table into the binary file loses its"
-" column over-allocation. This isn't a big deal -- your data.table will be "
-"copied in memory on the next *by reference* operation and throw a warning. "
-"Therefore it is recommended to call `setalloccol()` on each data.table "
-"loaded with `readRDS()` or `load()` calls."
-msgstr ""
-"`*.RDS` y `*.RData` son tipos de archivos que pueden almacenar objetos R en "
-"memoria en el disco de manera eficiente. Sin embargo, al almacenar "
-"data.table en el archivo binario se pierde la sobreasignación de columnas. "
-"Esto no es un gran problema: tu data.table se copiará en la memoria en la "
-"siguiente operación *por referencia* y generará una advertencia. Por lo "
-"tanto, se recomienda llamar a `setalloccol()` en cada data.table cargado con"
-" llamadas `readRDS()` o `load()`."
-
 #: es/datatable-faq.Rmd.tmp:block 219 (header)
 msgid "General questions about the package"
 msgstr "Preguntas generales sobre el paquete"
@@ -2418,4 +2371,39 @@ msgstr ""
 msgid "Please see [this answer](https://stackoverflow.com/a/10529888/403310)."
 msgstr ""
 "Consulta [esta respuesta](https://stackoverflow.com/a/10529888/403310)."
+
+#: es/datatable-faq.Rmd.tmp:block 4 (paragraph)
+msgid ""
+"`r .write.translation.links(\"Translations of this document are available "
+"in: %s\")`"
+msgstr ""
+
+#: es/datatable-faq.Rmd.tmp:block 13 (paragraph)
+msgid ""
+"Say column 5 is named `\"region\"` and you really must extract that column "
+"as a vector not a data.table. It is more robust to use the column name and "
+"write `DT$region` or `DT[[\"region\"]]`; i.e., the same as base R. Using "
+"base R's `$` and `[[` on data.table is encouraged. Not when combined with "
+"`<-` to assign (use `:=` instead for that) but just to select a single "
+"column by name they are encouraged. A key difference, however, is that "
+"DT$col and DT[['col']] may return a reference, while DT[, col] always "
+"returns a copy. This can have important consequences and is explained in the"
+" `vignette(\"datatable-reference-semantics\", package=\"data.table\")`."
+msgstr ""
+
+#: es/datatable-faq.Rmd.tmp:block 218 (paragraph)
+msgid ""
+"`*.RDS` and `*.RData` are file types which can store in-memory R objects on "
+"disk efficiently. However, storing `data.table` into a binary file loses its"
+" column over-allocation (see also `?truelength`). This isn't a big deal -- "
+"your `data.table` will be copied in memory on the next *by reference* "
+"operation and throw a warning. Therefore, it is recommended to call "
+"`setDT()` on each `data.table` loaded with `readRDS()` or `load()` calls to "
+"restore its internal attributes. If you only need to pre-allocate space for "
+"new columns, `setalloccol()` can also be used."
+msgstr ""
+
+#: es/datatable-faq.Rmd.tmp:block 219 (paragraph)
+msgid "For more details, see `?setDT` and `?truelength`."
+msgstr ""
 

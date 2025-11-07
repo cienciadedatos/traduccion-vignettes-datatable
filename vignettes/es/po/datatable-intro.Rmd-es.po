@@ -1,26 +1,8 @@
 #
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2025-10-12 02:25-0300\n"
+"PO-Revision-Date: 2025-11-06 23:16-0300\n"
 "Language: es\n"
-
-#: es/datatable-intro.Rmd.tmp:block 2 (paragraph)
-msgid "Translations of this document are available in"
-msgstr "Las traducciones de este documento están disponibles en"
-
-#: es/datatable-intro.Rmd.tmp:block 3 (paragraph)
-msgid ""
-"=====* "
-"[French](https://rdatatable.gitlab.io/data.table/articles/fr/datatable-"
-"intro.html)===== =====* "
-"[Russian](https://rdatatable.gitlab.io/data.table/articles/ru/datatable-"
-"intro.html)====="
-msgstr ""
-"=====* "
-"[Francés](https://rdatatable.gitlab.io/data.table/articles/fr/datatable-"
-"intro.html)===== =====* "
-"[Ruso](https://rdatatable.gitlab.io/data.table/articles/ru/datatable-"
-"intro.html)====="
 
 #: es/datatable-intro.Rmd.tmp:block 5 (paragraph)
 msgid ""
@@ -1678,4 +1660,10 @@ msgstr ""
 "combinarlas con `i` y `by` en la [siguiente viñeta (`vignette(\"datatable-"
 "reference-semantics\", package=\"data.table\")`)](datatable-reference-"
 "semantics.html)."
+
+#: es/datatable-intro.Rmd.tmp:block 3 (paragraph)
+msgid ""
+"`r .write.translation.links(\"Translations of this document are available "
+"in: %s\")`"
+msgstr ""
 

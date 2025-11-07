@@ -1,45 +1,8 @@
 #
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2025-10-12 02:25-0300\n"
+"PO-Revision-Date: 2025-11-06 23:16-0300\n"
 "Language: es\n"
-
-#: es/datatable-secondary-indices-and-auto-indexing.Rmd.tmp:block 2
-#: (paragraph)
-msgid "Translations of this document are available in"
-msgstr "Las traducciones de este documento están disponibles en"
-
-#: es/datatable-secondary-indices-and-auto-indexing.Rmd.tmp:block 3
-#: (paragraph)
-msgid ""
-"=====* "
-"[French](https://rdatatable.gitlab.io/data.table/articles/fr/datatable-"
-"secondary-indices-and-auto-indexing.html)====="
-msgstr ""
-"=====* "
-"[Francés](https://rdatatable.gitlab.io/data.table/articles/fr/datatable-"
-"secondary-indices-and-auto-indexing.html)====="
-
-#: es/datatable-secondary-indices-and-auto-indexing.Rmd.tmp:block 5
-#: (paragraph)
-msgid ""
-"This vignette assumes that the reader is familiar with data.table's `[i, j, "
-"by]` syntax, and how to perform fast key based subsets. If you're not "
-"familiar with these concepts, please read the [`vignette(\"datatable-"
-"intro\", package=\"data.table\")`](datatable-intro.html), "
-"[`vignette(\"datatable-reference-semantics\", "
-"package=\"data.table\")`](datatable-reference-semantics.html), and "
-"[`vignette(\"datatable-keys-fast-subset\", "
-"package=\"data.table\")`](datatable-keys-fast-subset.html) vignettes first."
-msgstr ""
-"Esta viñeta supone que el lector está familiarizado con la sintaxis `[i, j, "
-"by]` de data.table y con la forma de realizar subconjuntos rápidos basados "
-"en claves. Si no estás familiarizado con estos conceptos, lea primero las "
-"viñetas [`vignette(\"datatable-intro\", package=\"data.table\")`](datatable-"
-"intro.html), [`vignette(\"datatable-reference-semantics\", "
-"package=\"data.table\")`](datatable-reference-semantics.html) y "
-"[`vignette(\"datatable-keys-fast-subset\", "
-"package=\"data.table\")`](datatable-keys-fast-subset.html)."
 
 #: es/datatable-secondary-indices-and-auto-indexing.Rmd.tmp:block 6 (header)
 msgid "Data {#data}"
@@ -747,4 +710,64 @@ msgstr ""
 " *uniones* en la [siguiente viñeta (`vignette(\"datatable-joins\", "
 "package=\"data.table\")`)](datatable-joins.html)."
 
-#: es/datatable-secondary-indices-and-auto-indexing.Rmd.tmp:block 117
+#: es/datatable-secondary-indices-and-auto-indexing.Rmd.tmp:block 3
+#: (paragraph)
+msgid ""
+"`r .write.translation.links(\"Translations of this document are available "
+"in: %s\")`"
+msgstr ""
+
+#: es/datatable-secondary-indices-and-auto-indexing.Rmd.tmp:block 5
+#: (paragraph)
+msgid ""
+"This vignette assumes that the reader is familiar with data.table's `[i, j, "
+"by]` syntax, and how to perform fast key based subsets. If you're not "
+"familiar with these concepts, please read the following vignettes first:"
+msgstr ""
+
+#: es/datatable-secondary-indices-and-auto-indexing.Rmd.tmp:block 6
+#: (paragraph)
+msgid ""
+"=====- [`vignette(\"datatable-intro\", package=\"data.table\")`](datatable-"
+"intro.html) ===== =====- [`vignette(\"datatable-reference-semantics\", "
+"package=\"data.table\")`](datatable-reference-semantics.html)===== =====- "
+"[`vignette(\"datatable-keys-fast-subset\", "
+"package=\"data.table\")`](datatable-keys-fast-subset.html)====="
+msgstr ""
+
+#: es/datatable-secondary-indices-and-auto-indexing.Rmd.tmp:block 21 (header)
+msgid "Keyed vs. Indexed Subsetting"
+msgstr ""
+
+#: es/datatable-secondary-indices-and-auto-indexing.Rmd.tmp:block 22
+#: (paragraph)
+msgid ""
+"While both **keys** and **indices** enable fast binary search subsetting, "
+"they differ significantly in usage:"
+msgstr ""
+
+#: es/datatable-secondary-indices-and-auto-indexing.Rmd.tmp:block 23
+#: (paragraph)
+msgid "**Keyed subsetting** (implicit column matching)"
+msgstr ""
+
+#: es/datatable-secondary-indices-and-auto-indexing.Rmd.tmp:block 25
+#: (paragraph)
+msgid "**Indexed subsetting** (explicit column specification)"
+msgstr ""
+
+#: es/datatable-secondary-indices-and-auto-indexing.Rmd.tmp:block 75
+#: (paragraph)
+msgid ""
+"=====* For clarity/readability, it might help to name the inputs in `i`, "
+"e.g.,====="
+msgstr ""
+
+#: es/datatable-secondary-indices-and-auto-indexing.Rmd.tmp:block 77
+#: (paragraph)
+msgid ""
+"This makes it clear which entries in `j` correspond to which element of "
+"`on`."
+msgstr ""
+
+#: es/datatable-secondary-indices-and-auto-indexing.Rmd.tmp:block 127

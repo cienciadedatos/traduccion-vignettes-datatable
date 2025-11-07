@@ -1,22 +1,8 @@
 #
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2025-10-12 02:25-0300\n"
+"PO-Revision-Date: 2025-11-06 23:16-0300\n"
 "Language: es\n"
-
-#: es/datatable-sd-usage.Rmd.tmp:block 3 (paragraph)
-msgid "Translations of this document are available in"
-msgstr "Las traducciones de este documento están disponibles en"
-
-#: es/datatable-sd-usage.Rmd.tmp:block 4 (paragraph)
-msgid ""
-"=====* "
-"[French](https://rdatatable.gitlab.io/data.table/articles/fr/datatable-sd-"
-"usage.html)====="
-msgstr ""
-"=====* "
-"[Francés](https://rdatatable.gitlab.io/data.table/articles/fr/datatable-sd-"
-"usage.html)====="
 
 #: es/datatable-sd-usage.Rmd.tmp:block 6 (paragraph)
 msgid ""
@@ -576,4 +562,10 @@ msgid ""
 msgstr ""
 "Lo anterior es solo una breve introducción del poder de `.SD` para facilitar"
 " un código hermoso y eficiente en `data.table`."
+
+#: es/datatable-sd-usage.Rmd.tmp:block 4 (paragraph)
+msgid ""
+"`r .write.translation.links(\"Translations of this document are available "
+"in: %s\")`"
+msgstr ""
 
