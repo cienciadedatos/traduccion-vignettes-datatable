@@ -1,5 +1,3 @@
-Translations of this document are available in
-=====* [French](https://rdatatable.gitlab.io/data.table/articles/fr/datatable-reshape.html)===== =====* [Russian](https://rdatatable.gitlab.io/data.table/articles/ru/datatable-reshape.html)=====
 This vignette discusses the default usage of reshaping functions `melt` (wide to long) and `dcast` (long to wide) for *data.tables* as well as the **new extended functionalities** of melting and casting on *multiple columns* available from `v1.9.6`.
 Data
 We will load the data sets directly within sections.
@@ -36,9 +34,7 @@ Check `?dcast` for other useful arguments and additional examples.
 2. Limitations in previous `melt/dcast` approaches
 So far we've seen features of `melt` and `dcast` that are implemented efficiently for `data.table`s, using internal `data.table` machinery (*fast radix ordering*, *binary search* etc.).
 However, there are situations we might run into where the desired operation is not expressed in a straightforward manner. For example, consider the `data.table` shown below:
-And you'd like to combine (`melt`) all the `dob` columns together, and `gender` columns together. Using the current functionality, we can do something like this:
 Issues
-=====1. What we wanted to do was to combine all the `dob` and `gender` type columns together respectively. Instead, we are combining *everything* together, and then splitting them again. I think it's easy to see that it's quite roundabout (and inefficient).=====
 =====2. The columns to `melt` may be of different types. By `melt`ing them all together, the columns will be coerced in result.=====
 =====3. We are generating an additional column by splitting the `variable` column into two columns, whose purpose is quite cryptic. We do it because we need it for *casting* in the next step.=====
 =====4. Finally, we cast the data set. But the issue is it's a much more computationally involved operation than *melt*. Specifically, it requires computing the order of the variables in formula, and that's costly.=====
@@ -61,7 +57,6 @@ Using the code above we get one value column per flower part. If we instead want
 Going back to the example of the data with families and children, we can see a more complex usage of `measure`, involving a function which is used to convert the `child` string values to integers:
 In the code above we used `sep=\"_child\"` which results in melting only the columns which contain that string (six column names split into two groups each). The `child=as.integer` argument means the second group will result in an output column named `child` with values defined by plugging the character strings from that group into the function `as.integer`.
 Finally we consider an example (borrowed from tidyr package) where we need to define the groups using a regular expression rather than a separator.
-When using the `pattern` argument, it must be a Perl-compatible regular expression containing the same number of capture groups (parenthesized sub-expressions) as the number other arguments (group names). The code below shows how to use a more complex regex with five groups, two numeric output columns, and an anonymous type conversion function,
 b) Enhanced `dcast`
 Okay great! We can now melt into multiple columns simultaneously. Now given the data set `DT.m2` as shown above, how can we get back to the same format as the original data we started with?
 If we use the current functionality of `dcast`, then we'd have to cast twice and bind the results together. But that's once again verbose, not straightforward and is also inefficient.
@@ -71,3 +66,7 @@ We can now provide **multiple `value.var` columns** to `dcast` for `data.table`s
 =====* Everything is taken care of internally, and efficiently. In addition to being fast, it is also very memory efficient.=====
 Multiple functions to `fun.aggregate`:
 You can also provide *multiple functions* to `fun.aggregate` to `dcast` for *data.tables*. Check the examples in `?dcast` which illustrates this functionality.
+And you'd like to combine (`melt`) all the `name` columns together, and `gender` columns together. Using the old functionality, we could do something like this:
+=====1. What we wanted to do was to combine all the `name` and `gender` type columns together respectively. Instead, we are combining *everything* together, and then splitting them again. I think it's easy to see that it's quite roundabout (and inefficient).=====
+When using the `pattern` argument, it must be a Perl-compatible regular expression containing the same number of capture groups (parenthesized sub-expressions) as the number of other arguments (group names). The code below shows how to use a more complex regex with five groups, two numeric output columns, and an anonymous type conversion function,
+`{r} .write.translation.links(\"Translations of this document are available in: %s\")`

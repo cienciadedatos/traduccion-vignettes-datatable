@@ -1,5 +1,3 @@
-Translations of this document are available in
-=====* [French](https://rdatatable.gitlab.io/data.table/articles/fr/datatable-benchmarking.html)=====
 This document is meant to guide on measuring performance of `data.table`. Single place to document best practices and traps to avoid.
 fread: clear caches
 Ideally each `fread` call should be run in fresh session with the following commands preceding R execution. This clears OS cache file in RAM and HD cache.
@@ -28,3 +26,4 @@ inside a loop prefer `set` instead of `:=`
 Unless you are utilizing index when doing *sub-assign by reference* you should prefer `set` function which does not impose overhead of `[.data.table` method call.
 inside a loop prefer `setDT` instead of `data.table()`
 As of now `data.table()` has an overhead, thus inside loops it is preferred to use `as.data.table()` or `setDT()` on a valid list.
+`{r} .write.translation.links(\"Translations of this document are available in: %s\")`

@@ -1,5 +1,3 @@
-Translations of this document are available in
-=====* [French](https://rdatatable.gitlab.io/data.table/articles/fr/datatable-intro.html)===== =====* [Russian](https://rdatatable.gitlab.io/data.table/articles/ru/datatable-intro.html)=====
 This vignette introduces the `data.table` syntax, its general form, how to *subset* rows, *select and compute* on columns, and perform aggregations *by group*. Familiarity with the `data.frame` data structure from base R is useful, but not essential to follow this vignette.
 Data analysis using `data.table`
 Data manipulation operations such as *subset*, *group*, *update*, *join*, etc. are all inherently related. Keeping these *related operations together* allows for:
@@ -170,7 +168,6 @@ So that we have a consistent syntax and keep using already existing (and familia
 =====* Note that those commas are for display only. A list column can contain any object in each cell, and in this example, each cell is itself a vector and some cells contain longer vectors than others.=====
 Once you start internalising usage in `j`, you will realise how powerful the syntax can be. A very useful way to understand it is by playing around, with the help of `print()`.
 For example:
-In (1), for each group, a vector is returned, with length = 6,4,2 here. However, (2) returns a list of length 1 for each group, with its first element holding vectors of length 6,4,2. Therefore, (1) results in a length of `6+4+2 =`r 6+4+2``, whereas (2) returns `1+1+1=`r 1+1+1``.
 Flexibility of j allows us to store any list object as an element of data.table. For example, when statistical models are fit to groups, these models can be stored in a data.table. Code is concise and easy to understand.
 Using data.frames, we need more complicated code to obtain same result.
 Summary
@@ -197,3 +194,5 @@ Using `by`:
 And remember the tip:
 As long as `j` returns a `list`, each element of the list will become a column in the resulting `data.table`.
 We will see how to *add/update/delete* columns *by reference* and how to combine them with `i` and `by` in the [next vignette (`vignette(\"datatable-reference-semantics\", package=\"data.table\")`)](datatable-reference-semantics.html).
+`{r} .write.translation.links(\"Translations of this document are available in: %s\")`
+In (1), for each group, a vector is returned, with length = 6,4,2 here. However, (2) returns a list of length 1 for each group, with its first element holding vectors of length 6,4,2. Therefore, (1) results in a length of `{r} p(6+4+2)`, whereas (2) returns `{r} p(1+1+1)`.

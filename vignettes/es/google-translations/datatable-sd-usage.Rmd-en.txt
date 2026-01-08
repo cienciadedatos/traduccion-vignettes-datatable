@@ -1,5 +1,3 @@
-Translations of this document are available in
-=====* [French](https://rdatatable.gitlab.io/data.table/articles/fr/datatable-sd-usage.html)=====
 This vignette will explain the most common ways to use the `.SD` variable in your `data.table` analyses. It is an adaptation of [this answer](https://stackoverflow.com/a/47406952/3576984) given on StackOverflow.
 What is `.SD`?
 In the broadest sense, `.SD` is just shorthand for capturing a variable that comes up frequently in the context of data analysis. It can be understood to stand for *S*ubset, *S*elfsame, or *S*elf-reference of the *D*ata. That is, `.SD` is in its most basic guise a *reflexive reference* to the `data.table` itself -- as we'll see in examples below, this is particularly helpful for chaining together \"queries\" (extractions/subsets/etc using `[`). In particular, this also means that `.SD` is *itself a `data.table`* (with the caveat that it does not allow assignment with `:=`).
@@ -14,8 +12,6 @@ In terms of subsetting, `.SD` is still a subset of the data, it's just a trivial
 Column Subsetting: `.SDcols`
 The first way to impact what `.SD` is is to limit the *columns* contained in `.SD` using the `.SDcols` argument to `[`:
 This is just for illustration and was pretty boring. In addition to accepting a character vector, `.SDcols` also accepts:
-=====1. any function such as `is.character` to filter *columns*===== =====2. the function^{*} `patterns()` to filter *column names* by regular expression===== =====3. integer and logical vectors=====
-*see `?patterns` for more details
 This simple usage lends itself to a wide variety of highly beneficial / ubiquitous data manipulation operations:
 Column Type Conversion
 Column type conversion is a fact of life for data munging. Though [`fwrite` recently gained the ability to declare the class of each column up front](https://github.com/Rdatatable/data.table/pull/2545), not all data sets come from `fread` (e.g. in this vignette) and conversions back and forth among `character`/`factor`/`numeric` types are common. We can use `.SD` and `.SDcols` to batch-convert groups of columns to a common type.
@@ -48,9 +44,12 @@ Recall that `.SD` is itself a `data.table`, and that `.N` refers to the total nu
 Another common version of this is to use `.SD[1L]` instead to get the *first* observation for each group, or `.SD[sample(.N, 1L)]` to return a *random* row for each group.
 Group Optima
 Suppose we wanted to return the *best* year for each team, as measured by their total number of runs scored (`R`; we could easily adjust this to refer to other metrics, of course). Instead of taking a *fixed* element from each sub-`data.table`, we now define the desired index *dynamically* as follows:
-Note that this approach can of course be combined with `.SDcols` to return only portions of the `data.table` for each `.SD` (with the caveat that `.SDcols` should be fixed across the various subsets)
-*NB*: `.SD[1L]` is currently optimized by [*`GForce`*](https://Rdatatable.gitlab.io/data.table/library/data.table/html/datatable-optimize.html) ([see also](https://stackoverflow.com/questions/22137591/about-gforce-in-data-table-1-9-2)), `data.table` internals which massively speed up the most common grouped operations like `sum` or `mean` -- see `?GForce` for more details and keep an eye on/voice support for feature improvement requests for updates on this front: [1](https://github.com/Rdatatable/data.table/issues/735), [2](https://github.com/Rdatatable/data.table/issues/2778), [3](https://github.com/Rdatatable/data.table/issues/523), [4](https://github.com/Rdatatable/data.table/issues/971), [5](https://github.com/Rdatatable/data.table/issues/1197), [6](https://github.com/Rdatatable/data.table/issues/1414)
 Grouped Regression
 Returning to the inquiry above regarding the relationship between `ERA` and `W`, suppose we expect this relationship to differ by team (i.e., there's a different slope for each team). We can easily re-run this regression to explore the heterogeneity in this relationship as follows (noting that the standard errors from this approach are generally incorrect -- the specification `ERA ~ W*teamID` will be better -- this approach is easier to read and the *coefficients* are OK):
 While there is indeed a fair amount of heterogeneity, there's a distinct concentration around the observed overall value.
 The above is just a short introduction of the power of `.SD` in facilitating beautiful, efficient code in `data.table`!
+`{r} .write.translation.links(\"Translations of this document are available in: %s\")`
+=====1. any function such as `is.character` to filter *columns*===== =====2. the function[^*] `patterns()` to filter *column names* by regular expression===== =====3. integer and logical vectors=====
+[^*]: see `?patterns` for more details
+Note that this approach can of course be combined with `.SDcols` to return only portions of the `data.table` for each `.SD` (with the caveat that `.SDcols` should be fixed across the various subsets).
+*NB*: `.SD[1L]` is currently optimized by [*`GForce`*](https://Rdatatable.gitlab.io/data.table/library/data.table/html/datatable-optimize.html) ([see also](https://stackoverflow.com/questions/22137591/about-gforce-in-data-table-1-9-2)), `data.table` internals which massively speed up the most common grouped operations like `sum` or `mean` -- see `?GForce` for more details and keep an eye on/voice support for feature improvement requests for updates on this front: [1](https://github.com/Rdatatable/data.table/issues/735), [2](https://github.com/Rdatatable/data.table/issues/2778), [3](https://github.com/Rdatatable/data.table/issues/523), [4](https://github.com/Rdatatable/data.table/issues/971), [5](https://github.com/Rdatatable/data.table/issues/1197), [6](https://github.com/Rdatatable/data.table/issues/1414).

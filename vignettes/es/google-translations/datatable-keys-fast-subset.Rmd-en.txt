@@ -1,5 +1,3 @@
-Translations of this document are available in
-=====* [French](https://rdatatable.gitlab.io/data.table/articles/fr/datatable-keys-fast-subset.html)=====
 This vignette is aimed at those who are already familiar with *data.table* syntax, its general form, how to subset rows in `i`, select and compute on columns, add/modify/delete columns *by reference* in `j` and group by using `by`. If you're not familiar with these concepts, please read the vignettes [`vignette(\"datatable-intro\", package=\"data.table\")`](datatable-intro.html) and [`vignette(\"datatable-reference-semantics\", package=\"data.table\")`](datatable-reference-semantics.html) first.
 Data {#data}
 We will use the same `flights` data as in the [`vignette(\"datatable-intro\", package=\"data.table\")`](datatable-intro.html) vignette.
@@ -105,10 +103,8 @@ One advantage very likely is shorter syntax. But even more than that, *binary se
 As the time goes `data.table` gets new optimization and currently the latter call is automatically optimized to use *binary search*. To use slow *vector scan* key needs to be removed.
 a) Performance of binary search approach
 To illustrate, let's create a sample *data.table* with 20 million rows and three columns and key it by columns `x` and `y`.
-`DT` is ~380MB. It is not really huge, but this will do to illustrate the point.
 From what we have seen in the Introduction to data.table section, we can subset those rows where columns `x = \"g\"` and `y = 877` as follows:
 Now let's try to subset by using keys.
-=====* The speed-up is **~`r round(t1[3]/max(t2[3], .001))`x**!=====
 b) Why does keying a *data.table* result in blazing fast subsets?
 To understand that, let's first look at what *vector scan approach* (method 1) does.
 Vector scan approach
@@ -133,3 +129,6 @@ In this vignette, we have learnt another method to subset rows in `i` by keying 
 =====* subset using keys which fetches *row indices* in `i`, but much faster.=====
 =====* combine key based subsets with `j` and `by`. Note that the `j` and `by` operations are exactly the same as before.=====
 Key based subsets are **incredibly fast** and are particularly useful when the task involves *repeated subsetting*. But it may not be always desirable to set key and physically reorder the *data.table*. In the next [next vignette (`vignette(\"datatable-secondary-indices-and-auto-indexing\", package=\"data.table\")`)](datatable-secondary-indices-and-auto-indexing.html), we will address this using a *new* feature -- *secondary indexes*.
+`DT` is ~380MiB. It is not really huge, but this will do to illustrate the point.
+`{r} .write.translation.links(\"Translations of this document are available in: %s\")`
+=====* The speed-up is **~`{r} round(t1[3]/max(t2[3], .001))`x**!=====

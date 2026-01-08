@@ -1,6 +1,3 @@
-Translations of this document are available in
-=====* [French](https://rdatatable.gitlab.io/data.table/articles/fr/datatable-secondary-indices-and-auto-indexing.html)=====
-This vignette assumes that the reader is familiar with data.table's `[i, j, by]` syntax, and how to perform fast key based subsets. If you're not familiar with these concepts, please read the [`vignette(\"datatable-intro\", package=\"data.table\")`](datatable-intro.html), [`vignette(\"datatable-reference-semantics\", package=\"data.table\")`](datatable-reference-semantics.html), and [`vignette(\"datatable-keys-fast-subset\", package=\"data.table\")`](datatable-keys-fast-subset.html) vignettes first.
 Data {#data}
 We will use the same `flights` data as in the [`vignette(\"datatable-intro\", package=\"data.table\")`](datatable-intro.html) vignette.
 Introduction
@@ -85,3 +82,12 @@ The time to subset the first time is the time to create the index + the time to 
 =====* Disabling auto indexing still allows to use indices created explicitly with `setindex` or `setindexv`. You can disable indices fully by setting global argument `options(datatable.use.index = FALSE)`.=====
 In recent version we extended auto indexing to expressions involving more than one column (combined with `&` operator). In the future, we plan to extend binary search to work with more binary operators like `<`, `<=`, `>` and `>=`.
 We will discuss fast *subsets* using keys and secondary indices to *joins* in the [next vignette (`vignette(\"datatable-joins\", package=\"data.table\")`)](datatable-joins.html).
+This vignette assumes that the reader is familiar with data.table's `[i, j, by]` syntax, and how to perform fast key based subsets. If you're not familiar with these concepts, please read the following vignettes first:
+=====- [`vignette(\"datatable-intro\", package=\"data.table\")`](datatable-intro.html) ===== =====- [`vignette(\"datatable-reference-semantics\", package=\"data.table\")`](datatable-reference-semantics.html)===== =====- [`vignette(\"datatable-keys-fast-subset\", package=\"data.table\")`](datatable-keys-fast-subset.html)=====
+Keyed vs. Indexed Subsetting
+While both **keys** and **indices** enable fast binary search subsetting, they differ significantly in usage:
+**Keyed subsetting** (implicit column matching)
+**Indexed subsetting** (explicit column specification)
+=====* For clarity/readability, it might help to name the inputs in `i`, e.g.,=====
+This makes it clear which entries in `j` correspond to which element of `on`.
+`{r} .write.translation.links(\"Translations of this document are available in: %s\")`
