@@ -1,7 +1,7 @@
 #
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2025-11-06 23:16-0300\n"
+"PO-Revision-Date: 2026-01-09 20:18-0300\n"
 "Language: es\n"
 
 #: es/datatable-reference-semantics.Rmd.tmp:block 5 (paragraph)
@@ -767,15 +767,9 @@ msgstr ""
 "package=\"data.table\")`)](datatable-keys-fast-subset.html) para realizar "
 "*subconjuntos ultrarrápidos* mediante *keying data.tables*."
 
-#: es/datatable-reference-semantics.Rmd.tmp:block 3 (paragraph)
-msgid ""
-"`r .write.translation.links(\"Translations of this document are available "
-"in: %s\")`"
-msgstr ""
-
 #: es/datatable-reference-semantics.Rmd.tmp:block 121 (header)
 msgid "c) Selecting columns: `$` / `[[...]]` vs `[, col]`"
-msgstr ""
+msgstr "c) Selección de columnas: `$` / `[[...]]` vs `[, col]`"
 
 #: es/datatable-reference-semantics.Rmd.tmp:block 122 (paragraph)
 msgid ""
@@ -784,10 +778,14 @@ msgid ""
 "data.table's j expression. DT$col and DT[['col']] may return a reference to "
 "the column, while DT[, col] always returns a copy."
 msgstr ""
+"Cuando se extrae una sola columna como vector, existe una diferencia sutil "
+"pero importante entre los métodos R estándar ($ y [[...]]) y la expresión j "
+"de data.table. DT$col y DT[['col']] pueden devolver una referencia a la "
+"columna, mientras que DT[, col] siempre devuelve una copia."
 
 #: es/datatable-reference-semantics.Rmd.tmp:block 123 (paragraph)
 msgid "A short example:"
-msgstr ""
+msgstr "Un breve ejemplo:"
 
 #: es/datatable-reference-semantics.Rmd.tmp:block 125 (paragraph)
 msgid ""
@@ -796,4 +794,16 @@ msgid ""
 " is fast but may return a reference. Use `copy(DT$$$mycol)` to guarantee "
 "independence.====="
 msgstr ""
+"Para seleccionar una sola columna como vector, recuerde: =====- `DT[, "
+"mycol]` es más seguro, ya que siempre devuelve una copia nueva e "
+"independiente.===== =====- `DT$$$mycol` es rápido, pero puede devolver una "
+"referencia. Use `copy(DT$$$mycol)` para garantizar la independencia.====="
+
+#: es/datatable-reference-semantics.Rmd.tmp:block 3 (paragraph)
+msgid ""
+"`{r} .write.translation.links(\"Translations of this document are available "
+"in: %s\")`"
+msgstr ""
+"`{r} .write.translation.links(\"Las traducciones de este documento están "
+"disponibles en: %s\")`"
 

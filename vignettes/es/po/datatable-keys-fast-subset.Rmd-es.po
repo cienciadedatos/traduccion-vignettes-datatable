@@ -1,7 +1,7 @@
 #
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2025-11-06 23:16-0300\n"
+"PO-Revision-Date: 2026-01-09 20:18-0300\n"
 "Language: es\n"
 
 #: es/datatable-keys-fast-subset.Rmd.tmp:block 5 (paragraph)
@@ -824,11 +824,6 @@ msgstr ""
 msgid "Now let's try to subset by using keys."
 msgstr "Ahora vamos a intentar crear subconjuntos mediante el uso de claves."
 
-#: es/datatable-keys-fast-subset.Rmd.tmp:block 149 (paragraph)
-msgid "=====* The speed-up is **~`r round(t1[3]/max(t2[3], .001))`x**!====="
-msgstr ""
-"=====* La aceleración es **~`r round(t1[3]/max(t2[3], .001))`x**!====="
-
 #: es/datatable-keys-fast-subset.Rmd.tmp:block 150 (header)
 msgid "b) Why does keying a *data.table* result in blazing fast subsets?"
 msgstr ""
@@ -1048,15 +1043,24 @@ msgstr ""
 "indexing.html), abordaremos este problema utilizando una *nueva* "
 "característica: *índices secundarios*."
 
-#: es/datatable-keys-fast-subset.Rmd.tmp:block 3 (paragraph)
-msgid ""
-"`r .write.translation.links(\"Translations of this document are available "
-"in: %s\")`"
-msgstr ""
-
 #: es/datatable-keys-fast-subset.Rmd.tmp:block 144 (paragraph)
 msgid ""
 "`DT` is ~380MiB. It is not really huge, but this will do to illustrate the "
 "point."
 msgstr ""
+"`DT` ocupa unos 380 MiB. No es un tamaño enorme, pero basta con esto para "
+"ilustrar el punto."
+
+#: es/datatable-keys-fast-subset.Rmd.tmp:block 3 (paragraph)
+msgid ""
+"`{r} .write.translation.links(\"Translations of this document are available "
+"in: %s\")`"
+msgstr ""
+"`{r} .write.translation.links(\"Las traducciones de este documento están "
+"disponibles en: %s\")`"
+
+#: es/datatable-keys-fast-subset.Rmd.tmp:block 149 (paragraph)
+msgid "=====* The speed-up is **~`{r} round(t1[3]/max(t2[3], .001))`x**!====="
+msgstr ""
+"=====* La aceleración es **~`{r} round(t1[3]/max(t2[3], .001))`x**!====="
 

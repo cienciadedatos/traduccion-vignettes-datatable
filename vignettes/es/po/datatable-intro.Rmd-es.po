@@ -1,7 +1,7 @@
 #
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2025-11-06 23:16-0300\n"
+"PO-Revision-Date: 2026-01-09 20:18-0300\n"
 "Language: es\n"
 
 #: es/datatable-intro.Rmd.tmp:block 5 (paragraph)
@@ -1453,19 +1453,6 @@ msgstr ""
 msgid "For example:"
 msgstr "Por ejemplo:"
 
-#: es/datatable-intro.Rmd.tmp:block 220 (paragraph)
-msgid ""
-"In (1), for each group, a vector is returned, with length = 6,4,2 here. "
-"However, (2) returns a list of length 1 for each group, with its first "
-"element holding vectors of length 6,4,2. Therefore, (1) results in a length "
-"of `6+4+2 =`r 6+4+2``, whereas (2) returns `1+1+1=`r 1+1+1``."
-msgstr ""
-"En (1), para cada grupo, se devuelve un vector, con longitud = 6,4,2 aquí. "
-"Sin embargo, (2) devuelve una lista de longitud 1 para cada grupo, con su "
-"primer elemento que contiene vectores de longitud 6,4,2. Por lo tanto, (1) "
-"da como resultado una longitud de `6+4+2 =`r 6+4+2``, mientras que (2) "
-"devuelve `1+1+1=`r 1+1+1``."
-
 #: es/datatable-intro.Rmd.tmp:block 221 (paragraph)
 msgid ""
 "Flexibility of j allows us to store any list object as an element of "
@@ -1663,7 +1650,22 @@ msgstr ""
 
 #: es/datatable-intro.Rmd.tmp:block 3 (paragraph)
 msgid ""
-"`r .write.translation.links(\"Translations of this document are available "
+"`{r} .write.translation.links(\"Translations of this document are available "
 "in: %s\")`"
 msgstr ""
+"`{r} .write.translation.links(\"Las traducciones de este documento están "
+"disponibles en: %s\")`"
+
+#: es/datatable-intro.Rmd.tmp:block 221 (paragraph)
+msgid ""
+"In (1), for each group, a vector is returned, with length = 6,4,2 here. "
+"However, (2) returns a list of length 1 for each group, with its first "
+"element holding vectors of length 6,4,2. Therefore, (1) results in a length "
+"of `{r} p(6+4+2)`, whereas (2) returns `{r} p(1+1+1)`."
+msgstr ""
+"En (1), para cada grupo, se devuelve un vector, con longitud = 6,4,2. Sin "
+"embargo, (2) devuelve una lista de longitud 1 para cada grupo, cuyo primer "
+"elemento contiene vectores de longitud 6,4,2. Por lo tanto, (1) da como "
+"resultado una longitud de `{r} p(6+4+2)`, mientras que (2) devuelve `{r} "
+"p(1+1+1)`."
 

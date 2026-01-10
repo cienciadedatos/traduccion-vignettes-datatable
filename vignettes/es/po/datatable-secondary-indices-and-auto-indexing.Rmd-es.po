@@ -1,7 +1,7 @@
 #
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2025-11-06 23:16-0300\n"
+"PO-Revision-Date: 2026-01-09 20:18-0300\n"
 "Language: es\n"
 
 #: es/datatable-secondary-indices-and-auto-indexing.Rmd.tmp:block 6 (header)
@@ -710,13 +710,6 @@ msgstr ""
 " *uniones* en la [siguiente viñeta (`vignette(\"datatable-joins\", "
 "package=\"data.table\")`)](datatable-joins.html)."
 
-#: es/datatable-secondary-indices-and-auto-indexing.Rmd.tmp:block 3
-#: (paragraph)
-msgid ""
-"`r .write.translation.links(\"Translations of this document are available "
-"in: %s\")`"
-msgstr ""
-
 #: es/datatable-secondary-indices-and-auto-indexing.Rmd.tmp:block 5
 #: (paragraph)
 msgid ""
@@ -724,6 +717,10 @@ msgid ""
 "by]` syntax, and how to perform fast key based subsets. If you're not "
 "familiar with these concepts, please read the following vignettes first:"
 msgstr ""
+"Esta viñeta asume que el lector está familiarizado con la sintaxis `[i, j, "
+"by]` de data.table y cómo crear subconjuntos rápidos basados ​​en claves. Si"
+" no está familiarizado con estos conceptos, lea primero las siguientes "
+"viñetas:"
 
 #: es/datatable-secondary-indices-and-auto-indexing.Rmd.tmp:block 6
 #: (paragraph)
@@ -734,10 +731,15 @@ msgid ""
 "[`vignette(\"datatable-keys-fast-subset\", "
 "package=\"data.table\")`](datatable-keys-fast-subset.html)====="
 msgstr ""
+"=====- [`viñeta(\"datatable-intro\", paquete=\"data.table\")`](datatable-"
+"intro.html) ===== =====- [`viñeta(\"datatable-reference-semantics\", "
+"paquete=\"data.table\")`](datatable-reference-semantics.html)===== =====- "
+"[`viñeta(\"datatable-keys-fast-subset\", "
+"paquete=\"data.table\")`](datatable-keys-fast-subset.html)====="
 
 #: es/datatable-secondary-indices-and-auto-indexing.Rmd.tmp:block 21 (header)
 msgid "Keyed vs. Indexed Subsetting"
-msgstr ""
+msgstr "Subconjuntos con clave vs. subconjuntos indexados"
 
 #: es/datatable-secondary-indices-and-auto-indexing.Rmd.tmp:block 22
 #: (paragraph)
@@ -745,16 +747,18 @@ msgid ""
 "While both **keys** and **indices** enable fast binary search subsetting, "
 "they differ significantly in usage:"
 msgstr ""
+"Si bien tanto las **claves** como los **índices** permiten la subdivisión "
+"rápida de búsquedas binarias, difieren significativamente en su uso:"
 
 #: es/datatable-secondary-indices-and-auto-indexing.Rmd.tmp:block 23
 #: (paragraph)
 msgid "**Keyed subsetting** (implicit column matching)"
-msgstr ""
+msgstr "**Subconjunto con clave** (coincidencia de columnas implícita)"
 
 #: es/datatable-secondary-indices-and-auto-indexing.Rmd.tmp:block 25
 #: (paragraph)
 msgid "**Indexed subsetting** (explicit column specification)"
-msgstr ""
+msgstr "**Subconjunto indexado** (especificación de columna explícita)"
 
 #: es/datatable-secondary-indices-and-auto-indexing.Rmd.tmp:block 75
 #: (paragraph)
@@ -762,6 +766,8 @@ msgid ""
 "=====* For clarity/readability, it might help to name the inputs in `i`, "
 "e.g.,====="
 msgstr ""
+"=====* Para mayor claridad y legibilidad, podría ser útil nombrar las "
+"entradas en `i`, por ejemplo,====="
 
 #: es/datatable-secondary-indices-and-auto-indexing.Rmd.tmp:block 77
 #: (paragraph)
@@ -769,5 +775,15 @@ msgid ""
 "This makes it clear which entries in `j` correspond to which element of "
 "`on`."
 msgstr ""
+"Esto deja claro qué entradas en `j` corresponden a qué elemento de `on`."
+
+#: es/datatable-secondary-indices-and-auto-indexing.Rmd.tmp:block 3
+#: (paragraph)
+msgid ""
+"`{r} .write.translation.links(\"Translations of this document are available "
+"in: %s\")`"
+msgstr ""
+"`{r} .write.translation.links(\"Las traducciones de este documento están "
+"disponibles en: %s\")`"
 
 #: es/datatable-secondary-indices-and-auto-indexing.Rmd.tmp:block 127

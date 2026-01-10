@@ -1,7 +1,7 @@
 #
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2025-11-06 23:16-0300\n"
+"PO-Revision-Date: 2026-01-09 20:18-0300\n"
 "Language: es\n"
 
 #: es/datatable-programming.Rmd.tmp:block 5 (header)
@@ -598,15 +598,9 @@ msgstr ""
 "entre comillas en el elemento del argumento `env`, por lo que no se necesita"
 " una llamada `eval` adicional."
 
-#: es/datatable-programming.Rmd.tmp:block 3 (paragraph)
-msgid ""
-"`r .write.translation.links(\"Translations of this document are available "
-"in: %s\")`"
-msgstr ""
-
 #: es/datatable-programming.Rmd.tmp:block 50 (header)
 msgid "Substitute functions"
-msgstr ""
+msgstr "Funciones sustitutivas"
 
 #: es/datatable-programming.Rmd.tmp:block 51 (paragraph)
 msgid ""
@@ -614,12 +608,17 @@ msgid ""
 "in an expression. Note that providing `outer=\"sqrt\"` (string) vs. "
 "`outer=sqrt` (symbol) is very different:"
 msgstr ""
+"Una pequeña aclaración puede ser útil sobre cómo sustituir el nombre de una "
+"función en una expresión. Tenga en cuenta que proporcionar `outer=\"sqrt\"` "
+"(cadena) y `outer=sqrt` (símbolo) es muy diferente:"
 
 #: es/datatable-programming.Rmd.tmp:block 53 (paragraph)
 msgid ""
 "And while `.Primitive(\"sqrt\")(Sepal.Length)` still works, it is almost "
 "never the desired form."
 msgstr ""
+"Y aunque `.Primitive(\"sqrt\")(Sepal.Length)` todavía funciona, casi nunca "
+"es la forma deseada."
 
 #: es/datatable-programming.Rmd.tmp:block 54 (paragraph)
 msgid ""
@@ -627,6 +626,9 @@ msgid ""
 "and should, be used directly in the expression, as there is no need for "
 "substitution."
 msgstr ""
+"Más importante aún, si se pretende utilizar la forma del símbolo, entonces "
+"se puede y se debe utilizar directamente en la expresión, ya que no hay "
+"necesidad de sustitución."
 
 #: es/datatable-programming.Rmd.tmp:block 56 (paragraph)
 msgid ""
@@ -634,10 +636,13 @@ msgid ""
 "namespace and function name can be substituted as any other symbol in the "
 "expression:"
 msgstr ""
+"Si el nombre de la función que se va a sustituir necesita estar calificado "
+"por el espacio de nombres, entonces el espacio de nombres y el nombre de la "
+"función se pueden sustituir por cualquier otro símbolo en la expresión:"
 
 #: es/datatable-programming.Rmd.tmp:block 86 (header)
 msgid "Common mistakes"
-msgstr ""
+msgstr "Errores comunes"
 
 #: es/datatable-programming.Rmd.tmp:block 87 (paragraph)
 msgid ""
@@ -645,6 +650,8 @@ msgid ""
 " name that points to an object. See the verbose output of following "
 "examples."
 msgstr ""
+"Es importante comprender la diferencia entre pasar un objeto y un nombre que"
+" apunta a un objeto. Vea la salida detallada de los siguientes ejemplos."
 
 #: es/datatable-programming.Rmd.tmp:block 89 (paragraph)
 msgid ""
@@ -652,16 +659,22 @@ msgid ""
 "inserting the actual function body. Therefore, the second approach (passing "
 "a character string) is often preferred."
 msgstr ""
+"Los usuarios suelen preferir sustituir el nombre de la función en lugar de "
+"insertar el cuerpo de la misma. Por lo tanto, suele preferirse el segundo "
+"enfoque (pasar una cadena de caracteres)."
 
 #: es/datatable-programming.Rmd.tmp:block 90 (paragraph)
 msgid ""
 "In case of any doubts on the `env` interface functioning, set `verbose = "
 "TRUE` to inspect how expressions are resolved internally."
 msgstr ""
+"En caso de dudas sobre el funcionamiento de la interfaz `env`, configure "
+"`verbose = TRUE` para inspeccionar cómo se resuelven las expresiones "
+"internamente."
 
 #: es/datatable-programming.Rmd.tmp:block 91 (header)
 msgid "Use `env` argument from inside another function"
-msgstr ""
+msgstr "Utilice el argumento `env` desde dentro de otra función"
 
 #: es/datatable-programming.Rmd.tmp:block 92 (paragraph)
 msgid ""
@@ -675,6 +688,15 @@ msgid ""
 " `list()`, *a la* `env = .(.col=\"Petal.Length\")`, will not work; use `env "
 "= list(.col=\"Petal.Length\")` instead."
 msgstr ""
+"Se decidió por diseño que el argumento `env` siga las reglas de *Evaluación "
+"Estándar* (SE), es decir, los valores pasados ​​a `env` se evalúan en su "
+"ámbito original tal cual. Para más información sobre el tema, consulte el "
+"[Manual del lenguaje R: Computación en el "
+"lenguaje](https://cran.r-project.org/doc/manuals/r-release/R-lang.html#Computing-"
+"on-the-language)). Por lo tanto, **usar el argumento `env` desde una función"
+" no requiere ningún manejo especial**. Esto también significa que el alias "
+"`.()` para una `list()`, *como* `env = .(.col=\"Petal.Length\")`, no "
+"funcionará; utilice `env = list(.col=\"Petal.Length\")` ​​en su lugar."
 
 #: es/datatable-programming.Rmd.tmp:block 94 (paragraph)
 msgid ""
@@ -682,4 +704,15 @@ msgid ""
 "then it has to resolve language objects the same way as when passing its "
 "arguments to any other SE function."
 msgstr ""
+"Si la función externa en sí sigue las reglas NSE (evaluación no estándar), "
+"entonces tiene que resolver los objetos del lenguaje de la misma manera que "
+"cuando pasa sus argumentos a cualquier otra función SE."
+
+#: es/datatable-programming.Rmd.tmp:block 3 (paragraph)
+msgid ""
+"`{r} .write.translation.links(\"Translations of this document are available "
+"in: %s\")`"
+msgstr ""
+"`{r} .write.translation.links(\"Las traducciones de este documento están "
+"disponibles en: %s\")`"
 

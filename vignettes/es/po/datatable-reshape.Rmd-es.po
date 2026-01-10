@@ -1,7 +1,7 @@
 #
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2025-11-06 23:16-0300\n"
+"PO-Revision-Date: 2026-01-09 20:18-0300\n"
 "Language: es\n"
 
 #: es/datatable-reshape.Rmd.tmp:block 5 (paragraph)
@@ -545,18 +545,14 @@ msgstr ""
 "`dcast` para *data.tables*. Consulte los ejemplos en `?dcast` que ilustran "
 "esta funcionalidad."
 
-#: es/datatable-reshape.Rmd.tmp:block 3 (paragraph)
-msgid ""
-"`r .write.translation.links(\"Translations of this document are available "
-"in: %s\")`"
-msgstr ""
-
 #: es/datatable-reshape.Rmd.tmp:block 49 (paragraph)
 msgid ""
 "And you'd like to combine (`melt`) all the `name` columns together, and "
 "`gender` columns together. Using the old functionality, we could do "
 "something like this:"
 msgstr ""
+"Y quieres combinar (`melt`) todas las columnas `name` y `gender`. Con la "
+"funcionalidad anterior, podríamos hacer algo como esto:"
 
 #: es/datatable-reshape.Rmd.tmp:block 52 (paragraph)
 msgid ""
@@ -565,6 +561,10 @@ msgid ""
 "together, and then splitting them again. I think it's easy to see that it's "
 "quite roundabout (and inefficient).====="
 msgstr ""
+"=====1. Lo que queríamos hacer era combinar todas las columnas de tipo "
+"`nombre` y `género`, respectivamente. En lugar de eso, combinamos *todo* y "
+"luego lo volvemos a dividir. Creo que es fácil ver que es bastante indirecto"
+" (e ineficiente).====="
 
 #: es/datatable-reshape.Rmd.tmp:block 84 (paragraph)
 msgid ""
@@ -574,4 +574,18 @@ msgid ""
 "shows how to use a more complex regex with five groups, two numeric output "
 "columns, and an anonymous type conversion function,"
 msgstr ""
+"Al usar el argumento `patrón`, debe ser una expresión regular compatible con"
+" Perl que contenga el mismo número de grupos de captura (subexpresiones "
+"entre paréntesis) que el resto de argumentos (nombres de grupo). El código a"
+" continuación muestra cómo usar una expresión regular más compleja con cinco"
+" grupos, dos columnas de salida numérica y una función de conversión de "
+"tipos anónima."
+
+#: es/datatable-reshape.Rmd.tmp:block 3 (paragraph)
+msgid ""
+"`{r} .write.translation.links(\"Translations of this document are available "
+"in: %s\")`"
+msgstr ""
+"`{r} .write.translation.links(\"Las traducciones de este documento están "
+"disponibles en: %s\")`"
 

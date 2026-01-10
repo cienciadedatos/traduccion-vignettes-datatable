@@ -1,7 +1,7 @@
 #
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2025-11-06 23:16-0300\n"
+"PO-Revision-Date: 2026-01-09 20:18-0300\n"
 "Language: es\n"
 
 #: es/datatable-faq.Rmd.tmp:block 6 (paragraph)
@@ -2372,12 +2372,6 @@ msgid "Please see [this answer](https://stackoverflow.com/a/10529888/403310)."
 msgstr ""
 "Consulta [esta respuesta](https://stackoverflow.com/a/10529888/403310)."
 
-#: es/datatable-faq.Rmd.tmp:block 4 (paragraph)
-msgid ""
-"`r .write.translation.links(\"Translations of this document are available "
-"in: %s\")`"
-msgstr ""
-
 #: es/datatable-faq.Rmd.tmp:block 13 (paragraph)
 msgid ""
 "Say column 5 is named `\"region\"` and you really must extract that column "
@@ -2390,6 +2384,16 @@ msgid ""
 "returns a copy. This can have important consequences and is explained in the"
 " `vignette(\"datatable-reference-semantics\", package=\"data.table\")`."
 msgstr ""
+"Supongamos que la columna 5 se llama `\"region\"` y debe extraerla como un "
+"vector, no como un data.table. Es más robusto usar el nombre de la columna y"
+" escribir `DT$region` o `DT[[\"region\"]]`; es decir, lo mismo que la base "
+"R. Se recomienda usar `$` y `[[` de la base R en data.table. No se "
+"recomienda su uso cuando se combina con `<-` para asignar (use `:=` en su "
+"lugar), sino simplemente para seleccionar una sola columna por nombre. Sin "
+"embargo, una diferencia clave es que DT$col y DT[['col']] pueden devolver "
+"una referencia, mientras que DT[, col] siempre devuelve una copia. Esto "
+"puede tener consecuencias importantes y se explica en `vignette(\"datatable-"
+"reference-semantics\", package=\"data.table\")`."
 
 #: es/datatable-faq.Rmd.tmp:block 218 (paragraph)
 msgid ""
@@ -2402,8 +2406,25 @@ msgid ""
 "restore its internal attributes. If you only need to pre-allocate space for "
 "new columns, `setalloccol()` can also be used."
 msgstr ""
+"`*.RDS` y `*.RData` son tipos de archivo que permiten almacenar objetos R en"
+" memoria en disco de forma eficiente. Sin embargo, al almacenar `data.table`"
+" en un archivo binario, se pierde la sobreasignación de columnas (véase "
+"también `?truelength`). Esto no supone un gran problema: su `data.table` se "
+"copiará en memoria en la siguiente operación *por referencia* y generará una"
+" advertencia. Por lo tanto, se recomienda ejecutar `setDT()` en cada "
+"`data.table` cargado con `readRDS()` o `load()` para restaurar sus atributos"
+" internos. Si solo necesita preasignar espacio para nuevas columnas, también"
+" puede usar `setalloccol()`."
 
 #: es/datatable-faq.Rmd.tmp:block 219 (paragraph)
 msgid "For more details, see `?setDT` and `?truelength`."
+msgstr "Para obtener más detalles, consulte `?setDT` y `?truelength`."
+
+#: es/datatable-faq.Rmd.tmp:block 4 (paragraph)
+msgid ""
+"`{r} .write.translation.links(\"Translations of this document are available "
+"in: %s\")`"
 msgstr ""
+"`{r} .write.translation.links(\"Las traducciones de este documento están "
+"disponibles en: %s\")`"
 

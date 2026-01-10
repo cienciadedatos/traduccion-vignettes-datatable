@@ -1,7 +1,7 @@
 #
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2025-11-06 23:16-0300\n"
+"PO-Revision-Date: 2026-01-09 20:18-0300\n"
 "Language: es\n"
 
 #: es/datatable-benchmarking.Rmd.tmp:block 5 (paragraph)
@@ -287,9 +287,11 @@ msgstr ""
 " de los bucles se prefiere utilizar `as.data.table()` o `setDT()` en una "
 "lista válida."
 
-#: es/datatable-benchmarking.Rmd.tmp:block 4 (paragraph)
+#: es/datatable-benchmarking.Rmd.tmp:block 5 (paragraph)
 msgid ""
-"`r .write.translation.links(\"Translations of this document are available "
+"`{r} .write.translation.links(\"Translations of this document are available "
 "in: %s\")`"
 msgstr ""
+"`{r} .write.translation.links(\"Las traducciones de este documento están "
+"disponibles en: %s\")`"
 

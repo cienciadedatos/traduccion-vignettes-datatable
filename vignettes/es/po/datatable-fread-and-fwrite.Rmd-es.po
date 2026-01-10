@@ -1,7 +1,7 @@
 #
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2025-11-06 23:16-0300\n"
+"PO-Revision-Date: 2026-01-09 20:18-0300\n"
 "Language: es\n"
 
 #: es/datatable-fread-and-fwrite.Rmd.tmp:block 3 (paragraph)
@@ -9,6 +9,8 @@ msgid ""
 "`r .write.translation.links(\"Translations of this document are available "
 "in: %s\")`"
 msgstr ""
+"`r .write.translation.links(\"Las traducciones de este documento están "
+"disponibles en: %s\")`"
 
 #: es/datatable-fread-and-fwrite.Rmd.tmp:block 5 (paragraph)
 msgid ""
@@ -18,26 +20,36 @@ msgid ""
 "highlights their usability, flexibility, and performance for efficient data "
 "import and export."
 msgstr ""
+"Las funciones `fread()` y `fwrite()` del paquete `data.table` de R no solo "
+"están optimizadas para la velocidad con archivos grandes, sino que también "
+"ofrecen funciones potentes y prácticas para trabajar con conjuntos de datos "
+"pequeños. Esta viñeta destaca su usabilidad, flexibilidad y rendimiento para"
+" una importación y exportación de datos eficiente."
 
 #: es/datatable-fread-and-fwrite.Rmd.tmp:block 6 (header)
 msgid "1. fread()"
-msgstr ""
+msgstr "1. fread()"
 
 #: es/datatable-fread-and-fwrite.Rmd.tmp:block 7 (header)
 msgid "**1.1 Using command line tools directly**"
-msgstr ""
+msgstr "**1.1 Uso directo de herramientas de línea de comandos**"
 
 #: es/datatable-fread-and-fwrite.Rmd.tmp:block 8 (paragraph)
 msgid ""
 "The `fread()` function from `data.table` can read data piped from shell "
 "commands, letting you filter or preprocess data before it even enters R."
 msgstr ""
+"La función `fread()` de `data.table` puede leer datos canalizados desde "
+"comandos de shell, lo que le permite filtrar o preprocesar datos incluso "
+"antes de que ingresen a R."
 
 #: es/datatable-fread-and-fwrite.Rmd.tmp:block 10 (paragraph)
 msgid ""
 "The `-v` option makes `grep` return all lines except those containing the "
 "string 'HEADER'."
 msgstr ""
+"La opción `-v` hace que `grep` devuelva todas las líneas excepto aquellas "
+"que contienen la cadena 'HEADER'."
 
 #: es/datatable-fread-and-fwrite.Rmd.tmp:block 11 (quote)
 msgid ""
@@ -49,16 +61,26 @@ msgid ""
 "end of lines), the grep syntax is very powerful. Learning its syntax is a "
 "transferable skill for other languages and environments.\""
 msgstr ""
+"Dada la cantidad de ingenieros de alto nivel que han analizado la "
+"herramienta de comandos grep a lo largo de los años, es muy probable que sea"
+" la más rápida posible, además de ser correcta, práctica, estar bien "
+"documentada en línea y ser fácil de aprender y de buscar soluciones para "
+"tareas específicas. Si necesita realizar un filtrado de cadenas más complejo"
+" (por ejemplo, buscar cadenas al principio o al final de las líneas), la "
+"sintaxis de grep es muy potente. Aprender su sintaxis es una habilidad "
+"transferible a otros lenguajes y entornos."
 
 #: es/datatable-fread-and-fwrite.Rmd.tmp:block 11 (quote)
 msgid "— Matt Dowle"
-msgstr ""
+msgstr "—Matt Dowle"
 
 #: es/datatable-fread-and-fwrite.Rmd.tmp:block 12 (paragraph)
 msgid ""
 "Look at this [example](https://stackoverflow.com/questions/36256706/fread-"
 "together-with-grepl/36270543#36270543) for more detail."
 msgstr ""
+"Mira este [ejemplo](https://stackoverflow.com/questions/36256706/fread-"
+"together-with-grepl/36270543#36270543) para obtener más detalles."
 
 #: es/datatable-fread-and-fwrite.Rmd.tmp:block 13 (paragraph)
 msgid ""
@@ -67,10 +89,14 @@ msgid ""
 "(WSL). On Linux and macOS, these tools are typically included with the "
 "operating system."
 msgstr ""
+"En Windows, las herramientas de línea de comandos como `grep` están "
+"disponibles a través de diversos entornos, como Rtools, Cygwin o el "
+"Subsistema de Windows para Linux (WSL). En Linux y macOS, estas herramientas"
+" suelen estar incluidas en el sistema operativo."
 
 #: es/datatable-fread-and-fwrite.Rmd.tmp:block 14 (header)
 msgid "1.1.1 Reading directly from a text string"
-msgstr ""
+msgstr "1.1.1 Lectura directa de una cadena de texto"
 
 #: es/datatable-fread-and-fwrite.Rmd.tmp:block 15 (paragraph)
 msgid ""
@@ -80,10 +106,15 @@ msgid ""
 "programmatically within your R session. Each line in the string should be "
 "separated by a newline character `\\n`."
 msgstr ""
+"`fread()` puede leer datos directamente de una cadena de caracteres en R "
+"usando el argumento `text`. Esto es especialmente útil para crear ejemplos "
+"reproducibles, probar fragmentos de código o trabajar con datos generados "
+"programáticamente en la sesión de R. Cada línea de la cadena debe estar "
+"separada por un carácter de nueva línea `\\n`."
 
 #: es/datatable-fread-and-fwrite.Rmd.tmp:block 17 (header)
 msgid "1.1.2 Reading from URLs"
-msgstr ""
+msgstr "1.1.2 Lectura desde URL"
 
 #: es/datatable-fread-and-fwrite.Rmd.tmp:block 18 (paragraph)
 msgid ""
@@ -91,10 +122,13 @@ msgid ""
 "character string to its `file` argument. This allows you to download and "
 "read data from the internet in one step."
 msgstr ""
+"`fread()` puede leer datos directamente de URLs web al pasar la URL como una"
+" cadena de caracteres a su argumento `file`. Esto permite descargar y leer "
+"datos de internet en un solo paso."
 
 #: es/datatable-fread-and-fwrite.Rmd.tmp:block 20 (header)
 msgid "1.1.3 Automatic decompression of compressed files"
-msgstr ""
+msgstr "1.1.3 Descompresión automática de archivos comprimidos"
 
 #: es/datatable-fread-and-fwrite.Rmd.tmp:block 21 (paragraph)
 msgid ""
@@ -103,6 +137,10 @@ msgid ""
 "connection object or shell commands. This works by checking the file "
 "extension."
 msgstr ""
+"En muchos casos, `fread()` puede detectar y descomprimir automáticamente "
+"archivos con extensiones de compresión comunes, sin necesidad de un objeto "
+"de conexión explícito ni comandos de shell. Esto funciona comprobando la "
+"extensión del archivo."
 
 #: es/datatable-fread-and-fwrite.Rmd.tmp:block 22 (paragraph)
 msgid ""
@@ -111,16 +149,22 @@ msgid ""
 " / tar archives, single file): Supported—`fread()` will read the first file "
 "in the archive if only one file is present.====="
 msgstr ""
+"**Las extensiones compatibles generalmente incluyen:** =====- `.gz` / `.bz2`"
+" (gzip / bzip2): Compatible y funciona de inmediato.===== =====- `.zip` / "
+"`.tar` (archivos ZIP / tar, archivo único): Compatible: `fread()` leerá el "
+"primer archivo del archivo si solo hay un archivo presente.====="
 
 #: es/datatable-fread-and-fwrite.Rmd.tmp:block 23 (paragraph)
 msgid ""
 "**Note**: If there are multiple files in the archive, `fread()` will fail "
 "with an error."
 msgstr ""
+"**Nota**: Si hay varios archivos en el archivo, `fread()` fallará con un "
+"error."
 
 #: es/datatable-fread-and-fwrite.Rmd.tmp:block 24 (header)
 msgid "1.2 Automatic separator and skip detection"
-msgstr ""
+msgstr "1.2 Separador automático y detección de saltos"
 
 #: es/datatable-fread-and-fwrite.Rmd.tmp:block 25 (paragraph)
 msgid ""
@@ -128,10 +172,14 @@ msgid ""
 "manual specification in most cases. You simply provide the filename—`fread` "
 "intelligently detects the structure:"
 msgstr ""
+"`fread` automatiza la detección de delimitadores y encabezados, eliminando "
+"la necesidad de especificar manualmente en la mayoría de los casos. "
+"Simplemente proporcione el nombre del archivo; `fread` detecta la estructura"
+" de forma inteligente:"
 
 #: es/datatable-fread-and-fwrite.Rmd.tmp:block 26 (paragraph)
 msgid "**Separator Detection**"
-msgstr ""
+msgstr "**Detección de separadores**"
 
 #: es/datatable-fread-and-fwrite.Rmd.tmp:block 27 (paragraph)
 msgid ""
@@ -140,16 +188,23 @@ msgid ""
 "sampled rows. For non-standard delimiters, you can override this using the "
 "`sep=` parameter."
 msgstr ""
+"`fread` prueba separadores comunes (`,`,`\\t`, `|`, espacio, `:`, `;`) y "
+"selecciona el que genera el número más consistente de campos en las filas "
+"muestreadas. Para delimitadores no estándar, puede anular esto con el "
+"parámetro `sep=`."
 
 #: es/datatable-fread-and-fwrite.Rmd.tmp:block 28 (paragraph)
 msgid "**Header Detection**"
-msgstr ""
+msgstr "**Detección de encabezado**"
 
 #: es/datatable-fread-and-fwrite.Rmd.tmp:block 29 (paragraph)
 msgid ""
 "After applying any `skip` or `nrows` settings (if specified), the first row "
 "with a consistent number of fields is examined:"
 msgstr ""
+"Después de aplicar cualquier configuración `skip` o `nrows` (si se "
+"especifica), se examina la primera fila con una cantidad constante de "
+"campos:"
 
 #: es/datatable-fread-and-fwrite.Rmd.tmp:block 30 (paragraph)
 msgid ""
@@ -158,6 +213,10 @@ msgid ""
 "strings might still be considered data), it is typically used as the header "
 "(column names)."
 msgstr ""
+"Si todos los campos de esta línea son interpretables como caracteres y los "
+"valores no se parecen mucho a una fila de datos (por ejemplo, una fila de "
+"cadenas de apariencia puramente numérica aún podría considerarse datos), "
+"normalmente se utiliza como encabezado (nombres de columnas)."
 
 #: es/datatable-fread-and-fwrite.Rmd.tmp:block 31 (paragraph)
 msgid ""
@@ -165,16 +224,22 @@ msgid ""
 "strings that strongly resemble numbers and could be data), it is treated as "
 "a data row, and default column names (`V1`, `V2`, …) are assigned."
 msgstr ""
+"De lo contrario (por ejemplo, si la línea contiene tipos numéricos "
+"detectados o cadenas de caracteres que se parecen mucho a números y podrían "
+"ser datos), se trata como una fila de datos y se asignan nombres de columna "
+"predeterminados (`V1`, `V2`, …)."
 
 #: es/datatable-fread-and-fwrite.Rmd.tmp:block 32 (paragraph)
 msgid ""
 "You can explicitly tell fread whether a header exists using `header = TRUE` "
 "or `header = FALSE`."
 msgstr ""
+"Puedes decirle explícitamente a fread si existe un encabezado usando `header"
+" = TRUE` o `header = FALSE`."
 
 #: es/datatable-fread-and-fwrite.Rmd.tmp:block 33 (paragraph)
 msgid "**Skip Detection**"
-msgstr ""
+msgstr "**Detección de saltos**"
 
 #: es/datatable-fread-and-fwrite.Rmd.tmp:block 34 (paragraph)
 msgid ""
@@ -182,6 +247,10 @@ msgid ""
 "and comment lines (e.g., starting with `#`) before the data header. To "
 "manually specify a different number of lines to skip, use"
 msgstr ""
+"De forma predeterminada (`skip=\"auto\"`), `fread` omitirá automáticamente "
+"las líneas en blanco y las líneas de comentario (p. ej., las que empiezan "
+"por `#`) antes del encabezado de datos. Para especificar manualmente un "
+"número diferente de líneas a omitir, utilice"
 
 #: es/datatable-fread-and-fwrite.Rmd.tmp:block 35 (paragraph)
 msgid ""
@@ -192,10 +261,16 @@ msgid ""
 " files. This feature is inspired by the `read.xls` function in the `gdata` "
 "package.====="
 msgstr ""
+"=====* `skip=n` para omitir las primeras `n` líneas.===== =====* "
+"`skip=\"string\"` para buscar una línea que contenga una subcadena "
+"(normalmente de los nombres de columna, como `skip=\"Date\"`). La lectura "
+"comienza en la primera línea coincidente. Esto es útil para omitir metadatos"
+" o seleccionar subtablas en archivos multitabla. Esta función está inspirada"
+" en la función `read.xls` del paquete `gdata`.====="
 
 #: es/datatable-fread-and-fwrite.Rmd.tmp:block 36 (header)
 msgid "1.3 High-Quality Automatic Column Type Detection"
-msgstr ""
+msgstr "1.3 Detección automática de tipo de columna de alta calidad"
 
 #: es/datatable-fread-and-fwrite.Rmd.tmp:block 37 (paragraph)
 msgid ""
@@ -203,6 +278,10 @@ msgid ""
 "filled, or appear numeric but later contain characters. To handle such "
 "inconsistencies, `fread()` employs a robust column type detection strategy."
 msgstr ""
+"Muchos conjuntos de datos reales contienen columnas que inicialmente están "
+"en blanco, se rellenan con ceros o parecen numéricas, pero luego contienen "
+"caracteres. Para gestionar estas inconsistencias, `fread()` emplea una "
+"robusta estrategia de detección de tipos de columna."
 
 #: es/datatable-fread-and-fwrite.Rmd.tmp:block 38 (paragraph)
 msgid ""
@@ -214,10 +293,18 @@ msgid ""
 "changes that occur later in the data (e.g., `001` to `0A0` or blanks "
 "becoming populated)."
 msgstr ""
+"Desde la versión 1.10.5, `fread()` muestrea filas leyendo bloques de filas "
+"contiguas desde varios puntos equidistantes del archivo, incluyendo el "
+"inicio, el centro y el final. El número total de filas muestreadas se "
+"selecciona dinámicamente en función del tamaño y la estructura del archivo, "
+"y suele rondar las 10 000, aunque puede ser menor o ligeramente mayor. Este "
+"amplio muestreo ayuda a detectar cambios de tipo que se producen "
+"posteriormente en los datos (por ejemplo, de `001` a `0A0` o espacios en "
+"blanco que se rellenan)."
 
 #: es/datatable-fread-and-fwrite.Rmd.tmp:block 39 (paragraph)
 msgid "**Efficient File Access with mmap**"
-msgstr ""
+msgstr "**Acceso eficiente a archivos con mmap**"
 
 #: es/datatable-fread-and-fwrite.Rmd.tmp:block 40 (paragraph)
 msgid ""
@@ -227,6 +314,11 @@ msgid ""
 "demand strategy makes sampling nearly instantaneous, even for very large "
 "files."
 msgstr ""
+"Para implementar este muestreo eficientemente, `fread()` utiliza el acceso a"
+" archivos mapeados en memoria del sistema operativo (`mmap`), lo que le "
+"permite saltar a posiciones arbitrarias en el archivo sin necesidad de "
+"escaneo secuencial. Esta estrategia perezosa y bajo demanda hace que el "
+"muestreo sea casi instantáneo, incluso para archivos muy grandes."
 
 #: es/datatable-fread-and-fwrite.Rmd.tmp:block 41 (paragraph)
 msgid ""
@@ -234,24 +326,30 @@ msgid ""
 "tests subsequent lines until it finds 5 consecutive rows with the expected "
 "number of fields, ensuring correct parsing even in complex files."
 msgstr ""
+"Si un salto cae dentro de un campo entre comillas que incluye nuevas líneas,"
+" `fread()` prueba las líneas subsiguientes hasta que encuentra 5 filas "
+"consecutivas con la cantidad esperada de campos, lo que garantiza un "
+"análisis correcto incluso en archivos complejos."
 
 #: es/datatable-fread-and-fwrite.Rmd.tmp:block 42 (paragraph)
 msgid "**Accurate and Optimized Type Detection**"
-msgstr ""
+msgstr "**Detección de tipos precisa y optimizada**"
 
 #: es/datatable-fread-and-fwrite.Rmd.tmp:block 43 (paragraph)
 msgid ""
 "The type for each column is inferred based on the lowest required type from "
 "the following ordered list:"
 msgstr ""
+"El tipo de cada columna se infiere en función del tipo requerido más bajo de"
+" la siguiente lista ordenada:"
 
 #: es/datatable-fread-and-fwrite.Rmd.tmp:block 44 (paragraph)
 msgid "`logical` < `integer` < `integer64` < `double` < `character`"
-msgstr ""
+msgstr "`lógico` < `entero` < `entero64` < `doble` < `carácter`"
 
 #: es/datatable-fread-and-fwrite.Rmd.tmp:block 45 (paragraph)
 msgid "This ensures:"
-msgstr ""
+msgstr "Esto garantiza:"
 
 #: es/datatable-fread-and-fwrite.Rmd.tmp:block 46 (paragraph)
 msgid ""
@@ -259,10 +357,14 @@ msgid ""
 "=====- Avoidance of rereading the file or manually setting `colClasses`====="
 " =====- Improved speed and memory efficiency====="
 msgstr ""
+"=====- Asignación única de memoria por adelantado utilizando el tipo "
+"correcto===== =====- Evita tener que volver a leer el archivo o configurar "
+"manualmente `colClasses`===== =====- Mayor velocidad y eficiencia de la "
+"memoria====="
 
 #: es/datatable-fread-and-fwrite.Rmd.tmp:block 47 (paragraph)
 msgid "**Out-of-Sample Type Exceptions**"
-msgstr ""
+msgstr "**Excepciones de tipo fuera de muestra**"
 
 #: es/datatable-fread-and-fwrite.Rmd.tmp:block 48 (paragraph)
 msgid ""
@@ -271,16 +373,23 @@ msgid ""
 "requiring user intervention. For example, a column sampled as integer might "
 "later contain `00A` — triggering an automatic reread as character."
 msgstr ""
+"Si se produce un cambio de tipo fuera de las filas muestreadas, `fread()` lo"
+" detecta automáticamente y relee el archivo para garantizar la correcta "
+"asignación de tipo, sin necesidad de intervención del usuario. Por ejemplo, "
+"una columna muestreada como entero podría contener posteriormente `00A`, lo "
+"que activaría una relectura automática como carácter."
 
 #: es/datatable-fread-and-fwrite.Rmd.tmp:block 49 (paragraph)
 msgid ""
 "All detection logic and any rereads are detailed when `verbose=TRUE` is "
 "enabled."
 msgstr ""
+"Toda la lógica de detección y cualquier relectura se detallan cuando "
+"`verbose=TRUE` está habilitado."
 
 #: es/datatable-fread-and-fwrite.Rmd.tmp:block 50 (header)
 msgid "1.4 Early Error Detection at End-of-File"
-msgstr ""
+msgstr "1.4 Detección temprana de errores al final del archivo"
 
 #: es/datatable-fread-and-fwrite.Rmd.tmp:block 51 (paragraph)
 msgid ""
@@ -293,10 +402,18 @@ msgid ""
 "feedback and more efficient resource usage, especially when working with "
 "large datasets."
 msgstr ""
+"Dado que la muestra grande incluye explícitamente el final del archivo, se "
+"pueden detectar y reportar casi al instante problemas críticos, como un "
+"número inconsistente de columnas, un pie de página incorrecto o una comilla "
+"inicial sin su comilla de cierre correspondiente. Esta detección temprana de"
+" errores evita la sobrecarga innecesaria de procesar todo el archivo o "
+"asignar memoria excesiva para luego encontrar un fallo en el paso final. "
+"Garantiza una retroalimentación más rápida y un uso más eficiente de los "
+"recursos, especialmente al trabajar con grandes conjuntos de datos."
 
 #: es/datatable-fread-and-fwrite.Rmd.tmp:block 52 (header)
 msgid "1.5 `integer64` Support"
-msgstr ""
+msgstr "1.5 Compatibilidad con `integer64`"
 
 #: es/datatable-fread-and-fwrite.Rmd.tmp:block 53 (paragraph)
 msgid ""
@@ -304,36 +421,50 @@ msgid ""
 "them as `bit64::integer64` to preserve full precision. This behavior can be "
 "overridden in three ways:"
 msgstr ""
+"De forma predeterminada, `fread` detecta enteros mayores que 2 31 y los lee "
+"como `bit64::integer64` para mantener la precisión total. Este "
+"comportamiento se puede anular de tres maneras:"
 
 #: es/datatable-fread-and-fwrite.Rmd.tmp:block 54 (paragraph)
 msgid ""
 "=====- Per-column: Use the `colClasses` argument to specify the type for "
 "individual columns.====="
 msgstr ""
+"=====- Por columna: utilice el argumento `colClasses` para especificar el "
+"tipo de columnas individuales.====="
 
 #: es/datatable-fread-and-fwrite.Rmd.tmp:block 55 (paragraph)
 msgid ""
 "=====- Per-call: Use the `integer64` argument in `fread()` to set how all "
 "detected `integer64` columns are read.====="
 msgstr ""
+"=====- Por llamada: use el argumento `integer64` en `fread()` para "
+"establecer cómo se leen todas las columnas `integer64` detectadas.====="
 
 #: es/datatable-fread-and-fwrite.Rmd.tmp:block 56 (paragraph)
 msgid ""
 "=====- Globally: Set the option `datatable.integer64` in your R session or "
 "`.Rprofile` file to change the default behavior for all fread calls.====="
 msgstr ""
+"=====- Globalmente: Establezca la opción `datatable.integer64` en su sesión "
+"R o en el archivo `.Rprofile` para cambiar el comportamiento predeterminado "
+"para todas las llamadas fread.====="
 
 #: es/datatable-fread-and-fwrite.Rmd.tmp:block 57 (paragraph)
 msgid ""
 "The integer64 argument (and corresponding option) accepts the following "
 "values:"
 msgstr ""
+"El argumento integer64 (y la opción correspondiente) acepta los siguientes "
+"valores:"
 
 #: es/datatable-fread-and-fwrite.Rmd.tmp:block 58 (paragraph)
 msgid ""
 "=====- `\"integer64\"` (default): Reads large integers as `bit64::integer64`"
 " with full precision.====="
 msgstr ""
+"=====- `\"integer64\"` (predeterminado): lee números enteros grandes como "
+"`bit64::integer64` con total precisión.====="
 
 #: es/datatable-fread-and-fwrite.Rmd.tmp:block 59 (paragraph)
 msgid ""
@@ -341,24 +472,31 @@ msgid ""
 "precision numbers, potentially losing precision silently (similar to "
 "`utils::read.csv` in base R).====="
 msgstr ""
+"=====- `\"double\"` o `\"numeric\"`: lee números enteros grandes como "
+"números de doble precisión, perdiendo potencialmente la precisión de forma "
+"silenciosa (similar a `utils::read.csv` en base R).====="
 
 #: es/datatable-fread-and-fwrite.Rmd.tmp:block 60 (paragraph)
 msgid "=====- `\"character\"`: Reads large integers as character strings.====="
 msgstr ""
+"=====- `\"carácter\"`: Lee números enteros grandes como cadenas de "
+"caracteres.====="
 
 #: es/datatable-fread-and-fwrite.Rmd.tmp:block 61 (paragraph)
 msgid "To check or set the global default, use:"
-msgstr ""
+msgstr "Para comprobar o establecer el valor predeterminado global, utilice:"
 
 #: es/datatable-fread-and-fwrite.Rmd.tmp:block 63 (header)
 msgid "1.6 Drop or Select Columns by Name or Position"
-msgstr ""
+msgstr "1.6 Eliminar o seleccionar columnas por nombre o posición"
 
 #: es/datatable-fread-and-fwrite.Rmd.tmp:block 64 (paragraph)
 msgid ""
 "To save memory and improve performance, use `fread()`'s `select` or `drop` "
 "arguments to read only the columns you need."
 msgstr ""
+"Para ahorrar memoria y mejorar el rendimiento, utilice los argumentos "
+"`select` o `drop` de `fread()` para leer solo las columnas que necesita."
 
 #: es/datatable-fread-and-fwrite.Rmd.tmp:block 65 (paragraph)
 msgid ""
@@ -366,6 +504,9 @@ msgid ""
 " to exclude just a few, use `drop`—this avoids listing everything you want "
 "to keep.====="
 msgstr ""
+"=====- Si solo necesita unas pocas columnas, utilice `select`.===== =====- "
+"Si desea excluir solo algunas, utilice `drop`—esto evita tener que listar "
+"todo lo que desea conservar.====="
 
 #: es/datatable-fread-and-fwrite.Rmd.tmp:block 66 (paragraph)
 msgid ""
@@ -375,14 +516,24 @@ msgid ""
 "together—they are mutually exclusive.===== =====- `fread()` will warn you if"
 " any specified column is missing in the file.====="
 msgstr ""
+"Puntos clave: =====- `select`: Vector de nombres/posiciones de columnas a "
+"conservar (descarta las demás).===== =====- `drop`: Vector de "
+"nombres/posiciones de columnas a descartar (descarta las demás).===== =====-"
+" No utilice `select` y `drop` juntos, son mutuamente excluyentes.===== "
+"=====- `fread()` le avisará si falta alguna columna especificada en el "
+"archivo.====="
 
 #: es/datatable-fread-and-fwrite.Rmd.tmp:block 67 (paragraph)
 msgid "For details, see the manual page by running `?fread` in R."
 msgstr ""
+"Para obtener más detalles, consulte la página del manual ejecutando `?fread`"
+" en R."
 
 #: es/datatable-fread-and-fwrite.Rmd.tmp:block 68 (header)
 msgid "1.7 Automatic Quote Escape Detection (Including No-Escape)"
 msgstr ""
+"1.7 Detección automática de escape de comillas (incluida la ausencia de "
+"escape)"
 
 #: es/datatable-fread-and-fwrite.Rmd.tmp:block 69 (paragraph)
 msgid ""
@@ -391,6 +542,10 @@ msgid ""
 "is determined using a large sample of the data (see point 3), and validated "
 "against the entire file."
 msgstr ""
+"`fread` detecta automáticamente cómo se escapan las comillas, incluidas las "
+"comillas dobles (\"\") o las comillas con barra invertida (\"), sin "
+"necesidad de intervención del usuario. Esto se determina mediante una "
+"muestra amplia de datos (véase el punto 3) y se valida con todo el archivo."
 
 #: es/datatable-fread-and-fwrite.Rmd.tmp:block 70 (paragraph)
 msgid ""
@@ -398,24 +553,35 @@ msgid ""
 " `\"This \"quote\" is invalid, but fread works anyway\"` — supported as long"
 " as column count remains consistent :"
 msgstr ""
+"Escenarios admitidos: =====- Comillas sin escape dentro de campos entre "
+"comillas===== p. ej., `\"Esta \"comilla\" no es válida, pero fread funciona "
+"de todos modos\"` — admitido siempre que el recuento de columnas permanezca "
+"constante:"
 
 #: es/datatable-fread-and-fwrite.Rmd.tmp:block 72 (paragraph)
 msgid ""
 "=====- Unquoted fields that begin with quotes===== e.g., "
 "`Invalid\"Field,10,20` — recognized correctly as not a quoted field."
 msgstr ""
+"=====- Campos sin comillas que comienzan con comillas===== p. ej., "
+"`Invalid\"Field,10,20` — se reconoce correctamente como un campo no entre "
+"comillas."
 
 #: es/datatable-fread-and-fwrite.Rmd.tmp:block 74 (paragraph)
 msgid ""
 "Requirements & Limitations: =====- Escaping rules and column counts must be "
 "consistent throughout the file.====="
 msgstr ""
+"Requisitos y limitaciones: =====- Las reglas de escape y los recuentos de "
+"columnas deben ser consistentes en todo el archivo.====="
 
 #: es/datatable-fread-and-fwrite.Rmd.tmp:block 75 (paragraph)
 msgid ""
 "=====- Not supported when `fill=TRUE` — in that case, the file must follow "
 "RFC4180-compliant quoting/escaping.====="
 msgstr ""
+"=====- No compatible cuando `fill=TRUE` — en ese caso, el archivo debe "
+"seguir las comillas y el escape compatibles con RFC4180.====="
 
 #: es/datatable-fread-and-fwrite.Rmd.tmp:block 76 (paragraph)
 msgid ""
@@ -424,10 +590,15 @@ msgid ""
 "(default is `fill=FALSE`). Warnings are issued if parsing fails due to "
 "ambiguity."
 msgstr ""
+"Robustez específica de la versión: A partir de la versión 1.10.6, `fread` "
+"resuelve ambigüedades de forma más fiable en todo el archivo mediante la "
+"consistencia de recuento de columnas completo (el valor predeterminado es "
+"`fill=FALSE`). Se emiten advertencias si el análisis falla debido a una "
+"ambigüedad."
 
 #: es/datatable-fread-and-fwrite.Rmd.tmp:block 77 (header)
 msgid "2. fwrite()"
-msgstr ""
+msgstr "2. fwrite()"
 
 #: es/datatable-fread-and-fwrite.Rmd.tmp:block 78 (paragraph)
 msgid ""
@@ -435,10 +606,13 @@ msgid ""
 " speed, sensible defaults, and ease of use, mirroring many of the "
 "conveniences found in `fread`."
 msgstr ""
+"`fwrite()` es el complemento rápido para la escritura de archivos de "
+"`fread()`. Está diseñado para ofrecer velocidad, valores predeterminados "
+"sensatos y facilidad de uso, reflejando muchas de las ventajas de `fread`."
 
 #: es/datatable-fread-and-fwrite.Rmd.tmp:block 79 (header)
 msgid "2.1 Intelligent and Minimalist Quoting (quote=\"auto\")"
-msgstr ""
+msgstr "2.1 Cita inteligente y minimalista (quote=\"auto\")"
 
 #: es/datatable-fread-and-fwrite.Rmd.tmp:block 80 (paragraph)
 msgid ""
@@ -446,6 +620,9 @@ msgid ""
 "or by choice, like `dateTimeAs=\"ISO\"`), `quote=\"auto\"` (default) "
 "intelligently quotes fields:"
 msgstr ""
+"Cuando los datos se escriben como cadenas (ya sea de manera inherente, como "
+"columnas de caracteres, o por elección, como `dateTimeAs=\"ISO\"`), "
+"`quote=\"auto\"` (predeterminado) cita los campos de manera inteligente:"
 
 #: es/datatable-fread-and-fwrite.Rmd.tmp:block 81 (paragraph)
 msgid ""
@@ -455,6 +632,11 @@ msgid ""
 "`(\"\")`. Quoting the empty string is done to distinguish it from an NA "
 "value when the file is read."
 msgstr ""
+"**Citas contextuales**: Los campos se citan solo cuando es necesario. Esto "
+"ocurre si contienen el delimitador `(sep)`, una comilla doble `(\")`, un "
+"salto de línea `(\\n)`, un retorno de carro `(\\r)` o si el campo es una "
+"cadena vacía `(\"\")`. La cadena vacía se cita para distinguirla de un valor"
+" NA al leer el archivo."
 
 #: es/datatable-fread-and-fwrite.Rmd.tmp:block 82 (paragraph)
 msgid ""
@@ -463,14 +645,20 @@ msgid ""
 "`POSIXct`, or if a user pre-converts Date to integer), then quoting logic is"
 " naturally bypassed for those numeric fields, contributing to efficiency."
 msgstr ""
+"**Omitido para salida numérica directa**: si se escriben columnas "
+"específicas como sus tipos numéricos subyacentes (por ejemplo, a través de "
+"`dateTimeAs=\"epoch\"` para `POSIXct`, o si un usuario preconvierte Date a "
+"entero), entonces la lógica de comillas se omite naturalmente para esos "
+"campos numéricos, lo que contribuye a la eficiencia."
 
 #: es/datatable-fread-and-fwrite.Rmd.tmp:block 84 (header)
 msgid "2.2 Fine-Grained Date/Time Serialization (`dateTimeAs` argument)"
 msgstr ""
+"2.2 Serialización de fecha y hora de grano fino (argumento `dateTimeAs`)"
 
 #: es/datatable-fread-and-fwrite.Rmd.tmp:block 85 (paragraph)
 msgid "Offers precise control for POSIXct/Date types:"
-msgstr ""
+msgstr "Ofrece un control preciso para los tipos POSIXct/Date:"
 
 #: es/datatable-fread-and-fwrite.Rmd.tmp:block 86 (paragraph)
 msgid ""
@@ -478,16 +666,21 @@ msgid ""
 "YYYY-MM-DDTHH:MM:SS.ffffffZ), preserving sub-second precision for "
 "unambiguous interchange.====="
 msgstr ""
+"=====- `dateTimeAs=\"ISO\"` (predeterminado para POSIXct): formato ISO 8601 "
+"(por ejemplo, AAAA-MM-DDTHH:MM:SS.ffffffZ), que conserva una precisión de "
+"subsegundos para un intercambio inequívoco.====="
 
 #: es/datatable-fread-and-fwrite.Rmd.tmp:block 87 (paragraph)
 msgid ""
 "=====- `dateTimeAs=\"epoch\"`: POSIXct as seconds since epoch "
 "(numeric).====="
 msgstr ""
+"=====- `dateTimeAs=\"epoch\"`: POSIXct como segundos desde la época "
+"(numérico).====="
 
 #: es/datatable-fread-and-fwrite.Rmd.tmp:block 89 (header)
 msgid "2.3 Handling of `bit64::integer64`"
-msgstr ""
+msgstr "2.3 Manejo de `bit64::integer64`"
 
 #: es/datatable-fread-and-fwrite.Rmd.tmp:block 90 (paragraph)
 msgid ""
@@ -497,6 +690,12 @@ msgid ""
 "specialized writers. This is crucial for IDs or measurements requiring more "
 "than R's standard `32-bit` integer range or `53-bit` double precision."
 msgstr ""
+"**Precisión completa para enteros grandes**: `fwrite` escribe columnas "
+"`bit64::integer64` convirtiéndolas en cadenas con precisión completa. Esto "
+"evita la pérdida de datos o la conversión silenciosa a dobles que podrían "
+"ocurrir con escritores menos especializados. Esto es crucial para "
+"identificadores o mediciones que requieren un rango de enteros superior al "
+"estándar de R de `32 bits` o una precisión doble de `53 bits`."
 
 #: es/datatable-fread-and-fwrite.Rmd.tmp:block 91 (paragraph)
 msgid ""
@@ -504,10 +703,13 @@ msgid ""
 "numerics ensures data integrity and efficient I/O, without unnecessary "
 "intermediate conversions to less precise types."
 msgstr ""
+"**Manejo directo**: Este manejo directo y cuidadoso de datos numéricos "
+"especializados garantiza la integridad de los datos y una E/S eficiente, sin"
+" conversiones intermedias innecesarias a tipos menos precisos."
 
 #: es/datatable-fread-and-fwrite.Rmd.tmp:block 93 (header)
 msgid "2.4 Column Order and Subset Control"
-msgstr ""
+msgstr "2.4 Orden de columnas y control de subconjuntos"
 
 #: es/datatable-fread-and-fwrite.Rmd.tmp:block 94 (paragraph)
 msgid ""
@@ -516,16 +718,23 @@ msgid ""
 "`fwrite()` is a logical (TRUE/FALSE) that controls whether the header row is"
 " written, not which columns are written."
 msgstr ""
+"Para controlar el orden y el subconjunto de columnas que se escriben en el "
+"archivo, cree un subconjunto de `data.table` antes de llamar a `fwrite()`. "
+"El argumento `col.names` en `fwrite()` es un valor lógico (VERDADERO/FALSO) "
+"que controla si se escribe la fila del encabezado, no qué columnas se "
+"escriben."
 
 #: es/datatable-fread-and-fwrite.Rmd.tmp:block 96 (header)
 msgid "3. A Note on Performance"
-msgstr ""
+msgstr "3. Una nota sobre el rendimiento"
 
 #: es/datatable-fread-and-fwrite.Rmd.tmp:block 97 (paragraph)
 msgid ""
 "While this vignette focuses on features and usability, the primary "
 "motivation for `fread` and `fwrite` is speed."
 msgstr ""
+"Si bien esta viñeta se centra en las características y la facilidad de uso, "
+"la motivación principal para `fread` y `fwrite` es la velocidad."
 
 #: es/datatable-fread-and-fwrite.Rmd.tmp:block 98 (paragraph)
 msgid ""
@@ -533,6 +742,9 @@ msgid ""
 "recommend these external blog posts which use the `atime` package for "
 "rigorous analysis:"
 msgstr ""
+"Para los usuarios interesados ​​en comparaciones de rendimiento detalladas y"
+" actualizadas, recomendamos estas publicaciones de blog externas que "
+"utilizan el paquete `atime` para un análisis riguroso:"
 
 #: es/datatable-fread-and-fwrite.Rmd.tmp:block 99 (paragraph)
 msgid ""
@@ -544,10 +756,20 @@ msgid ""
 "Compares `data.table` I/O and grouping performance against leading Python "
 "libraries.====="
 msgstr ""
+"=====- **[Tiempos asintóticos de "
+"data.table](https://tdhock.github.io/blog/2023/dt-atime-figures/)**: Compara"
+" el rendimiento de `fread` y `fwrite` con otros paquetes R populares como "
+"`readr` y `arrow`.===== =====- **[Evaluación comparativa de data.table con "
+"polares, duckdb y pandas](https://tdhock.github.io/blog/2024/pandas-dt/)**: "
+"Compara el rendimiento de E/S y agrupación de `data.table` con las "
+"principales bibliotecas de Python.====="
 
 #: es/datatable-fread-and-fwrite.Rmd.tmp:block 100 (paragraph)
 msgid ""
 "These benchmarks consistently show that `fread` and `fwrite` are highly "
 "competitive and often state-of-the-art for performance in the R ecosystem."
 msgstr ""
+"Estos puntos de referencia muestran consistentemente que `fread` y `fwrite` "
+"son altamente competitivos y, a menudo, están a la vanguardia en términos de"
+" rendimiento en el ecosistema R."
 
