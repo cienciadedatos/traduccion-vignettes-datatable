@@ -13,18 +13,16 @@ msgid ""
 msgstr ""
 "Esta viñeta analiza el uso predeterminado de las funciones de remodelación "
 "`melt` (de ancho a largo) y `dcast` (de largo a ancho) para *data.tables*, "
-"así como las **nuevas funcionalidades extendidas** de *fusión* y *moldeo* "
-"[ingl. *melting* y *casting*] en *múltiples columnas* disponibles a partir "
-"de `v1.9.6`."
+"así como las **nuevas funcionalidades extendidas** de fusión y conversión en "
+"*múltiples columnas* disponibles a partir de `v1.9.6`."
 
 #: es/datatable-reshape.Rmd.tmp:block 7 (header)
 msgid "Data"
-msgstr "Datos "
+msgstr "Datos"
 
 #: es/datatable-reshape.Rmd.tmp:block 8 (paragraph)
 msgid "We will load the data sets directly within sections."
-msgstr ""
-"Cargaremos los conjuntos de datos directamente dentro de las secciones."
+msgstr "Cargaremos los conjuntos de datos directamente dentro de las secciones."
 
 #: es/datatable-reshape.Rmd.tmp:block 9 (header)
 msgid "Introduction"
@@ -36,14 +34,14 @@ msgid ""
 "to-long and long-to-wide, respectively; the implementations are specifically"
 " designed with large in-memory data (e.g. 10Gb) in mind."
 msgstr ""
-"Las funciones `melt` y `dcast` para `data.table`s sirven para cambiar la "
-"forma de ancho a largo y de largo a ancho, respectivamente; las "
-"implementaciones están diseñadas específicamente teniendo en mente grandes "
-"datos en memoria (por ejemplo, 10 Gb)."
+"Las funciones `melt` y `dcast` para `data.table` sirven para remodelar de "
+"ancho a largo y de largo a ancho, respectivamente; las implementaciones "
+"están diseñadas específicamente teniendo en mente grandes datos en memoria "
+"(por ejemplo, 10 Gb)."
 
 #: es/datatable-reshape.Rmd.tmp:block 11 (paragraph)
 msgid "In this vignette, we will"
-msgstr "En esta viñeta, vamos a"
+msgstr "En esta viñeta, vamos a:"
 
 #: es/datatable-reshape.Rmd.tmp:block 12 (paragraph)
 msgid ""
@@ -52,7 +50,7 @@ msgid ""
 "versa*====="
 msgstr ""
 "=====1. Primero, observar brevemente la conversión predeterminada de `melt` "
-"y `dcast` de `data.table` para convertirlas de formato *ancho* a *largo* y "
+"y `dcast` de `data.table` para convertirlos de formato *ancho* a *largo* y "
 "*viceversa*====="
 
 #: es/datatable-reshape.Rmd.tmp:block 13 (paragraph)
@@ -60,16 +58,16 @@ msgid ""
 "=====2. Look at scenarios where the current functionalities become "
 "cumbersome and inefficient====="
 msgstr ""
-"=====2. Analizar los escenarios en los que las funcionalidades actuales se "
-"vuelven engorrosas e ineficientes====="
+"=====2. Analizar escenarios donde las funcionalidades actuales se vuelven "
+"engorrosas e ineficientes====="
 
 #: es/datatable-reshape.Rmd.tmp:block 14 (paragraph)
 msgid ""
 "=====3. Finally look at the new improvements to both `melt` and `dcast` "
 "methods for `data.table`s to handle multiple columns simultaneously.====="
 msgstr ""
-"=====3. Por último, observar las nuevas mejoras en los métodos `melt` y "
-"`dcast` para que `data.table` pueda manejar múltiples columnas "
+"=====3. Finalmente, observar las nuevas mejoras en los métodos `melt` y "
+"`dcast` para que `data.table` gestione múltiples columnas "
 "simultáneamente.====="
 
 #: es/datatable-reshape.Rmd.tmp:block 15 (paragraph)
@@ -77,7 +75,7 @@ msgid ""
 "The extended functionalities are in line with `data.table`'s philosophy of "
 "performing operations efficiently and in a straightforward manner."
 msgstr ""
-"Las funcionalidades extendidas están en línea con la filosofía de "
+"Las funcionalidades ampliadas están en línea con la filosofía de "
 "`data.table` de realizar operaciones de manera eficiente y sencilla."
 
 #: es/datatable-reshape.Rmd.tmp:block 16 (header)
@@ -86,13 +84,13 @@ msgstr "1. Funcionalidad predeterminada"
 
 #: es/datatable-reshape.Rmd.tmp:block 17 (header)
 msgid "a) `melt`ing `data.table`s (wide to long)"
-msgstr "a) `data.table::melt` (de tabla ancha a larga)"
+msgstr "a) fusión (`melt`ing) de `data.table` (de ancho a largo)"
 
 #: es/datatable-reshape.Rmd.tmp:block 18 (paragraph)
 msgid "Suppose we have a `data.table` (artificial data) as shown below:"
 msgstr ""
-"Supongamos que tenemos una `data.table` (datos artificiales) como se muestra"
-" a continuación:"
+"Supongamos que tenemos una `data.table` (datos artificiales) como se muestra "
+"a continuación:"
 
 #: es/datatable-reshape.Rmd.tmp:block 20 (header)
 msgid ""
@@ -106,8 +104,8 @@ msgid ""
 "We could accomplish this using `melt()` by specifying `id.vars` and "
 "`measure.vars` arguments as follows:"
 msgstr ""
-"Podríamos lograr esto usando `melt()` especificando los argumentos `id.vars`"
-" y `measure.vars` de la siguiente manera:"
+"Podríamos lograr esto usando `melt()` especificando los argumentos `id.vars` "
+"y `measure.vars` de la siguiente manera:"
 
 #: es/datatable-reshape.Rmd.tmp:block 23 (paragraph)
 msgid ""
@@ -115,12 +113,12 @@ msgid ""
 "(or combine) together.====="
 msgstr ""
 "=====* `measure.vars` especifica el conjunto de columnas que nos gustaría "
-"contraer (o combinar) juntas.====="
+"contraer (o combinar).====="
 
 #: es/datatable-reshape.Rmd.tmp:block 24 (paragraph)
 msgid "=====* We can also specify column *positions* instead of *names*.====="
 msgstr ""
-"=====* También podemos especificar *posiciones* de columnas en lugar de "
+"=====* También podemos especificar *posiciones* de columna en lugar de "
 "*nombres*.====="
 
 #: es/datatable-reshape.Rmd.tmp:block 25 (paragraph)
@@ -129,9 +127,9 @@ msgid ""
 "`variable.factor` argument to `FALSE` if you'd like to return a "
 "*`character`* vector instead.====="
 msgstr ""
-"=====* De manera predeterminada, la columna `variable` es del tipo `factor`."
-" Establezca el argumento `variable.factor` en `FALSO` si desea devolver un "
-"vector de *`carácter`* en su lugar.====="
+"=====* Por defecto, la columna `variable` es de tipo `factor`. Establezca el "
+"argumento `variable.factor` en `FALSE` si prefiere devolver un vector de "
+"tipo *`character`*.====="
 
 #: es/datatable-reshape.Rmd.tmp:block 26 (paragraph)
 msgid ""
@@ -139,19 +137,18 @@ msgid ""
 " `value`.====="
 msgstr ""
 "=====* De forma predeterminada, las columnas fundidas se denominan "
-"automáticamente `variable` y `valor`.====="
+"automáticamente `variable` y `value`.====="
 
 #: es/datatable-reshape.Rmd.tmp:block 27 (paragraph)
 msgid "=====* `melt` preserves column attributes in result.====="
-msgstr ""
-"=====* `melt` conserva los atributos de la columna en el resultado.====="
+msgstr "=====* `melt` conserva los atributos de la columna en el resultado.====="
 
 #: es/datatable-reshape.Rmd.tmp:block 28 (header)
 msgid ""
 "- Name the `variable` and `value` columns to `child` and `dob` respectively"
 msgstr ""
-"- Nombra las columnas `variable` y `valor` como `hijo` y `dob` "
-"respectivamente"
+"- Nombrar las columnas `variable` y `valor` como `hijo` y `fecha de "
+"nacimiento` respectivamente"
 
 #: es/datatable-reshape.Rmd.tmp:block 30 (paragraph)
 msgid ""
@@ -160,7 +157,7 @@ msgid ""
 "argument.====="
 msgstr ""
 "=====* De manera predeterminada, cuando falta una de las `id.vars` o "
-"`measure.vars`, el resto de las columnas se *asigna automáticamente* al "
+"`measure.vars`, el resto de las columnas se *asignan automáticamente* al "
 "argumento faltante.====="
 
 #: es/datatable-reshape.Rmd.tmp:block 31 (paragraph)
@@ -170,25 +167,24 @@ msgid ""
 "assigned to `id.vars`.====="
 msgstr ""
 "=====* Cuando no se especifican ni `id.vars` ni `measure.vars`, como se "
-"menciona en `?melt`, todas las columnas *no* `numéricas`, `enteras`, "
-"`lógicas` se asignarán a `id.vars`.====="
+"menciona en `?melt`, todas las columnas *no* `numeric`, `integer` o "
+"`logical` se asignarán a `id.vars`.====="
 
 #: es/datatable-reshape.Rmd.tmp:block 33 (header)
 msgid "b) `dcast`ing `data.table`s (long to wide)"
-msgstr "b) `data.table::dcast` (de largo a ancho)"
+msgstr "b) `dcast` de `data.table` (de largo a ancho)"
 
 #: es/datatable-reshape.Rmd.tmp:block 34 (paragraph)
 msgid ""
 "In the previous section, we saw how to get from wide form to long form. "
 "Let's see the reverse operation in this section."
 msgstr ""
-"En la sección anterior, vimos cómo pasar del formato ancho al formato largo."
-" Veamos la operación inversa en esta sección."
+"En la sección anterior, vimos cómo pasar del formato ancho al formato largo. "
+"Veamos la operación inversa en esta sección."
 
 #: es/datatable-reshape.Rmd.tmp:block 35 (header)
 msgid "- How can we get back to the original data table `DT` from `DT.m1`?"
-msgstr ""
-"- ¿Cómo podemos volver a la tabla de datos original `DT` desde `DT.m1`?"
+msgstr "- ¿Cómo podemos volver a la tabla de datos original `DT` desde `DT.m1`?"
 
 #: es/datatable-reshape.Rmd.tmp:block 36 (paragraph)
 msgid ""
@@ -196,25 +192,25 @@ msgid ""
 " `family_id, age_mother` together under the same row. We can accomplish it "
 "using `dcast` as follows:"
 msgstr ""
-"Es decir, nos gustaría recopilar todas las observaciones de *child* "
-"correspondientes a cada `family_id, age_mother` juntas en la misma fila. "
-"Podemos lograrlo usando `dcast` de la siguiente manera:"
+"Es decir, queremos recopilar todas las observaciones de *child* "
+"correspondientes a cada `family_id, age_mother` en la misma fila. Podemos "
+"lograrlo usando `dcast` de la siguiente manera:"
 
 #: es/datatable-reshape.Rmd.tmp:block 38 (paragraph)
 msgid ""
 "=====* `dcast` uses *formula* interface. The variables on the *LHS* of "
 "formula represents the *id* vars and *RHS* the *measure* vars.====="
 msgstr ""
-"=====* `dcast` utiliza la interfaz *formula*. Las variables del *lado "
-"izquierdo* de la fórmula representan las variables *id* y del *lado derecho*"
-" las variables *measure*.====="
+"=====* `dcast` usa la interfaz *formula*. Las variables del lado izquierdo "
+"de *formula* representan las variables *id* y del lado derecho, las "
+"variables *measure*.====="
 
 #: es/datatable-reshape.Rmd.tmp:block 39 (paragraph)
 msgid ""
 "=====* `value.var` denotes the column to be filled in with while casting to "
 "wide format.====="
 msgstr ""
-"=====* `value.var` indica la columna que se debe completar al convertir a "
+"=====* `value.var` denota la columna que se debe completar al convertir a "
 "formato ancho.====="
 
 #: es/datatable-reshape.Rmd.tmp:block 40 (paragraph)
@@ -240,7 +236,7 @@ msgid ""
 "does not identify single observation for each cell."
 msgstr ""
 "También puede pasar una función para agregar en `dcast` con el argumento "
-"`fun.agregate`. Esto es particularmente esencial cuando la fórmula "
+"`fun.aggregate`. Esto es especialmente esencial cuando la fórmula "
 "proporcionada no identifica una sola observación para cada celda."
 
 #: es/datatable-reshape.Rmd.tmp:block 44 (paragraph)
@@ -251,7 +247,7 @@ msgstr ""
 
 #: es/datatable-reshape.Rmd.tmp:block 45 (header)
 msgid "2. Limitations in previous `melt/dcast` approaches"
-msgstr "2. Limitaciones de los enfoques anteriores de `melt` y `dcast`"
+msgstr "2. Limitaciones de los enfoques anteriores de `melt/dcast`"
 
 #: es/datatable-reshape.Rmd.tmp:block 46 (paragraph)
 msgid ""
@@ -260,9 +256,9 @@ msgid ""
 "radix ordering*, *binary search* etc.)."
 msgstr ""
 "Hasta ahora hemos visto características de `melt` y `dcast` que se "
-"implementan de manera eficiente para `data.table`s, utilizando la maquinaria"
-" interna de `data.table` (*ordenamiento rápido de radix*, *búsqueda "
-"binaria*, etc.)."
+"implementan de manera eficiente para `data.table`s, utilizando maquinaria "
+"interna de `data.table` (*ordenamiento rápido de radix*, *búsqueda binaria*, "
+"etc.)."
 
 #: es/datatable-reshape.Rmd.tmp:block 47 (paragraph)
 msgid ""
@@ -270,9 +266,9 @@ msgid ""
 "is not expressed in a straightforward manner. For example, consider the "
 "`data.table` shown below:"
 msgstr ""
-"Sin embargo, existen situaciones en las que podemos encontrarnos con la "
-"operación deseada que no se expresa de manera sencilla. Por ejemplo, "
-"considere la tabla `data.table` que se muestra a continuación:"
+"Sin embargo, existen situaciones en las que la operación deseada no se "
+"expresa de forma clara. Por ejemplo, considere la tabla `data.table` que se "
+"muestra a continuación:"
 
 #: es/datatable-reshape.Rmd.tmp:block 51 (header)
 msgid "Issues"
@@ -283,9 +279,8 @@ msgid ""
 "=====2. The columns to `melt` may be of different types. By `melt`ing them "
 "all together, the columns will be coerced in result.====="
 msgstr ""
-"=====2. Las columnas que se van a \"fundir\" pueden ser de distintos tipos. "
-"Al \"fundirlas\" todas juntas, las columnas se convertirán en el "
-"resultado.====="
+"2. Las columnas a fusionar pueden ser de diferentes tipos. Al fusionarlas "
+"todas juntas, se forzará el resultado."
 
 #: es/datatable-reshape.Rmd.tmp:block 55 (paragraph)
 msgid ""
@@ -293,9 +288,9 @@ msgid ""
 "column into two columns, whose purpose is quite cryptic. We do it because we"
 " need it for *casting* in the next step.====="
 msgstr ""
-"=====3. Estamos generando una columna adicional dividiendo la columna "
-"`variable` en dos columnas, cuyo propósito es bastante críptico. Lo hacemos "
-"porque lo necesitamos para el *moldeo* (`dcast`) en el siguiente paso.====="
+"=====3. Generamos una columna adicional dividiendo la columna `variable` en "
+"dos, cuyo propósito es bastante complejo. Lo hacemos porque la necesitamos "
+"para la *conversión* en el siguiente paso.====="
 
 #: es/datatable-reshape.Rmd.tmp:block 56 (paragraph)
 msgid ""
@@ -303,10 +298,10 @@ msgid ""
 "computationally involved operation than *melt*. Specifically, it requires "
 "computing the order of the variables in formula, and that's costly.====="
 msgstr ""
-"=====4. Finalmente, *moldeamos* el conjunto de datos. Pero el problema es "
-"que es una operación que requiere mucho más trabajo computacional que "
-"*melt*. En concreto, requiere calcular el orden de las variables en la "
-"fórmula, y eso es costoso.====="
+"4. Finalmente, convertimos el conjunto de datos. El problema es que es una "
+"operación mucho más compleja computacionalmente que *melt*. En concreto, "
+"requiere calcular el orden de las variables en la fórmula, lo cual es "
+"costoso."
 
 #: es/datatable-reshape.Rmd.tmp:block 57 (paragraph)
 msgid ""
@@ -314,9 +309,9 @@ msgid ""
 "straightforward manner. It is an extremely useful and often underrated "
 "function. You should definitely give it a try!"
 msgstr ""
-"De hecho, `stats::reshape` es capaz de realizar esta operación de una manera"
-" muy sencilla. Es una función extremadamente útil y a menudo subestimada. "
-"¡Definitivamente deberías probarla!"
+"De hecho, `stats::reshape` puede realizar esta operación de forma muy "
+"sencilla. Es una función extremadamente útil y a menudo subestimada. "
+"¡Debería probarla!"
 
 #: es/datatable-reshape.Rmd.tmp:block 58 (header)
 msgid "3. Enhanced (new) functionality"
@@ -324,7 +319,7 @@ msgstr "3. Funcionalidad mejorada (nueva)"
 
 #: es/datatable-reshape.Rmd.tmp:block 59 (header)
 msgid "a) Enhanced `melt`"
-msgstr "a) `melt` mejorado"
+msgstr "a) Fusión mejorada"
 
 #: es/datatable-reshape.Rmd.tmp:block 60 (paragraph)
 msgid ""
@@ -333,10 +328,10 @@ msgid ""
 "*additional functionality*, where we can `melt` to multiple columns "
 "*simultaneously*."
 msgstr ""
-"Como nos gustaría que `data.table` realice esta operación de manera sencilla"
-" y eficiente utilizando la misma interfaz, seguimos adelante e implementamos"
-" una *funcionalidad adicional*, donde podemos `fundir` varias columnas "
-"*simultáneamente*."
+"Dado que nos gustaría que `data.table` realice esta operación de manera "
+"sencilla y eficiente utilizando la misma interfaz, seguimos adelante e "
+"implementamos una *funcionalidad adicional*, donde podemos `fusionar` "
+"múltiples columnas *simultáneamente*."
 
 #: es/datatable-reshape.Rmd.tmp:block 61 (header)
 msgid "- `melt` multiple columns simultaneously"
@@ -354,7 +349,7 @@ msgstr ""
 
 #: es/datatable-reshape.Rmd.tmp:block 64 (paragraph)
 msgid "=====* We can remove the `variable` column if necessary.====="
-msgstr "=====*Podemos eliminar la columna `variable` si es necesario.====="
+msgstr "=====* Podemos eliminar la columna `variable` si es necesario.====="
 
 #: es/datatable-reshape.Rmd.tmp:block 65 (paragraph)
 msgid ""
@@ -362,12 +357,12 @@ msgid ""
 " *fast* and *memory efficient* in addition to being *straightforward*.====="
 msgstr ""
 "=====* La funcionalidad está implementada completamente en C y, por lo "
-"tanto, es *rápida* y *eficiente en el uso de la memoria*, además de ser "
+"tanto, es *rápida* y *eficiente en el uso de memoria*, además de ser "
 "*sencilla*.====="
 
 #: es/datatable-reshape.Rmd.tmp:block 66 (header)
 msgid "- Using `patterns()`"
-msgstr "- Usando `patterns()`"
+msgstr "- Usando `patrones()`"
 
 #: es/datatable-reshape.Rmd.tmp:block 67 (paragraph)
 msgid ""
@@ -376,11 +371,11 @@ msgid ""
 "implemented for convenience, to provide regular expressions for the columns "
 "to be combined together. The above operation can be rewritten as:"
 msgstr ""
-"Por lo general, en estos problemas, las columnas que queremos fundir se "
-"pueden distinguir por un patrón común. Podemos utilizar la función "
-"`patterns()`, implementada por conveniencia, para proporcionar expresiones "
-"regulares para las columnas que se combinarán. La operación anterior se "
-"puede reescribir como:"
+"Normalmente, en estos problemas, las columnas que queremos fundir se "
+"distinguen por un patrón común. Podemos usar la función `patterns()`, "
+"implementada para mayor comodidad, para proporcionar expresiones regulares "
+"que permitan combinar las columnas. La operación anterior se puede "
+"reescribir como:"
 
 #: es/datatable-reshape.Rmd.tmp:block 69 (header)
 msgid "- Using `measure()` to specify `measure.vars` via separator or pattern"
@@ -395,9 +390,9 @@ msgid ""
 "separator or a regex. For example consider the iris data,"
 msgstr ""
 "Si, como en los datos anteriores, las columnas de entrada que se van a "
-"fundir tienen nombres regulares, entonces podemos usar `measure`, que "
-"permite especificar las columnas que se van a fundir mediante un separador o"
-" una expresión regular. Por ejemplo, considere los datos del iris:"
+"fusionar tienen nombres regulares, podemos usar `measure`, que permite "
+"especificar las columnas que se van a fusionar mediante un separador o una "
+"expresión regular. Por ejemplo, considere los datos de *iris*:"
 
 #: es/datatable-reshape.Rmd.tmp:block 72 (paragraph)
 msgid ""
@@ -408,12 +403,13 @@ msgid ""
 "in the maximum number of groups after splitting will be used as "
 "`measure.vars`:"
 msgstr ""
-"Los datos del iris tienen cuatro columnas numéricas con una estructura "
-"regular: primero la parte de la flor, luego un punto y luego la dimensión de"
-" la medida. Para especificar que queremos fundir esas cuatro columnas, "
-"podemos usar `measure` con `sep=\".\"`, lo que significa usar `strsplit` en "
-"todos los nombres de columna; las columnas que resulten en la cantidad "
-"máxima de grupos después de la división se usarán como `measure.vars`:"
+"Los datos de *iris* tienen cuatro columnas numéricas con una estructura "
+"regular: primero la parte de la flor, luego un punto y finalmente la "
+"dimensión de la medida. Para especificar que queremos fusionar esas cuatro "
+"columnas, podemos usar `measure` con `sep=\".\"`, lo que significa usar "
+"`strsplit` en todos los nombres de columna; las columnas que resulten en el "
+"número máximo de grupos después de la división se usarán como "
+"`measure.vars`:"
 
 #: es/datatable-reshape.Rmd.tmp:block 74 (paragraph)
 msgid ""
@@ -433,17 +429,17 @@ msgid ""
 "name found in that group:"
 msgstr ""
 "Si queremos dos columnas de valores, una para cada parte, podemos usar la "
-"palabra clave especial `value.name`, lo que significa generar una columna de"
-" valores para cada nombre único encontrado en ese grupo:"
+"palabra clave especial `value.name`, lo que significa generar una columna de "
+"valores para cada nombre único encontrado en ese grupo:"
 
 #: es/datatable-reshape.Rmd.tmp:block 77 (paragraph)
 msgid ""
 "Using the code above we get one value column per flower part. If we instead "
 "want a value column for each measurement dimension, we can do:"
 msgstr ""
-"Con el código anterior obtenemos una columna de valores por cada parte de la"
-" flor. Si, en cambio, queremos una columna de valores para cada dimensión de"
-" medida, podemos hacer lo siguiente:"
+"Usando el código anterior, obtenemos una columna de valor por cada parte de "
+"la flor. Si, en cambio, queremos una columna de valor para cada dimensión de "
+"medida, podemos hacer lo siguiente:"
 
 #: es/datatable-reshape.Rmd.tmp:block 79 (paragraph)
 msgid ""
@@ -451,7 +447,7 @@ msgid ""
 " a more complex usage of `measure`, involving a function which is used to "
 "convert the `child` string values to integers:"
 msgstr ""
-"Volviendo al ejemplo de los datos con familias e hijos, podemos ver un uso "
+"Volviendo al ejemplo de los datos con familias y niños, podemos ver un uso "
 "más complejo de `measure`, que involucra una función que se utiliza para "
 "convertir los valores de la cadena `child` en números enteros:"
 
@@ -463,12 +459,12 @@ msgid ""
 " an output column named `child` with values defined by plugging the "
 "character strings from that group into the function `as.integer`."
 msgstr ""
-"En el código anterior, usamos `sep=\"_child\"`, lo que da como resultado la "
-"fusión de solo las columnas que contienen esa cadena (seis nombres de "
-"columnas divididos en dos grupos cada uno). El argumento `child=as.integer` "
-"significa que el segundo grupo dará como resultado una columna de salida "
-"llamada `child` con valores definidos al insertar las cadenas de caracteres "
-"de ese grupo en la función `as.integer`."
+"En el código anterior, usamos `sep=\"_child\"`, lo que resulta en la fusión "
+"de solo las columnas que contienen esa cadena (seis nombres de columna "
+"divididos en dos grupos cada uno). El argumento `child=as.integer` significa "
+"que el segundo grupo generará una columna de salida llamada `child` con "
+"valores definidos al insertar las cadenas de caracteres de ese grupo en la "
+"función `as.integer`."
 
 #: es/datatable-reshape.Rmd.tmp:block 82 (paragraph)
 msgid ""
@@ -489,9 +485,9 @@ msgid ""
 "the data set `DT.m2` as shown above, how can we get back to the same format "
 "as the original data we started with?"
 msgstr ""
-"¡Genial! Ahora podemos fundir varias columnas simultáneamente. Ahora, dado "
-"el conjunto de datos `DT.m2` como se muestra arriba, ¿cómo podemos volver al"
-" mismo formato que los datos originales con los que comenzamos?"
+"¡Genial! Ahora podemos fusionar varias columnas simultáneamente. Dado el "
+"conjunto de datos `DT.m2`, como se muestra arriba, ¿cómo podemos recuperar "
+"el mismo formato que los datos originales con los que empezamos?"
 
 #: es/datatable-reshape.Rmd.tmp:block 88 (paragraph)
 msgid ""
@@ -499,13 +495,13 @@ msgid ""
 " and bind the results together. But that's once again verbose, not "
 "straightforward and is also inefficient."
 msgstr ""
-"Si usamos la funcionalidad actual de `dcast`, entonces tendríamos que "
-"realizar la conversión dos veces y vincular los resultados. Pero eso es, una"
-" vez más, demasiado verboso, no es sencillo y también es ineficiente."
+"Si usamos la funcionalidad actual de `dcast`, tendríamos que convertir dos "
+"veces y enlazar los resultados. Pero esto, una vez más, es demasiado "
+"verboso, no es sencillo y, además, ineficiente."
 
 #: es/datatable-reshape.Rmd.tmp:block 89 (header)
 msgid "- Casting multiple `value.var`s simultaneously"
-msgstr "- Conversión de múltiples `value.var` simultáneamente"
+msgstr "- Convertir varios `value.var` simultáneamente"
 
 #: es/datatable-reshape.Rmd.tmp:block 90 (paragraph)
 msgid ""
@@ -513,8 +509,8 @@ msgid ""
 "`data.table`s directly so that the operations are taken care of internally "
 "and efficiently."
 msgstr ""
-"Ahora podemos proporcionar **múltiples columnas `value.var`** a `dcast` para"
-" `data.table` directamente para que las operaciones se realicen de manera "
+"Ahora podemos proporcionar **múltiples columnas `value.var`** a `dcast` para "
+"`data.table` directamente para que las operaciones se realicen de manera "
 "interna y eficiente."
 
 #: es/datatable-reshape.Rmd.tmp:block 92 (paragraph)
@@ -528,12 +524,12 @@ msgid ""
 "=====* Everything is taken care of internally, and efficiently. In addition "
 "to being fast, it is also very memory efficient.====="
 msgstr ""
-"=====* Todo se gestiona internamente y de manera eficiente. Además de ser "
-"rápido, también es muy eficiente en el uso de la memoria.====="
+"=====* Todo se gestiona internamente y de forma eficiente. Además de ser "
+"rápido, también es muy eficiente en el uso de memoria.====="
 
 #: es/datatable-reshape.Rmd.tmp:block 95 (header)
 msgid "Multiple functions to `fun.aggregate`:"
-msgstr "Varias funciones para `fun.agregate`:"
+msgstr "Varias funciones para `fun.aggregate`:"
 
 #: es/datatable-reshape.Rmd.tmp:block 96 (paragraph)
 msgid ""
@@ -541,9 +537,9 @@ msgid ""
 "*data.tables*. Check the examples in `?dcast` which illustrates this "
 "functionality."
 msgstr ""
-"También puede proporcionar *múltiples funciones* a `fun.agregate` para "
-"`dcast` para *data.tables*. Consulte los ejemplos en `?dcast` que ilustran "
-"esta funcionalidad."
+"También puede proporcionar múltiples funciones a `fun.aggregate` en `dcast` "
+"para *data.tables*. Consulte los ejemplos en `?dcast` que ilustran esta "
+"funcionalidad."
 
 #: es/datatable-reshape.Rmd.tmp:block 49 (paragraph)
 msgid ""
@@ -551,8 +547,8 @@ msgid ""
 "`gender` columns together. Using the old functionality, we could do "
 "something like this:"
 msgstr ""
-"Y quieres combinar (`melt`) todas las columnas `name` y `gender`. Con la "
-"funcionalidad anterior, podríamos hacer algo como esto:"
+"Y podría querer combinar (`melt`) todas las columnas `name` y `gender`. "
+"Con la funcionalidad anterior, podríamos hacer algo como esto:"
 
 #: es/datatable-reshape.Rmd.tmp:block 52 (paragraph)
 msgid ""
@@ -563,8 +559,8 @@ msgid ""
 msgstr ""
 "=====1. Lo que queríamos hacer era combinar todas las columnas de tipo "
 "`nombre` y `género`, respectivamente. En lugar de eso, combinamos *todo* y "
-"luego lo volvemos a dividir. Creo que es fácil ver que es bastante indirecto"
-" (e ineficiente).====="
+"luego lo volvemos a dividir. Creo que es fácil ver que es bastante indirecto "
+"(e ineficiente).====="
 
 #: es/datatable-reshape.Rmd.tmp:block 84 (paragraph)
 msgid ""
@@ -574,12 +570,12 @@ msgid ""
 "shows how to use a more complex regex with five groups, two numeric output "
 "columns, and an anonymous type conversion function,"
 msgstr ""
-"Al usar el argumento `patrón`, debe ser una expresión regular compatible con"
-" Perl que contenga el mismo número de grupos de captura (subexpresiones "
-"entre paréntesis) que el resto de argumentos (nombres de grupo). El código a"
-" continuación muestra cómo usar una expresión regular más compleja con cinco"
-" grupos, dos columnas de salida numérica y una función de conversión de "
-"tipos anónima."
+"Al usar el argumento `patrón`, debe ser una expresión regular compatible con "
+"Perl que contenga el mismo número de grupos de captura (subexpresiones entre "
+"paréntesis) que el resto de argumentos (nombres de grupo). El código a "
+"continuación muestra cómo usar una expresión regular más compleja con cinco "
+"grupos, dos columnas de salida numérica y una función de conversión de tipos "
+"anónima."
 
 #: es/datatable-reshape.Rmd.tmp:block 3 (paragraph)
 msgid ""
