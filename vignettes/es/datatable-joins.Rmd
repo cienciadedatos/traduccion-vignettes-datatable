@@ -5,8 +5,8 @@ output:
   markdown::html_format
 vignette: >
   %\VignetteIndexEntry{Joins in data.table}
-  %\VignetteEngine{knitr::knitr}
   \usepackage[utf8]{inputenc}
+  %\VignetteEngine{knitr::knitr}
 editor_options: 
   chunk_output_type: console
 ---
@@ -34,7 +34,7 @@ Se supone que se estás familiarizado con la sintaxis de `data.table`. Si no es 
 
 ## 1. Definición de datos de ejemplo
 
-Para ilustrar cómo utilizar el método disponible con ejemplos de la vida real, simulemos una **base de datos normalizada** de un pequeño supermercado realizando los siguientes pasos:
+Para ilustrar cómo utilizar el método disponible con ejemplos de la vida real, simularemos una **base de datos normalizada** de un pequeño supermercado realizando los siguientes pasos:
 
 1. Definir una `data.table` donde cada producto esté representado por una fila con algunas cualidades, pero dejando un producto sin `id` para mostrar cómo el marco maneja los ***valores faltantes***.
 
@@ -64,7 +64,7 @@ Products = data.table(
 Products
 ```
 
-2. Definir una `data.table` que muestre la proporción de impuestos a aplicar a los productos procesados en función de sus unidades.
+2. Definir una `data.table` que muestre la proporción de impuestos a aplicar a los productos procesados según sus unidades.
 
 ```{r}
 NewTax = data.table(
@@ -76,7 +76,7 @@ NewTax = data.table(
 NewTax
 ```
 
-3. Definir una `data.table` que simule los productos recibidos cada lunes con un `product_id` que no está presente en la tabla `Products`.
+3. Definir una `data.table` que simule los productos recibidos cada lunes con un `product_id` que no esté presente en la tabla `Products`.
 
 ```{r}
 set.seed(2156)
@@ -91,7 +91,7 @@ ProductReceived = data.table(
 ProductReceived
 ```
 
-4. Definir una `data.table` para mostrar algunas ventas que pueden tener lugar en días laborables con otro `product_id` que no está presente en la tabla `Products`.
+4. Definir una `data.table` para mostrar algunas ventas que pueden tener lugar en días laborables con otro `product_id` que no esté presente en la tabla `Products`.
 
 ```{r}
 sample_date = function(from, to, size, ...){
@@ -630,7 +630,7 @@ ProductReceived[!list(c(1L, 3L), 100L),
                 on = c("product_id", "count")]
 ```
 
-Si solo desea filtrar un valor para una sola **columna de caracteres**, puede omitir la llamada a la función `list()` y pasar el valor a filtrar en el argumento `i`.
+Si solo deseas filtrar un valor para una sola **columna de caracteres**, puedes omitir la llamada a la función `list()` y pasar el valor a filtrar en el argumento `i`.
 
 ```{r}
 Products[c("banana","popcorn"),

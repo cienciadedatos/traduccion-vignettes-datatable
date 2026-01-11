@@ -43,7 +43,7 @@ Esta viñeta explica las formas más comunes de usar la variable `.SD` en los an
 
 # ¿Qué es «.SD»?
 
-En el sentido más amplio, `.SD` es simplemente una abreviatura para capturar una variable que aparece con frecuencia en el contexto del análisis de datos. Puede entenderse como *S*ubset, *S*elfsame, o *S*elf-reference of the *D*ata. Es decir, `.SD` es en su forma más básica una *referencia reflexiva* a la propia `data.table` -- como veremos en los ejemplos a continuación, esto es particularmente útil para encadenar «consultas» (extracciones/subconjuntos/etc. usando `[`). En particular, esto también significa que `.SD` es *en sí mismo una `data.table`* (con la salvedad de que no permite la asignación con `:=`).
+En el sentido más amplio, `.SD` es simplemente una abreviatura para capturar una variable que aparece con frecuencia en el contexto del análisis de datos. Puede entenderse como *S*ubset, *S*elfsame, o *S*elf-reference del *D*ata. Es decir, `.SD` es en su forma más básica una *referencia reflexiva* a la propia `data.table` -- como veremos en los ejemplos a continuación, esto es particularmente útil para encadenar «consultas» (extracciones/subconjuntos/etc. usando `[`). En particular, esto también significa que `.SD` es *en sí mismo una `data.table`* (con la salvedad de que no permite la asignación con `:=`).
 
 El uso más simple de `.SD` es para la creación de subconjuntos de columnas (es decir, cuando se especifica `.SDcols`); como esta versión es mucho más sencilla de entender, la abordaremos primero a continuación. La interpretación de `.SD` en su segundo uso, los escenarios de agrupación (es decir, cuando se especifica `by = ` o `keyby = `), es ligeramente diferente, conceptualmente (aunque en esencia es la misma, ya que, después de todo, una operación no agrupada es un caso extremo de agrupación con un solo grupo).
 
@@ -191,7 +191,7 @@ La sintaxis de `data.table` es hermosa por su simplicidad y robustez. La sintaxi
 
 Esto es excelente en general, pero se queda corto cuando deseamos realizar una *unión condicional*, en donde la naturaleza exacta de la relación entre tablas depende de algunas características de las filas en una o más columnas.
 
-Este ejemplo es ciertamente un poco artificial, pero ilustra la idea; consulte aquí ([1](https://stackoverflow.com/questions/31329939/conditional-keyed-join-update-and-update-a-flag-column-for-matches), [2](https://stackoverflow.com/questions/29658627/conditional-binary-join-and-update-by-reference-using-the-data-table-package)) para obtener más información.
+Este ejemplo es ciertamente un poco artificial, pero ilustra la idea; consulta aquí ([1](https://stackoverflow.com/questions/31329939/conditional-keyed-join-update-and-update-a-flag-column-for-matches), [2](https://stackoverflow.com/questions/29658627/conditional-binary-join-and-update-by-reference-using-the-data-table-package)) para obtener más información.
 
 El objetivo es agregar una columna `team_performance` a la tabla `Pitching` que registre el desempeño del equipo (rango) del mejor lanzador de cada equipo (medido por la ERA más baja, entre los lanzadores con al menos 6 juegos registrados).
 
@@ -204,7 +204,7 @@ Pitching[rank_in_team == 1, team_performance :=
            Teams[.SD, Rank, on = c('teamID', 'yearID')]]
 ```
 
-Tenga en cuenta que la sintaxis `x[y]` devuelve valores `nrow(y)` (es decir, es una unión derecha), por lo que `.SD` está a la derecha en `Teams[.SD]` (ya que el RHS de `:=` en este caso requiere valores `nrow(Pitching[rank_in_team == 1])`).
+Tene en cuenta que la sintaxis `x[y]` devuelve valores `nrow(y)` (es decir, es una unión derecha), por lo que `.SD` está a la derecha en `Teams[.SD]` (ya que el RHS de `:=` en este caso requiere valores `nrow(Pitching[rank_in_team == 1])`).
 
 # Operaciones agrupadas `.SD`
 
@@ -212,7 +212,7 @@ A menudo, nos gustaría realizar alguna operación en nuestros datos *a nivel de
 
 ![Agrupamiento, ilustrado](../plots/grouping_illustration.png)
 
-<!-- 'A visual depiction of how grouping works. On the left is a grid. The first column is titled "ID COLUMN" with values the capital letters A through G, and the rest of the data is unlabelled, but is in a darker color and simply has "Data" written to indicate that's arbitrary. A right arrow shows how this data is split into groups. Each capital letter A through G has a grid on the right-hand side; the grid on the left has been subdivided to create that on the right.' -->
+<!-- 'Una representación visual de cómo funciona el agrupamiento. A la izquierda hay una cuadrícula. La primera columna se titula "COLONNA DE ID" con los valores de las letras mayúsculas de la A a la G, y el resto de los datos no tiene etiqueta, pero está en un color más oscuro y simplemente tiene escrita la palabra "Datos" para indicar que es arbitrario. Una flecha hacia la derecha muestra cómo estos datos se dividen en grupos. Cada letra mayúscula de la A a la G tiene una cuadrícula en el lado derecho; la cuadrícula de la izquierda ha sido subdividida para crear la de la derecha.' -->
 
 En el caso de la agrupación, `.SD` es de naturaleza múltiple: se refiere a *cada* una de estas sub-`data.table`s, *una a la vez* (de manera un poco más precisa, el alcance de `.SD` es una única sub-`data.table`). Esto nos permite expresar de manera concisa una operación que nos gustaría realizar en *cada sub-`data.table`* antes de que se nos devuelva el resultado reensamblado.
 

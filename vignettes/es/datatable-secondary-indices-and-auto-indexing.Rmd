@@ -152,8 +152,7 @@ Como veremos en la siguiente sección, el argumento `on` proporciona varias vent
 
 * permite una sintaxis más clara al incluir las columnas en las que se ejecuta el subconjunto como parte de la sintaxis. Esto hace que el código sea más fácil de seguir cuando se lo analiza más adelante.
 
-    Note that `on` argument can also be used on keyed subsets as well. In fact, we encourage providing the `on` argument even when subsetting using keys for better readability.
-
+    Ten en cuenta que el argumento `on` también se puede utilizar en subconjuntos con claves. De hecho, te recomendamos proporcionar el argumento `on` incluso cuando se haga un subconjunto utilizando claves para mejorar la legibilidad.
 # 
 
 ## 2. Creación rápida de subconjuntos mediante el argumento `on` e índices secundarios

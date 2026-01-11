@@ -45,7 +45,7 @@ En esta viñeta, vamos a
 
 1. Primero, observar brevemente la conversión predeterminada de `melt` y `dcast` de `data.table` para convertirlas de formato *ancho* a *largo* y *viceversa*
 
-2. Analizar los escenarios en los que las funcionalidades actuales se vuelven engorrosas e ineficientes
+2. Analizar los escenarios en los que las funcionalidades actuales se vuelven engorrosas e ineficientes.
 
 3. Por último, observar las nuevas mejoras en los métodos `melt` y `dcast` para que `data.table` pueda manejar múltiples columnas simultáneamente.
 
@@ -86,7 +86,7 @@ str(DT.m1)
 
 * También podemos especificar *posiciones* de columnas en lugar de *nombres*.
 
-* De manera predeterminada, la columna `variable` es del tipo `factor`. Establezca el argumento `variable.factor` en `FALSO` si desea devolver un vector de *`carácter`* en su lugar.
+* De manera predeterminada, la columna `variable` es del tipo `factor`. Establece el argumento `variable.factor` en `FALSO` si deseas devolver un vector de *`carácter`* en su lugar.
 
 * De forma predeterminada, las columnas fundidas se denominan automáticamente `variable` y `valor`.
 
@@ -104,7 +104,7 @@ DT.m1
 
 * Cuando no se especifican ni `id.vars` ni `measure.vars`, como se menciona en `?melt`, todas las columnas *no* `numéricas`, `enteras`, `lógicas` se asignarán a `id.vars`.
 
-    In addition, a warning message is issued highlighting the columns that are automatically considered to be `id.vars`.
+    Además, se emite un mensaje de advertencia destacando las columnas que se consideran automáticamente como `id.vars`.
 
 ### b) `data.table::dcast` (de largo a ancho)
 
@@ -152,7 +152,7 @@ DT
 ## 1 = female, 2 = male
 ```
 
-Y desea combinar (`melt`) todas las columnas `dob` y `gender`. Con la funcionalidad actual, podemos hacer algo como esto:
+Y deseas combinar (`melt`) todas las columnas `dob` y `gender`. Con la funcionalidad actual, podemos hacer algo como esto:
 
 ```{r}
 DT.m1 = melt(DT, id = c("family_id", "age_mother"))
@@ -167,7 +167,7 @@ str(DT.c1) ## gender column is class IDate now!
 
 1. Lo que queríamos hacer era combinar todas las columnas de tipo `dob` y `gender` respectivamente. En lugar de eso, estamos combinando *todo* y luego dividiendo todo. Creo que es fácil ver que es bastante indirecto (e ineficiente).
 
-    As an analogy, imagine you've a closet with four shelves of clothes and you'd like to put together the clothes from shelves 1 and 2 together (in 1), and 3 and 4 together (in 3). What we are doing is more or less to combine all the clothes together, and then split them back on to shelves 1 and 3!
+    Como analogía, imagina que tienes un armario con cuatro estantes de ropa y te gustaría juntar la ropa de los estantes 1 y 2 (en el estante 1), y la de los estantes 3 y 4 (en el estante 3). Lo que estamos haciendo es, más o menos, juntar toda la ropa, y luego volver a dividirla en los estantes 1 y 3.
 
 2. Las columnas que se van a "fundir" pueden ser de distintos tipos. Al "fundirlas" todas juntas, las columnas se convertirán en el resultado.
 

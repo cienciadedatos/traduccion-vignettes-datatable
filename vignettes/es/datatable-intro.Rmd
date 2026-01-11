@@ -34,7 +34,7 @@ Esta viñeta presenta la sintaxis de `data.table`, su forma general, cómo crear
 
 Las operaciones de manipulación de datos como *subconjunto*, *grupo*, *actualización*, *unión*, etc. están todas relacionadas de manera inherente. Mantener juntas estas *operaciones relacionadas* permite:
 
-* Sintaxis *concisa* y *consistente* independientemente del conjunto de operaciones que desee realizar para lograr su objetivo final.
+* Sintaxis *concisa* y *consistente* independientemente del conjunto de operaciones que desees realizar para lograr su objetivo final.
 
 * realizar análisis *de manera fluida* sin la carga cognitiva de tener que asignar cada operación a una función particular de un conjunto potencialmente enorme de funciones disponibles antes de realizar el análisis.
 
@@ -96,7 +96,7 @@ También puede convertir objetos existentes en una tabla `data.table` utilizando
 
 * Los números de fila se imprimen con un `:` para separar visualmente el número de fila de la primera columna.
 
-* Cuando el número de filas a imprimir excede la opción global `datatable.print.nrows` (predeterminado = `r getOption("datatable.print.nrows")`), imprime automáticamente solo las primeras 5 y las últimas 5 filas (como se puede ver en la sección [Data](#data)). Para un `data.frame` grande, es posible que se haya encontrado esperando mientras se imprimen y paginan tablas más grandes, a veces aparentemente sin fin. Esta restricción ayuda con eso, y puede consultar el número predeterminado de la siguiente manera:
+* Cuando el número de filas a imprimir excede la opción global `datatable.print.nrows` (predeterminado = `r getOption("datatable.print.nrows")`), imprime automáticamente solo las primeras 5 y las últimas 5 filas (como se puede ver en la sección [Data](#data)). Para un `data.frame` grande, es posible que se haya encontrado esperando mientras se imprimen y paginan tablas más grandes, a veces aparentemente sin fin. Esta restricción ayuda con eso, y puedes consultar el número predeterminado de la siguiente manera:
 
     ```{.r}
     getOption("datatable.print.nrows")
@@ -206,7 +206,7 @@ head(ans)
 
 * Envuelve ambas columnas dentro de `.()` o `list()`. Eso es todo.
 
-#### -- Selecciona las columnas `arr_delay` y `dep_delay` *y* cámbieles el nombre a `delay_arr` y `delay_dep`.
+#### -- Selecciona las columnas `arr_delay` y `dep_delay` *y* cambiale el nombre a `delay_arr` y `delay_dep`.
 
 Dado que `.()` es solo un alias de `list()`, podemos nombrar las columnas como lo haríamos al crear una `lista`.
 
@@ -328,7 +328,7 @@ ans <- flights[, c("arr_delay", "dep_delay")]
 head(ans)
 ```
 
-Si ha almacenado las columnas deseadas en un vector de caracteres, hay dos opciones: utilizar el prefijo `..` o utilizar el argumento `with`.
+Si has almacenado las columnas deseadas en un vector de caracteres, hay dos opciones: utilizar el prefijo `..` o utilizar el argumento `with`.
 
 #### -- Seleccionar columnas nombradas en una variable usando el prefijo `..`
 
@@ -345,7 +345,7 @@ Para aquellos familiarizados con la terminal Unix, el prefijo `..` debería reco
 flights[ , select_cols, with = FALSE]
 ```
 
-El argumento se llama `with` en honor a la función R `with()` debido a que su funcionalidad es similar. Supongamos que tiene un `data.frame` `DF` y desea crear un subconjunto de todas las filas donde `x > 1`. En `base` R puede hacer lo siguiente:
+El argumento se llama `with` en honor a la función R `with()` debido a que su funcionalidad es similar. Supongamos que tienes un `data.frame` `DF` y deseas crear un subconjunto de todas las filas donde `x > 1`. En `base` R puede hacer lo siguiente:
 
 ```{r}
 DF = data.frame(x = c(1,1,1,2,2,3,3,3), y = 1:8)
@@ -359,7 +359,7 @@ DF[with(DF, x > 1), ]
 
 * El uso de `with()` en (2) permite usar la columna `x` de `DF` como si fuera una variable.
 
-    Hence, the argument name `with` in `data.table`. Setting `with = FALSE` disables the ability to refer to columns as if they are variables, thereby restoring the "`data.frame` mode".
+    De aquí el nombre del argumento con nombre `with` en `data.table`. Establecer `with = FALSE` desactiva la capacidad de referirse a las columnas como si fueran variables, restaurando así el modo `data.frame`.
 
 * También podemos *deseleccionar* columnas usando `-` o `!`. Por ejemplo:
 
@@ -386,7 +386,7 @@ DF[with(DF, x > 1), ]
     ans <- flights[, !(year:day)]
     ```
     
-    This is particularly handy while working interactively.
+    Esto es especialmente útil cuando se trabaja de manera interactiva.
 
 `with = TRUE` es el valor predeterminado en `data.table` porque podemos hacer mucho más al permitir que `j` maneje expresiones, especialmente cuando se combina con `by`, como veremos en un momento.
 
@@ -408,7 +408,7 @@ ans
 
 * Sabemos que `.N` [es una variable especial](#special-N) que contiene la cantidad de filas del grupo actual. Al agrupar por `origen` se obtiene la cantidad de filas, `.N`, para cada grupo.
 
-* Al ejecutar `head(flights)`, puede ver que los aeropuertos de origen aparecen en el orden *"JFK"*, *"LGA"* y *"EWR"*. El orden original de agrupación de las variables se conserva en el resultado. *¡Es importante tener esto en cuenta!*
+* Al ejecutar `head(flights)`, puedes ver que los aeropuertos de origen aparecen en el orden *"JFK"*, *"LGA"* y *"EWR"*. El orden original de agrupación de las variables se conserva en el resultado. *¡Es importante tener esto en cuenta!*
 
 * Dado que no proporcionamos un nombre para la columna devuelta en `j`, se la denominó `N` automáticamente al reconocer el símbolo especial `.N`.
 
@@ -501,7 +501,7 @@ head(ans)
 
 * Recordemos que podemos usar `-` en una columna de caracteres en `order()` dentro del marco de un `data.table`. Esto es posible gracias a la optimización de consultas internas de `data.table`.
 
-* Recuerde también que `order(...)` con el marco de una `data.table` se *optimiza automáticamente* para usar el orden de radio rápido interno de `data.table` `forder()` para mayor velocidad. 
+* Recuerda también que `order(...)` con el marco de una `data.table` se *optimiza automáticamente* para usar el orden de radio rápido interno de `data.table` `forder()` para mayor velocidad. 
 
 Pero esto requiere tener que asignar el resultado intermedio y luego sobrescribirlo. Podemos hacer algo mejor y evitar por completo esta asignación intermedia a una variable temporal *encadenando* expresiones.
 
@@ -584,7 +584,7 @@ Ya casi estamos listos. Queda un pequeño detalle por resolver. En nuestra tabla
 
 Utilizando el argumento `.SDcols`. Acepta nombres de columnas o índices de columnas. Por ejemplo, `.SDcols = c("arr_delay", "dep_delay")` garantiza que `.SD` contenga solo estas dos columnas para cada grupo.
 
-De manera similar a [parte g)](#refer-j), también puede especificar las columnas que desea eliminar en lugar de las columnas que desea conservar utilizando `-` o `!`. Además, puede seleccionar columnas consecutivas como `colA:colB` y deseleccionarlas como `!(colA:colB)` o `-(colA:colB)`.
+De manera similar a [parte g)](#refer-j), también puedes especificar las columnas que deseas eliminar en lugar de las columnas que deseas conservar utilizando `-` o `!`. Además, puede seleccionar columnas consecutivas como `colA:colB` y deseleccionarlas como `!(colA:colB)` o `-(colA:colB)`.
 
 Ahora intentemos usar `.SD` junto con `.SDcols` para obtener la `media()` de las columnas `arr_delay` y `dep_delay` agrupadas por `origen`, `dest` y `mes`.
 

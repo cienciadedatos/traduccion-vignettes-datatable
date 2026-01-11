@@ -205,7 +205,7 @@ DT[filter_col %in% filter_val,
 
 ### Sustituir variables y valores de caracteres
 
-En el ejemplo anterior, hemos visto una característica conveniente de `substitute2`: conversión automática de cadenas en nombres/símbolos. Surge una pregunta obvia: ¿qué pasa si realmente queremos sustituir un parámetro con un valor de *carácter*, de modo de tener un comportamiento `substitute` de R base? Proporcionamos un mecanismo para escapar de la conversión automática envolviendo los elementos en la llamada `I()` de R base. La función `I` marca un objeto como *AsIs*, evitando que sus argumentos se conviertan automáticamente de carácter a símbolo. (Lea la documentación de `?AsIs` para obtener más detalles). Si se desea un comportamiento de R base para todo el argumento `env`, entonces es mejor envolver todo el argumento en `I()`. Alternativamente, cada elemento de la lista se puede envolver en `I()` individualmente. Exploremos ambos casos a continuación.
+En el ejemplo anterior, hemos visto una característica conveniente de `substitute2`: conversión automática de cadenas en nombres/símbolos. Surge una pregunta obvia: ¿qué pasa si realmente queremos sustituir un parámetro con un valor de *carácter*, de modo de tener un comportamiento `substitute` de R base? Proporcionamos un mecanismo para escapar de la conversión automática envolviendo los elementos en la llamada `I()` de R base. La función `I` marca un objeto como *AsIs*, evitando que sus argumentos se conviertan automáticamente de carácter a símbolo. (Lee la documentación de `?AsIs` para obtener más detalles). Si se desea un comportamiento de R base para todo el argumento `env`, entonces es mejor envolver todo el argumento en `I()`. Alternativamente, cada elemento de la lista se puede envolver en `I()` individualmente. Exploremos ambos casos a continuación.
 
 ```{r rank}
 substitute(    # base R behaviour
@@ -224,7 +224,7 @@ substitute2(   # only particular elements of env are used "AsIs"
 )
 ```
 
-Tenga en cuenta que la conversión funciona de forma recursiva en cada elemento de la lista, incluido el mecanismo de escape, por supuesto.
+Tene en cuenta que la conversión funciona de forma recursiva en cada elemento de la lista, incluido el mecanismo de escape, por supuesto.
 
 ```{r substitute2_recursive}
 substitute2(   # all are symbols
