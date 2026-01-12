@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<meta name="generator" content="litedown 0.9">
+<title>Preguntas frecuentes sobre data.table</title>
+<style type="text/css">
+body {
+  font-family: sans-serif;
+  max-width: 800px;
+  margin: auto;
+  padding: 1em;
+  line-height: 1.5;
+  print-color-adjust: exact;
+  -webkit-print-color-adjust: exact;
+}
+body, .abstract, code, .footnotes, footer, #refs, .caption { font-size: .9em; }
+li li { font-size: .95em; }
+ul:has(li > input[type="checkbox"]) { list-style: none; padding-left: 1em; }
+*, :before, :after { box-sizing: border-box; }
+a { color: steelblue; }
+pre, img { max-width: 100%; }
+pre { white-space: pre-wrap; word-break: break-word; }
+pre code { display: block; padding: 1em; overflow-x: auto; }
+code { font-family: 'DejaVu Sans Mono', 'Droid Sans Mono', 'Lucida Console', Consolas, Monaco, monospace; }
+:not(pre, th) > code, code[class], div > .caption { background: #f8f8f8; }
+pre > code:is(:not([class]), .language-plain, .language-none, .plain), .box, .figure, .table { background: inherit; border: 1px solid #eee; }
+pre > code {
+  &.message { border-color: #9eeaf9; }
+  &.warning { background: #fff3cd; border-color: #fff3cd; }
+  &.error { background: #f8d7da; border-color: #f8d7da; }
+}
+.fenced-chunk { border-left: 1px solid #666; }
+.code-fence {
+  opacity: .4;
+  border: 1px dashed #666;
+  border-left: 2px solid;
+  &:hover { opacity: inherit; }
+}
+.box, .figure, .table, table { margin: 1em auto; }
+div > .caption { padding: 1px 1em; }
+.figure { p:has(img, svg), pre:has(svg) { text-align: center; } }
+.flex-col { display: flex; justify-content: space-between; }
+table {
+  &:only-child:not(.table > *) { margin: auto; }
+  th, td { padding: 5px; font-variant-numeric: tabular-nums; }
+  thead, tfoot, tr:nth-child(even) { background: whitesmoke; }
+  thead th { border-bottom: 1px solid #ddd; }
+  &:not(.datatable-table) {
+    border-top: 1px solid #666;
+    border-bottom: 1px solid #666;
+  }
+}
+blockquote {
+  color: #666;
+  margin: 0;
+  padding: 1px 1em;
+  border-left: .5em solid #eee;
+}
+hr, .footnotes::before { border: 1px dashed #ddd; }
+.frontmatter { text-align: center; }
+#TOC {
+  a { text-decoration: none; }
+  ul { list-style: none; padding-left: 1em; }
+  & > ul { padding: 0; }
+  ul ul { border-left: 1px solid lightsteelblue; }
+}
+.body h2 { border-bottom: 1px solid #666; }
+.body .appendix, .appendix ~ h2 { border-bottom-style: dashed; }
+.main-number::after { content: "."; }
+span[class^="ref-number-"] { font-weight: bold; }
+.ref-number-fig::after, .ref-number-tab::after { content: ":"; }
+.cross-ref-chp::before { content: "Chapter "; }
+.cross-ref-sec::before { content: "Section "; }
+.cross-ref-fig::before, .ref-number-fig::before { content: "Figure "; }
+.cross-ref-tab::before, .ref-number-tab::before { content: "Table "; }
+.cross-ref-eqn::before, .MathJax_ref:has(mjx-mtext > mjx-c + mjx-c)::before { content: "Equation "; }
+.abstract, #refs {
+  &::before { display: block; margin: 1em auto; font-weight: bold; }
+}
+.abstract::before { content: "Abstract"; text-align: center; }
+#refs::before { content: "Bibliography"; font-size: 1.5em; }
+.ref-paren-open::before { content: "("; }
+.ref-paren-close::after { content: ")"; }
+.ref-semicolon::after { content: "; "; }
+.ref-and::after { content: " and "; }
+.ref-et-al::after { content: " et al."; font-style: italic; }
+.footnote-ref a {
+  &::before { content: "["; }
+  &::after { content: "]"; }
+}
+section.footnotes {
+  margin-top: 2em;
+  &::before { content: ""; display: block; max-width: 20em; }
+}
+.fade {
+  background: repeating-linear-gradient(135deg, white, white 30px, #ddd 32px, #ddd 32px);
+  opacity: 0.6;
+}
+
+@media print {
+  body { max-width: 100%; }
+  tr, img { break-inside: avoid; }
+}
+@media only screen and (min-width: 992px) {
+  body:not(.pagesjs) pre:has(.line-numbers):not(:hover) { white-space: pre; }
+}
+</style>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.21/dist/katex.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@xiee/utils@1.14.10/css/prism-xcode.min.css">
+</head>
+<body>
+<div class="frontmatter">
+<div class="title"><h1>Preguntas frecuentes sobre data.table</h1></div>
+<div class="date"><h3><code>{r} Sys.Date()</code></h3></div>
+</div>
+<div class="body">
+<div id="TOC">
+<ul class="numbered">
+<li><a href="#chp:preguntas-frecuentes-para-principiantes"><span class="section-number main-number">1</span> Preguntas frecuentes para principiantes</a>
+<ul>
+<li><a href="#j-num"><span class="section-number">1.1</span> ¿Por qué <code>DT[ , 5]</code> y <code>DT[2, 5]</code> devuelven un data.table de 1 columna en lugar de vectores como <code>data.frame</code>?</a></li>
+<li><a href="#sec:por-qu-dt-quot-region-quot-devuelve-un-data-table-de-1-columna-en-lugar-de-un-vector"><span class="section-number">1.2</span> ¿Por qué <code>DT[,&quot;region&quot;]</code> devuelve un data.table de 1 columna en lugar de un vector?</a></li>
+<li><a href="#sec:por-qu-dt-regi-n-devuelve-un-vector-para-la-columna-regi-n-me-gustar-a-una-tabla-data-table-de-una-sola-columna"><span class="section-number">1.3</span> ¿Por qué <code>DT[, región]</code> devuelve un vector para la columna “región”? Me gustaría una tabla data.table de una sola columna.</a></li>
+<li><a href="#sec:por-qu-no-funciona-dt-x-y-z-quer-a-las-tres-columnas-x-y-y-z"><span class="section-number">1.4</span> ¿Por qué no funciona <code>DT[, x, y, z]</code>? Quería las tres columnas <code>x</code>, <code>y</code> y <code>z</code>.</a></li>
+<li><a href="#sec:asign-la-variable-mycol-quot-x-quot-pero-dt-mycol-devuelve-un-error-c-mo-puedo-hacer-que-busque-el-nombre-de-la-columna-contenida-en-la-variable-mycol"><span class="section-number">1.5</span> Asigné la variable <code>mycol=&quot;x&quot;</code>, pero <code>DT[, mycol]</code> devuelve un error. ¿Cómo puedo hacer que busque el nombre de la columna contenida en la variable <code>mycol</code>?</a></li>
+<li><a href="#sec:cu-les-son-los-beneficios-de-poder-utilizar-nombres-de-columnas-como-si-fueran-variables-dentro-de-dt"><span class="section-number">1.6</span> ¿Cuáles son los beneficios de poder utilizar nombres de columnas como si fueran variables dentro de ‘DT[…]’?</a></li>
+<li><a href="#sec:vale-empiezo-a-entender-la-funci-n-de-data-table-pero-por-qu-no-mejoraron-data-frame-en-r-por-qu-tiene-que-ser-un-paquete-nuevo"><span class="section-number">1.7</span> Vale, empiezo a entender la función de data.table, pero ¿por qué no mejoraron <code>data.frame</code> en R? ¿Por qué tiene que ser un paquete nuevo?</a></li>
+<li><a href="#sec:por-qu-los-valores-predeterminados-son-as-por-qu-funciona-as"><span class="section-number">1.8</span> ¿Por qué los valores predeterminados son así? ¿Por qué funciona así?</a></li>
+<li><a href="#sec:esto-no-se-hace-ya-con-with-y-subset-en-base"><span class="section-number">1.9</span> ¿Esto no se hace ya con <code>with()</code> y <code>subset()</code> en <code>base</code>?</a></li>
+<li><a href="#sec:por-qu-x-y-devuelve-tambi-n-todas-las-columnas-de-y-no-deber-a-devolver-un-subconjunto-de-x"><span class="section-number">1.10</span> ¿Por qué «X[Y]» devuelve también todas las columnas de «Y»? ¿No debería devolver un subconjunto de «X»?</a></li>
+<li><a href="#MergeDiff"><span class="section-number">1.11</span> ¿Cuál es la diferencia entre <code>X[Y]</code> y <code>merge(X, Y)</code>?</a></li>
+<li><a href="#sec:algo-m-s-sobre-x-y-sum-foo-bar"><span class="section-number">1.12</span> ¿Algo más sobre <code>X[Y, sum(foo*bar)]</code>?</a></li>
+<li><a href="#sec:qu-bien-c-mo-lograron-cambiarlo-si-los-usuarios-depend-an-del-comportamiento-anterior"><span class="section-number">1.13</span> Qué bien. ¿Cómo lograron cambiarlo si los usuarios dependían del comportamiento anterior?</a></li>
+</ul>
+</li>
+<li><a href="#chp:sintaxis-general"><span class="section-number main-number">2</span> Sintaxis general</a>
+<ul>
+<li><a href="#sec:c-mo-puedo-evitar-escribir-una-expresi-n-j-muy-larga-dijiste-que-deber-a-usar-la-columna-nombres-pero-tengo-muchas-columnas"><span class="section-number">2.1</span> ¿Cómo puedo evitar escribir una expresión <code>j</code> muy larga? Dijiste que debería usar la columna <em>nombres</em>, pero tengo muchas columnas.</a></li>
+<li><a href="#sec:por-qu-el-valor-predeterminado-para-mult-ahora-es-quot-all-quot"><span class="section-number">2.2</span> ¿Por qué el valor predeterminado para <code>mult</code> ahora es <code>&quot;all&quot;</code>?</a></li>
+<li><a href="#sec:estoy-usando-c-en-j-y-obtengo-resultados-extra-os"><span class="section-number">2.3</span> Estoy usando <code>c()</code> en <code>j</code> y obtengo resultados extraños.</a></li>
+<li><a href="#sec:he-creado-una-tabla-compleja-con-muchas-columnas-quiero-usarla-como-plantilla-para-una-nueva-tabla-es-decir-crear-una-tabla-sin-filas-pero-con-los-nombres-y-tipos-de-columna-copiados-de-mi-tabla-es-f-cil-hacerlo"><span class="section-number">2.4</span> He creado una tabla compleja con muchas columnas. Quiero usarla como plantilla para una nueva tabla; es decir, crear una tabla sin filas, pero con los nombres y tipos de columna copiados de mi tabla. ¿Es fácil hacerlo?</a></li>
+<li><a href="#sec:es-un-data-table-nulo-lo-mismo-que-dt-0"><span class="section-number">2.5</span> ¿Es un data.table nulo lo mismo que <code>DT[0]</code>?</a></li>
+<li><a href="#DTremove1"><span class="section-number">2.6</span> ¿Por qué se ha eliminado el alias <code>DT()</code>?</a></li>
+<li><a href="#DTremove2"><span class="section-number">2.7</span> Pero mi código usa <code>j = DT(...)</code> y funciona. Las preguntas frecuentes anteriores indican que se ha eliminado <code>DT()</code>.</a></li>
+<li><a href="#sec:cu-les-son-las-reglas-de-alcance-para-las-expresiones-j"><span class="section-number">2.8</span> ¿Cuáles son las reglas de alcance para las expresiones ‘j’?</a></li>
+<li><a href="#j-trace"><span class="section-number">2.9</span> ¿Puedo rastrear la expresión ‘j’ a medida que se ejecuta a través de los grupos?</a></li>
+<li><a href="#sec:dentro-de-cada-grupo-por-qu-las-variables-del-grupo-tienen-una-longitud-de-1"><span class="section-number">2.10</span> Dentro de cada grupo, ¿por qué las variables del grupo tienen una longitud de 1?</a></li>
+<li><a href="#sec:solo-se-imprimen-las-primeras-10-filas-c-mo-imprimo-m-s"><span class="section-number">2.11</span> Solo se imprimen las primeras 10 filas, ¿cómo imprimo más?</a></li>
+<li><a href="#sec:con-una-uni-n-x-y-qu-pasa-si-x-contiene-una-columna-llamada-quot-y-quot"><span class="section-number">2.12</span> Con una unión <code>X[Y]</code>, ¿qué pasa si <code>X</code> contiene una columna llamada <code>&quot;Y&quot;</code>?</a></li>
+<li><a href="#sec:x-z-y-falla-porque-x-contiene-una-columna-quot-y-quot-me-gustar-a-usar-la-tabla-y-en-el-mbito-de-llamada"><span class="section-number">2.13</span> <code>X[Z[Y]]</code> falla porque <code>X</code> contiene una columna <code>&quot;Y&quot;</code>. Me gustaría usar la tabla <code>Y</code> en el ámbito de llamada.</a></li>
+<li><a href="#sec:puedes-explicar-con-m-s-detalle-por-qu-data-table-est-inspirado-en-la-sintaxis-a-b-en-base"><span class="section-number">2.14</span> ¿Puedes explicar con más detalle por qué data.table está inspirado en la sintaxis ‘A[B]’ en ‘base’?</a></li>
+<li><a href="#sec:se-puede-cambiar-r-base-para-que-haga-esto-en-lugar-de-un-nuevo-paquete"><span class="section-number">2.15</span> ¿Se puede cambiar R base para que haga esto, en lugar de un nuevo paquete?</a></li>
+<li><a href="#sec:he-o-do-que-la-sintaxis-data-table-es-an-loga-a-sql"><span class="section-number">2.16</span> He oído que la sintaxis data.table es análoga a SQL.</a></li>
+<li><a href="#sec:cu-les-son-las-diferencias-de-sintaxis-m-s-peque-as-entre-data-frame-y-data-table-smallerdiffs"><span class="section-number">2.17</span> ¿Cuáles son las diferencias de sintaxis más pequeñas entre <code>data.frame</code> y data.table {#SmallerDiffs}?</a></li>
+<li><a href="#sec:estoy-usando-j-solo-por-su-efecto-secundario-pero-sigo-obteniendo-datos-c-mo-puedo-detenerlo"><span class="section-number">2.18</span> Estoy usando <code>j</code> solo por su efecto secundario, pero sigo obteniendo datos. ¿Cómo puedo detenerlo?</a></li>
+<li><a href="#sec:por-qu-data-table-ahora-tiene-un-argumento-drop-desde-v1-5"><span class="section-number">2.19</span> ¿Por qué <code>[.data.table</code> ahora tiene un argumento <code>drop</code> desde v1.5?</a></li>
+<li><a href="#sec:las-uniones-continuas-son-geniales-y-rapid-simas-fue-dif-cil-programarlas"><span class="section-number">2.20</span> ¡Las uniones continuas son geniales y rapidísimas! ¿Fue difícil programarlas?</a></li>
+<li><a href="#sec:por-qu-dt-i-col-value-devuelve-dt-completo-esperaba-que-no-hubiera-ning-n-valor-visible-consistente-con-lt-o-un-mensaje-o-valor-de-retorno-que-indicara-cu-ntas-filas-se-actualizaron-no-es-evidente-que-los-datos-se-hayan-actualizado-por-referencia"><span class="section-number">2.21</span> ¿Por qué <code>DT[i, col := value]</code> devuelve <code>DT</code> completo? Esperaba que no hubiera ningún valor visible (consistente con <code>&lt;-</code>), o un mensaje o valor de retorno que indicara cuántas filas se actualizaron. No es evidente que los datos se hayan actualizado por referencia.</a></li>
+<li><a href="#sec:bien-gracias-qu-ten-a-de-dif-cil-que-el-resultado-de-dt-i-col-valor-se-devolviera-de-forma-invisible"><span class="section-number">2.22</span> Bien, gracias. ¿Qué tenía de difícil que el resultado de <code>DT[i, col := valor]</code> se devolviera de forma invisible?</a></li>
+<li><a href="#sec:por-qu-a-veces-tengo-que-escribir-dt-dos-veces-despu-s-de-usar-para-imprimir-el-resultado-en-la-consola"><span class="section-number">2.23</span> ¿Por qué a veces tengo que escribir ‘DT’ dos veces después de usar ‘:=’ para imprimir el resultado en la consola?</a></li>
+<li><a href="#sec:he-observado-que-base-cbind-data-frame-y-base-rbind-data-frame-parecen-ser-modificados-por-data-table-c-mo-es-posible-por-qu"><span class="section-number">2.24</span> He observado que <code>base::cbind.data.frame</code> (y <code>base::rbind.data.frame</code>) parecen ser modificados por data.table. ¿Cómo es posible? ¿Por qué?</a></li>
+<li><a href="#r-dispatch"><span class="section-number">2.25</span> He leído sobre la resolución de métodos (p. ej., “merge” puede o no derivar a “merge.data.table”), pero ¿cómo sabe R cómo derivar? ¿Son los puntos significativos o especiales? ¿Cómo sabe R a qué función resolver y cuándo?</a></li>
+<li><a href="#sec:por-qu-t-y-f-se-comportan-de-manera-diferente-a-true-y-false-en-algunas-consultas-data-table"><span class="section-number">2.26</span> ¿Por qué <code>T</code> y <code>F</code> se comportan de manera diferente a <code>TRUE</code> y <code>FALSE</code> en algunas consultas <code>data.table</code>?</a></li>
+</ul>
+</li>
+<li><a href="#chp:preguntas-relacionadas-con-el-tiempo-de-c-mputo"><span class="section-number main-number">3</span> Preguntas relacionadas con el tiempo de cómputo</a>
+<ul>
+<li><a href="#sec:tengo-20-columnas-y-muchas-filas-por-qu-una-expresi-n-de-una-sola-columna-es-tan-r-pida"><span class="section-number">3.1</span> Tengo 20 columnas y muchas filas. ¿Por qué una expresión de una sola columna es tan rápida?</a></li>
+<li><a href="#sec:no-tengo-una-clave-en-una-tabla-grande-pero-aun-as-la-agrupaci-n-es-muy-r-pida-por-qu"><span class="section-number">3.2</span> No tengo una clave en una tabla grande, pero aun así la agrupación es muy rápida. ¿Por qué?</a></li>
+<li><a href="#sec:por-qu-la-agrupaci-n-por-columnas-en-la-clave-es-m-s-r-pida-que-un-por-ad-hoc"><span class="section-number">3.3</span> ¿Por qué la agrupación por columnas en la clave es más rápida que un <code>por</code> <em>ad hoc</em>?</a></li>
+<li><a href="#sec:qu-son-los-ndices-primarios-y-secundarios-en-data-table"><span class="section-number">3.4</span> ¿Qué son los índices primarios y secundarios en data.table?</a></li>
+</ul>
+</li>
+<li><a href="#chp:mensajes-de-error"><span class="section-number main-number">4</span> Mensajes de error</a>
+<ul>
+<li><a href="#sec:no-se-pudo-encontrar-la-funci-n-dt"><span class="section-number">4.1</span> “No se pudo encontrar la función <code>DT</code>”</a></li>
+<li><a href="#sec:argumentos-no-utilizados-mysum-sum-v"><span class="section-number">4.2</span> “argumentos no utilizados (<code>MySum = sum(v)</code>)”</a></li>
+<li><a href="#sec:translatecharutf8-debe-llamarse-en-un-charsxp"><span class="section-number">4.3</span> “<code>translateCharUTF8</code> debe llamarse en un <code>CHARSXP</code>”</a></li>
+<li><a href="#cbinderror"><span class="section-number">4.4</span> <code>cbind(DT, DF)</code> devuelve un formato extraño, <em>por ejemplo</em> <code>Integer,5</code></a></li>
+<li><a href="#sec:no-se-puede-cambiar-el-valor-del-enlace-bloqueado-para-sd"><span class="section-number">4.5</span> “no se puede cambiar el valor del enlace bloqueado para <code>.SD</code>”</a></li>
+<li><a href="#sec:no-se-puede-cambiar-el-valor-del-enlace-bloqueado-para-n"><span class="section-number">4.6</span> “no se puede cambiar el valor del enlace bloqueado para <code>.N</code>”</a></li>
+</ul>
+</li>
+<li><a href="#chp:mensajes-de-advertencia"><span class="section-number main-number">5</span> Mensajes de advertencia</a>
+<ul>
+<li><a href="#sec:los-siguientes-objetos-est-n-enmascarados-de-paquete-base-cbind-rbind"><span class="section-number">5.1</span> “Los siguientes objetos están enmascarados de <code>paquete:base</code>: <code>cbind</code>, <code>rbind</code>”</a></li>
+<li><a href="#sec:se-convirti-el-rhs-num-rico-a-entero-para-que-coincida-con-el-tipo-de-la-columna"><span class="section-number">5.2</span> “Se convirtió el RHS numérico a entero para que coincida con el tipo de la columna”</a></li>
+<li><a href="#sec:lectura-de-data-table-desde-un-archivo-rds-o-rdata"><span class="section-number">5.3</span> Lectura de data.table desde un archivo RDS o RData</a></li>
+</ul>
+</li>
+<li><a href="#chp:preguntas-generales-sobre-el-paquete"><span class="section-number main-number">6</span> Preguntas generales sobre el paquete</a>
+<ul>
+<li><a href="#sec:parece-que-la-versi-n-v1-3-falta-en-el-archivo-cran"><span class="section-number">6.1</span> ¿Parece que la versión v1.3 falta en el archivo CRAN?</a></li>
+<li><a href="#sec:es-data-table-compatible-con-s-plus"><span class="section-number">6.2</span> ¿Es data.table compatible con S-plus?</a></li>
+<li><a href="#sec:est-disponible-para-linux-mac-y-windows"><span class="section-number">6.3</span> ¿Está disponible para Linux, Mac y Windows?</a></li>
+<li><a href="#sec:me-parece-genial-qu-puedo-hacer"><span class="section-number">6.4</span> Me parece genial. ¿Qué puedo hacer?</a></li>
+<li><a href="#sec:no-me-parece-bien-c-mo-puedo-advertir-a-los-dem-s-sobre-mi-experiencia"><span class="section-number">6.5</span> No me parece bien. ¿Cómo puedo advertir a los demás sobre mi experiencia?</a></li>
+<li><a href="#sec:tengo-una-pregunta-s-que-la-gu-a-de-publicaci-n-de-r-help-me-indica-que-contacte-al-responsable-no-a-r-help-pero-hay-alg-n-grupo-m-s-amplio-a-quien-pueda-preguntar"><span class="section-number">6.6</span> Tengo una pregunta. Sé que la guía de publicación de r-help me indica que contacte al responsable (no a r-help), pero ¿hay algún grupo más amplio a quien pueda preguntar?</a></li>
+<li><a href="#sec:d-nde-est-n-los-archivos-de-ayuda-de-datatable"><span class="section-number">6.7</span> ¿Dónde están los archivos de ayuda de datatable?</a></li>
+<li><a href="#sec:preferir-a-no-publicar-en-la-p-gina-de-problemas-puedo-enviar-un-correo-electr-nico-privado-a-una-o-dos-personas"><span class="section-number">6.8</span> Preferiría no publicar en la página de Problemas, ¿puedo enviar un correo electrónico privado a una o dos personas?</a></li>
+<li><a href="#sec:he-creado-un-paquete-que-usa-data-table-c-mo-puedo-asegurarme-de-que-mi-paquete-sea-compatible-con-data-table-para-que-la-herencia-de-data-frame-funcione"><span class="section-number">6.9</span> He creado un paquete que usa data.table. ¿Cómo puedo asegurarme de que mi paquete sea compatible con data.table para que la herencia de <code>data.frame</code> funcione?</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<style>
+h2 {
+    font-size: 20px;
+}
+
+#TOC {
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding-left: 1em;
+  background: #f6f6f6;
+  width: 100%;
+}
+</style>
+<p><code>{r} .write.translation.links(&quot;Las traducciones de este documento están disponibles en: %s&quot;)</code></p>
+<p>La primera sección, Preguntas frecuentes para principiantes, está diseñada para leerse en orden, de principio a fin. Simplemente está escrita en estilo FAQ para facilitar su comprensión. No se trata de las preguntas más frecuentes. Una mejor manera de comprobarlo es consultar Stack Overflow.</p>
+<p>Estas preguntas frecuentes son de lectura obligatoria y se consideran documentación esencial. No haga preguntas en Stack Overflow ni plantee problemas en GitHub hasta que las haya leído. Todos sabemos que no las ha leído cuando pregunta. Así que, si pregunta y no las ha leído, no use su nombre real.</p>
+<p>Este documento se ha revisado rápidamente debido a los cambios en la versión 1.9.8, publicada en noviembre de 2016. Por favor, envíe solicitudes de incorporación de cambios para corregir errores o realizar mejoras. Si alguien sabe por qué la tabla de contenido aparece tan estrecha y compacta al ser mostrada por CRAN, por favor, infórmenos. Este documento solía estar en formato PDF y recientemente lo cambiamos a HTML.</p>
+<h1 id="chp:preguntas-frecuentes-para-principiantes"><span class="section-number main-number">1</span> Preguntas frecuentes para principiantes</h1>
+<h2 id="j-num"><span class="section-number">1.1</span> ¿Por qué <code>DT[ , 5]</code> y <code>DT[2, 5]</code> devuelven un data.table de 1 columna en lugar de vectores como <code>data.frame</code>?</h2>
+<p>Para mantener la coherencia, al usar data.table en funciones que aceptan entradas variables, se puede confiar en que <code>DT[...]</code> devolverá un data.table. No es necesario recordar incluir <code>drop=FALSE</code> como en data.frame. data.table se lanzó por primera vez en 2006 y esta diferencia con data.frame ha sido una característica desde el principio.</p>
+<p>Quizás haya oído que, en general, es una mala práctica referirse a las columnas por número en lugar de nombre. Si su colega lee tu código más tarde, puede que tenga que buscar por todas partes para encontrar la columna número 5. Si usted o él cambian el orden de las columnas en los niveles superiores de tu programa R, podría obtener resultados erróneos sin previo aviso ni error si se olvida modificar todos los lugares del código que hacen referencia a la columna número 5. La culpa es suya, no de R ni de data.table. Es realmente malo. Por favor, no lo haga. Es el mismo mantra de los desarrolladores profesionales de SQL: nunca uses <code>select *</code>, selecciona siempre explícitamente por nombre de columna para, al menos, intentar ser robusto ante futuros cambios.</p>
+<p>Supongamos que la columna 5 se llama <code>&quot;region&quot;</code> y debe extraerla como un vector, no como un data.table. Es más robusto usar el nombre de la columna y escribir <code>DT$region</code> o <code>DT[[&quot;region&quot;]]</code>; es decir, lo mismo que la base R. Se recomienda usar <code>$</code> y <code>[[</code> de la base R en data.table. No se recomienda su uso cuando se combina con <code>&lt;-</code> para asignar (use <code>:=</code> en su lugar), sino simplemente para seleccionar una sola columna por nombre. Sin embargo, una diferencia clave es que DT$col y DT[[‘col’]] pueden devolver una referencia, mientras que DT[, col] siempre devuelve una copia. Esto puede tener consecuencias importantes y se explica en <code>vignette(&quot;datatable-reference-semantics&quot;, package=&quot;data.table&quot;)</code>.</p>
+<p>Hay circunstancias en las que referirse a una columna por número parece ser la única opción, como en el caso de una secuencia de columnas. En estas situaciones, al igual que en data.frame, puede escribir <code>DT[, 5:10]</code> y <code>DT[,c(1,4,10)]</code>. Sin embargo, es más robusto (ante futuros cambios en el número y orden de las columnas de sus datos) usar un rango con nombre como <code>DT[,columnRed:columnViolet]</code> o nombrar cada una <code>DT[,c(&quot;columnRed&quot;,&quot;columnOrange&quot;,&quot;columnYellow&quot;)]</code>. Al principio es más laborioso, pero probablemente se lo agradecerá a sí mismo y sus colegas podrían agradecérselo en el futuro. Al menos podrá decir que se esforzó al máximo por escribir código robusto si algo sale mal.</p>
+<p>Sin embargo, lo que realmente queremos que hagas es <code>DT[,.(columnRed,columnOrange,columnYellow)]</code>; es decir, usar los nombres de columna como si fueran variables directamente dentro de <code>DT[...]</code>. No tiene que prefijar cada columna con <code>DT$</code> como lo hace en data.frame. La parte <code>.()</code> es solo un alias para <code>list()</code> y puede usar <code>list()</code> en su lugar si lo prefiere. Puede colocar cualquier expresión R de nombres de columna, usando cualquier paquete R, que devuelva diferentes tipos de diferentes longitudes, justo ahí. Queríamos alentarle a hacer eso tan fuertemente en el pasado que deliberadamente no hicimos que <code>DT[,5]</code> funcionara en absoluto. Antes de v1.9.8 lanzado en noviembre de 2016, <code>DT[,5]</code> solía devolver solo <code>5</code>. La idea era que podíamos enseñar más simplemente un hecho de que las partes dentro de <code>DT[...]</code> se evalúan dentro del marco de DT siempre (ven los nombres de columna como si fueran variables). Y <code>5</code> evalúa a <code>5</code>, por lo que el comportamiento fue consistente con la regla única. Les solicitamos que superaran un obstáculo adicional deliberado <code>DT[,5,with=FALSE]</code> si realmente deseaban seleccionar una columna por nombre o número. A partir de noviembre de 2016, ya no es necesario usar <code>with=FALSE</code> y veremos cómo una mayor consistencia con data.frame en este sentido ayudará o perjudicará tanto a los usuarios nuevos como a los antiguos. Los nuevos usuarios que no lean estas preguntas frecuentes, ni siquiera esta primera entrada, esperamos que no se tropiecen tan pronto con data.table como antes si esperaban que funcionara como data.frame. Esperamos que no se pierdan nuestra intención y recomendación de colocar expresiones de columnas dentro de <code>DT[i, j, by]</code>. Si usan data.table como data.frame, no obtendrán ningún beneficio. Si conocen a alguien en esa situación, por favor, anímenle a leer este documento como ustedes.</p>
+<p>Recordatorio: puede colocar <em>cualquier</em> expresión de R dentro de <code>DT[...]</code> usando los nombres de columna como si fueran variables; por ejemplo, pruebe <code>DT[, colA*colB/2]</code>. Esto devuelve un vector porque usó los nombres de columna como si fueran variables. Envuélvalo en <code>.()</code> para devolver una data.table; es decir, <code>DT[,.(colA*colB/2)]</code>. Asígnele un nombre: <code>DT[,.(myResult = colA*colB/2)]</code>. Dejamos que adivine cómo devolver dos valores de esta consulta. También es bastante común realizar varias acciones dentro de un cuerpo anónimo: <code>DT[, { x&lt;-colA+10; x*x/2 }]</code> o llamar a la función de otro paquete: <code>DT[ , fitdistr(columnA, &quot;normal&quot;)]</code>.</p>
+<h2 id="sec:por-qu-dt-quot-region-quot-devuelve-un-data-table-de-1-columna-en-lugar-de-un-vector"><span class="section-number">1.2</span> ¿Por qué <code>DT[,&quot;region&quot;]</code> devuelve un data.table de 1 columna en lugar de un vector?</h2>
+<p>Consulte la <a href="#j-num">respuesta anterior</a>. Prueba con <code>DT$region</code> o <code>DT[[&quot;region&quot;]]</code>.</p>
+<h2 id="sec:por-qu-dt-regi-n-devuelve-un-vector-para-la-columna-regi-n-me-gustar-a-una-tabla-data-table-de-una-sola-columna"><span class="section-number">1.3</span> ¿Por qué <code>DT[, región]</code> devuelve un vector para la columna “región”? Me gustaría una tabla data.table de una sola columna.</h2>
+<p>Pruebe <code>DT[ , .(region)]</code> en su lugar. <code>.()</code> es un alias para <code>list()</code> y garantiza que se devuelva una data.table.</p>
+<p>Continúe leyendo y consulte las preguntas frecuentes a continuación. Revise los documentos completos antes de atascarse en una parte.</p>
+<h2 id="sec:por-qu-no-funciona-dt-x-y-z-quer-a-las-tres-columnas-x-y-y-z"><span class="section-number">1.4</span> ¿Por qué no funciona <code>DT[, x, y, z]</code>? Quería las tres columnas <code>x</code>, <code>y</code> y <code>z</code>.</h2>
+<p>La expresión <code>j</code> es el segundo argumento. Pruebe <code>DT[ , c(&quot;x&quot;,&quot;y&quot;,&quot;z&quot;)]</code> o <code>DT[ , .(x,y,z)]</code>.</p>
+<h2 id="sec:asign-la-variable-mycol-quot-x-quot-pero-dt-mycol-devuelve-un-error-c-mo-puedo-hacer-que-busque-el-nombre-de-la-columna-contenida-en-la-variable-mycol"><span class="section-number">1.5</span> Asigné la variable <code>mycol=&quot;x&quot;</code>, pero <code>DT[, mycol]</code> devuelve un error. ¿Cómo puedo hacer que busque el nombre de la columna contenida en la variable <code>mycol</code>?</h2>
+<p>El error es que no se puede encontrar la columna denominada <code>&quot;mycol&quot;</code>, y este error es correcto. El alcance de <code>data.table</code> es diferente al de <code>data.frame</code> en el sentido de que puede usar los nombres de las columnas como si fueran variables directamente dentro de <code>DT[...]</code> sin anteponer <code>DT$</code> a cada nombre de columna; consulte la pregunta frecuente 1.1 anterior.</p>
+<p>Para usar <code>mycol</code> para seleccionar la columna <code>x</code> de <code>DT</code>, hay algunas opciones:</p>
+<pre><code class="language-r">DT[, ..mycol]            # .. prefix conveys to look for the mycol one level up in calling scope
+DT[, mycol, with=FALSE]  # revert to data.frame behavior
+DT[[mycol]]               # treat DT as a list and use [[ from base R
+</code></pre>
+<p>Consulte <code>?data.table</code> para obtener más detalles sobre el prefijo <code>..</code>.</p>
+<p>El argumento <code>with</code> toma su nombre de la función <code>base</code> <code>with()</code>. Cuando <code>with=TRUE</code> (predeterminado), <code>data.table</code> funciona de forma similar a <code>with()</code>, es decir, <code>DT[, mycol]</code> se comporta como <code>with(DT, mycol)</code>. Cuando <code>with=FALSE</code>, las reglas de evaluación estándar de <code>data.frame</code> se aplican a todas las variables en <code>j</code> y ya no se pueden usar nombres de columna directamente.</p>
+<h2 id="sec:cu-les-son-los-beneficios-de-poder-utilizar-nombres-de-columnas-como-si-fueran-variables-dentro-de-dt"><span class="section-number">1.6</span> ¿Cuáles son los beneficios de poder utilizar nombres de columnas como si fueran variables dentro de ‘DT[…]’?</h2>
+<p><code>j</code> no tiene por qué ser solo nombres de columnas. Puede escribir cualquier <em>expresión</em> de R de nombres de columnas directamente en <code>j</code>, <em>p. ej.</em>, <code>DT[ , media(x*y/z)]</code>. Lo mismo aplica para <code>i</code>, <em>p. ej.</em>, <code>DT[x&gt;1000, suma(y*z)]</code>.</p>
+<p>Esto ejecuta la expresión <code>j</code> en el conjunto de filas donde la expresión <code>i</code> es verdadera. Ni siquiera necesita devolver datos, <em>p. ej.</em>, <code>DT[x&gt;1000, plot(y, z)]</code>. Puede hacer <code>j</code> por grupo simplemente agregando <code>by = </code>; p. ej., <code>DT[x&gt;1000, sum(y*z), by = w]</code>. Esto ejecuta <code>j</code> para cada grupo en la columna <code>w</code> pero solo sobre las filas donde <code>x&gt;1000</code>. Al colocar las 3 partes de la consulta (i=where, j=select y by=group by) dentro de los corchetes, data.table ve esta consulta como un todo antes de que se evalúe cualquier parte de ella. Por lo tanto, puede optimizar la consulta combinada para el rendimiento. Puede hacer esto porque el lenguaje R tiene una evaluación diferida única (Python y Julia no la tienen). data.table ve las expresiones dentro de <code>DT[...]</code> antes de que se evalúen y las optimiza antes de la evaluación. Por ejemplo, si data.table ve que solo está usando 2 columnas de 100, no se molestará en filtrar las 98 que no son necesarias para su expresión j.</p>
+<h2 id="sec:vale-empiezo-a-entender-la-funci-n-de-data-table-pero-por-qu-no-mejoraron-data-frame-en-r-por-qu-tiene-que-ser-un-paquete-nuevo"><span class="section-number">1.7</span> Vale, empiezo a entender la función de data.table, pero ¿por qué no mejoraron <code>data.frame</code> en R? ¿Por qué tiene que ser un paquete nuevo?</h2>
+<p>Como se <a href="#j-num">resaltó arriba</a>, <code>j</code> en <code>[.data.table</code> es fundamentalmente diferente de <code>j</code> en <code>[.data.frame</code>. Incluso si algo tan simple como <code>DF[ , 1]</code> se modificara en R base para devolver un data.frame en lugar de un vector, esto afectaría el código existente en miles de paquetes CRAN y código de usuario. En cuanto creamos una nueva clase que heredara de data.frame, tuvimos la oportunidad de cambiar algunas cosas, y lo hicimos. Queremos que data.table sea ligeramente diferente y funcione de esta manera para que funcione una sintaxis más compleja. También existen otras diferencias (véase <a href="#SmallerDiffs">abajo</a>).</p>
+<p>Además, data.table hereda de <code>data.frame</code>. También es un <code>data.frame</code>. Un data.table se puede pasar a cualquier paquete que solo acepte <code>data.frame</code> y ese paquete puede usar la sintaxis <code>[.data.frame</code> en data.table. Consulta <a href="https://stackoverflow.com/a/10529888/403310">esta respuesta</a> para saber cómo lograrlo.</p>
+<p>También <em>hemos</em> propuesto mejoras para R siempre que ha sido posible. Una de ellas se aceptó como nueva característica en R 2.12.0:</p>
+<blockquote>
+<p><code>unique()</code> y <code>match()</code> ahora son más rápidos en vectores de caracteres donde todos los elementos están en la caché global CHARSXP y tienen codificación sin marcar (ASCII). Gracias a Matt Dowle por sugerir mejoras en la generación del código hash en unique.c.</p>
+</blockquote>
+<p>Una segunda propuesta fue usar <code>memcpy</code> en duplicate.c, que es mucho más rápido que un bucle for en C. Esto mejoraría la <em>forma</em> en que R copia datos internamente (en algunas mediciones, hasta 13 veces). El hilo sobre r-devel está <a href="https://stat.ethz.ch/pipermail/r-devel/2010-April/057249.html">aquí</a>.</p>
+<p>Una tercera propuesta más significativa que fue aceptada es que R ahora usa el código de ordenamiento por radix de data.table a partir de R 3.3.0:</p>
+<blockquote>
+<p>El algoritmo de ordenamiento por radio y su implementación de data.table (forder) reemplaza el ordenamiento por radio (conteo) anterior y añade un nuevo método para order(). Contribuido por Matt Dowle y Arun Srinivasan, el nuevo algoritmo admite vectores lógicos, enteros (incluso con valores grandes), reales y de caracteres. Supera a todos los demás métodos, pero presenta algunas desventajas (véase ?sort).</p>
+</blockquote>
+<p>Este fue un gran evento para nosotros y lo celebramos hasta el cansancio. (En realidad, no).</p>
+<h2 id="sec:por-qu-los-valores-predeterminados-son-as-por-qu-funciona-as"><span class="section-number">1.8</span> ¿Por qué los valores predeterminados son así? ¿Por qué funciona así?</h2>
+<p>La respuesta simple es que el autor principal lo diseñó originalmente para su propio uso. Así lo quiso. Le parece una forma más natural y rápida de escribir código, que también se ejecuta con mayor rapidez.</p>
+<h2 id="sec:esto-no-se-hace-ya-con-with-y-subset-en-base"><span class="section-number">1.9</span> ¿Esto no se hace ya con <code>with()</code> y <code>subset()</code> en <code>base</code>?</h2>
+<p>Algunas de las características comentadas hasta ahora son válidas. El paquete se basa en la funcionalidad básica. Hace lo mismo, pero requiere menos código y se ejecuta mucho más rápido si se usa correctamente.</p>
+<h2 id="sec:por-qu-x-y-devuelve-tambi-n-todas-las-columnas-de-y-no-deber-a-devolver-un-subconjunto-de-x"><span class="section-number">1.10</span> ¿Por qué «X[Y]» devuelve también todas las columnas de «Y»? ¿No debería devolver un subconjunto de «X»?</h2>
+<p>Esto se modificó en la versión 1.5.3 (febrero de 2011). Desde entonces, <code>X[Y]</code> incluye las columnas no unidas de <code>Y</code>. Esta función se denomina <em>ámbito heredado de unión</em> porque no solo las columnas <code>X</code> están disponibles para la expresión <code>j</code>, sino también las columnas <code>Y</code>. La desventaja es que <code>X[Y]</code> es menos eficiente, ya que cada elemento de las columnas no unidas de <code>Y</code> se duplica para coincidir con el (probablemente elevado) número de filas en <code>X</code> que coinciden. Por lo tanto, recomendamos encarecidamente <code>X[Y, j]</code> en lugar de <code>X[Y]</code>. Consulte las <a href="#MergeDiff">siguientes preguntas frecuentes</a>.</p>
+<h2 id="MergeDiff"><span class="section-number">1.11</span> ¿Cuál es la diferencia entre <code>X[Y]</code> y <code>merge(X, Y)</code>?</h2>
+<p><code>X[Y]</code> es una unión (join) que busca las filas de <code>X</code> utilizando <code>Y</code> (o la clave de <code>Y</code> si tiene una) como índice.</p>
+<p><code>Y[X]</code> es una unión que busca las filas de <code>Y</code> utilizando <code>X</code> (o la clave de <code>X</code> si tiene una) como índice.</p>
+<p><code>merge(X,Y)</code><sup class="footnote-ref"><a href="#fn-1" id="fnref-1" data-footnote-ref>1</a></sup> funciona en ambos sentidos simultáneamente. El número de filas de <code>X[Y]</code> e <code>Y[X]</code> suele ser diferente, mientras que el número de filas devuelto por <code>merge(X, Y)</code> y <code>merge(Y, X)</code> es el mismo.</p>
+<p><em>PERO</em> eso pasa por alto el punto principal. La mayoría de las tareas requieren que se haga algo en los datos después de una unión o fusión. ¿Por qué fusionar todas las columnas de datos, solo para usar un pequeño subconjunto de ellas después? Puede sugerir <code>merge(X[ , ColsNeeded1], Y[ , ColsNeeded2])</code>, pero eso requiere que el programador determine qué columnas se necesitan. <code>X[Y, j]</code> en data.table hace todo eso en un solo paso para ti. Cuando escribes <code>X[Y, sum(foo*bar)]</code>, data.table inspecciona automáticamente la expresión <code>j</code> para ver qué columnas usa. Solo creará un subconjunto de esas columnas; las demás se ignoran. Solo se crea memoria para las columnas que usa <code>j</code> y las columnas <code>Y</code> disfrutan de las reglas de reciclaje estándar de R dentro del contexto de cada grupo. Digamos que <code>foo</code> está en <code>X</code> y <code>bar</code> está en <code>Y</code> (junto con otras 20 columnas en <code>Y</code>). ¿No es <code>X[Y, sum(foo*bar)]</code> más rápido de programar y más rápido de ejecutar que el desperdicio de un <code>merge</code> de todo seguido de <code>subset</code>?</p>
+<h2 id="sec:algo-m-s-sobre-x-y-sum-foo-bar"><span class="section-number">1.12</span> ¿Algo más sobre <code>X[Y, sum(foo*bar)]</code>?</h2>
+<p>Este comportamiento cambió en la v1.9.4 (septiembre de 2014). Ahora realiza la unión <code>X[Y]</code> y luego ejecuta <code>sum(foo*bar)</code> sobre todas las filas; es decir, <code>X[Y][ , sum(foo*bar)]</code>. Antes, ejecutaba <code>j</code> para cada <em>grupo</em> de <code>X</code> con el que coincidía cada fila de <code>Y</code>. Esto aún se puede hacer, ya que es muy útil, pero ahora es necesario especificar explícitamente <code>by = .EACHI</code>, es decir, <code>X[Y, sum(foo*bar), by = .EACHI]</code>. A esto lo llamamos <em>agrupación por cada <code>i</code></em>.</p>
+<p>Por ejemplo, (para complicarlo aún más, también se utiliza <em>join legacy scope</em>):</p>
+<pre><code class="language-r">X = data.table(grp = c(&quot;a&quot;, &quot;a&quot;, &quot;b&quot;,
+                       &quot;b&quot;, &quot;b&quot;, &quot;c&quot;, &quot;c&quot;), foo = 1:7)
+setkey(X, grp)
+Y = data.table(c(&quot;b&quot;, &quot;c&quot;), bar = c(4, 2))
+X
+</code></pre>
+<pre><code>## Clave &lt;grp&gt;
+##       grp   foo
+##    &lt;char&gt; &lt;int&gt;
+## 1:      a     1
+## 2:      a     2
+## 3:      b     3
+## 4:      b     4
+## 5:      b     5
+## 6:      c     6
+## 7:      c     7
+</code></pre>
+<pre><code class="language-r">Y
+</code></pre>
+<pre><code>##        V1   bar
+##    &lt;char&gt; &lt;num&gt;
+## 1:      b     4
+## 2:      c     2
+</code></pre>
+<pre><code class="language-r">X[Y, sum(foo*bar)]
+</code></pre>
+<pre><code>## [1] 74
+</code></pre>
+<pre><code class="language-r">X[Y, sum(foo*bar), by = .EACHI]
+</code></pre>
+<pre><code>## Clave &lt;grp&gt;
+##       grp    V1
+##    &lt;char&gt; &lt;num&gt;
+## 1:      b    48
+## 2:      c    26
+</code></pre>
+<h2 id="sec:qu-bien-c-mo-lograron-cambiarlo-si-los-usuarios-depend-an-del-comportamiento-anterior"><span class="section-number">1.13</span> Qué bien. ¿Cómo lograron cambiarlo si los usuarios dependían del comportamiento anterior?</h2>
+<p>La solicitud de cambio provino de los usuarios. Se creía que, si una consulta realiza agrupaciones, debería incluirse un <code>by=</code> explícito para facilitar la lectura del código. Se proporcionó una opción para restablecer el comportamiento anterior: <code>options(datatable.old.bywithoutby)</code>, con <code>FALSE</code> por defecto. Esto permitió la actualización para probar las demás nuevas funciones y correcciones de errores de la v1.9.4, y la posterior migración de cualquier consulta <code>by-without-by</code> cuando estuviera lista, añadiéndoles <code>by=.EACHI</code>. Conservamos 47 pruebas previas al cambio y las reintrodujimos como nuevas pruebas, con <code>options(datatable.old.bywithoutby=TRUE)</code>. Añadimos un mensaje de inicio sobre el cambio y cómo volver al comportamiento anterior. Tras un año, la opción quedó obsoleta con una advertencia al usarla. Tras dos años, se eliminó la opción para volver al comportamiento anterior.</p>
+<p>De los 66 paquetes en CRAN o Bioconductor que dependían de o importaban data.table al momento de la publicación de la v1.9.4 (ahora son más de 300), solo uno se vio afectado por el cambio. Esto podría deberse a que muchos paquetes no cuentan con pruebas exhaustivas, o simplemente a que la agrupación por cada fila en <code>i</code> no se usaba mucho en los paquetes posteriores. Siempre probamos la nueva versión con todos los paquetes dependientes antes del lanzamiento y coordinamos cualquier cambio con los responsables. Por lo tanto, esta versión fue bastante sencilla en ese sentido.</p>
+<p>Otra razón convincente para realizar el cambio fue que, anteriormente, no existía una forma eficiente de lograr lo que <code>X[Y, sum(foo*bar)]</code> hace ahora. Se debía escribir <code>X[Y][ , sum(foo*bar)]</code>. Esto no era óptimo porque <code>X[Y]</code> unía todas las columnas y las pasaba a la segunda consulta compuesta sin saber que solo se necesitaban <code>foo</code> y <code>bar</code>. Para solucionar este problema de eficiencia, se requería un esfuerzo de programación adicional: <code>X[Y, list(foo, bar)][ , sum(foo*bar)]</code>. El cambio a <code>by = .EACHI</code> ha simplificado esto al permitir que ambas consultas se expresen dentro de una única consulta <code>DT[...]</code> para mayor eficiencia.</p>
+<h1 id="chp:sintaxis-general"><span class="section-number main-number">2</span> Sintaxis general</h1>
+<h2 id="sec:c-mo-puedo-evitar-escribir-una-expresi-n-j-muy-larga-dijiste-que-deber-a-usar-la-columna-nombres-pero-tengo-muchas-columnas"><span class="section-number">2.1</span> ¿Cómo puedo evitar escribir una expresión <code>j</code> muy larga? Dijiste que debería usar la columna <em>nombres</em>, pero tengo muchas columnas.</h2>
+<p>Al agrupar, la expresión <code>j</code> puede usar nombres de columna como variables, como ya sabe, pero también puede usar el símbolo reservado <code>.SD</code>, que hace referencia al <strong>S</strong>subconjunto de <strong>D</strong>ata.table** para cada grupo (excluyendo las columnas de agrupación). Por lo tanto, para sumar todas las columnas, simplemente se usa <code>DT[ , lapply(.SD, sum), by = grp]</code>. Puede parecer complicado, pero es rápido de escribir y de ejecutar. Tenga en cuenta que no es necesario crear una función anónima. El objeto <code>.SD</code> se implementa internamente de forma eficiente y es más eficiente que pasar un argumento a una función. Sin embargo, si el símbolo <code>.SD</code> aparece en <code>j</code>, data.table debe rellenar <code>.SD</code> por completo para cada grupo, incluso si <code>j</code> no lo usa del todo.</p>
+<p>Por lo tanto, no utilice, por ejemplo, <code>DT[ , sum(.SD[[&quot;sales&quot;]]), by = grp]</code>. Esto funciona, pero es ineficiente y poco elegante. <code>DT[ , sum(sales), by = grp]</code> es lo que se pretendía, y podría ser cientos de veces más rápido. Si utiliza <em>todos</em> los datos en <code>.SD</code> para cada grupo (como en <code>DT[ , lapply(.SD, sum), by = grp]</code>), es un uso muy adecuado de <code>.SD</code>. Si utiliza <em>varias</em> columnas, pero no <em>todas</em>, puede combinar <code>.SD</code> con <code>.SDcols</code>; consulte <code>?data.table</code>.</p>
+<h2 id="sec:por-qu-el-valor-predeterminado-para-mult-ahora-es-quot-all-quot"><span class="section-number">2.2</span> ¿Por qué el valor predeterminado para <code>mult</code> ahora es <code>&quot;all&quot;</code>?</h2>
+<p>En la v1.5.3, el valor predeterminado se cambió a <code>&quot;all&quot;</code>. Cuando <code>i</code> (o la clave de <code>i</code>, si la tiene) tiene menos columnas que la clave de <code>x</code>, <code>mult</code> ya estaba configurado automáticamente como <code>&quot;all&quot;</code>. Cambiar el valor predeterminado facilita y aclara esto para los usuarios, ya que se presentaba con bastante frecuencia.</p>
+<p>En versiones anteriores a la v1.3, <code>&quot;all&quot;</code> era más lento. Internamente, <code>&quot;all&quot;</code> se implementaba uniendo con <code>&quot;first&quot;</code> y luego desde cero con <code>&quot;last&quot;</code>. Tras esto, se realizaba una comparación entre ellos para determinar el intervalo de coincidencias en <code>x</code> para cada fila en <code>i</code>. Sin embargo, la mayoría de las veces, unimos filas individuales, donde <code>&quot;first&quot;</code>, <code>&quot;last&quot;</code> y <code>&quot;all&quot;</code> devuelven el mismo resultado. Preferimos el máximo rendimiento en la mayoría de los casos, por lo que el valor predeterminado elegido fue <code>&quot;first&quot;</code>. Al trabajar con una clave no única (generalmente una sola columna que contiene una variable de agrupación), <code>DT[&quot;A&quot;]</code> devolvía la primera fila de ese grupo, por lo que se necesitaba <code>DT[&quot;A&quot;, mult = &quot;all&quot;]</code> para devolver todas las filas de ese grupo.</p>
+<p>En la v1.4, la búsqueda binaria en C se modificó para que se ramificara en el nivel más profundo para encontrar el primero y el último. Es probable que esta ramificación ocurra dentro de las mismas páginas finales de RAM, por lo que ya no debería haber una desventaja de velocidad al establecer <code>mult</code> como <code>&quot;all&quot;</code> por defecto. Advertimos que el valor predeterminado podría cambiar e implementamos el cambio en la v1.5.3.</p>
+<p>Una versión futura de data.table podría permitir distinguir entre una clave y una <em>clave única</em>. Internamente, <code>mult = &quot;all&quot;</code> funcionaría de forma similar a <code>mult = &quot;first&quot;</code> cuando todas las columnas de la clave de <code>x</code> estuvieran unidas y la clave de <code>x</code> fuera única. data.table necesitaría comprobaciones al insertar y actualizar para garantizar que se mantenga una clave única. Una ventaja de especificar una clave única sería que, además de mejorar el rendimiento, data.table garantizaría que no se insertaran duplicados.</p>
+<h2 id="sec:estoy-usando-c-en-j-y-obtengo-resultados-extra-os"><span class="section-number">2.3</span> Estoy usando <code>c()</code> en <code>j</code> y obtengo resultados extraños.</h2>
+<p>Esta es una fuente común de confusión. En <code>data.frame</code> se suele usar, por ejemplo:</p>
+<pre><code class="language-r">DF = data.frame(x = 1:3, y = 4:6, z = 7:9)
+DF
+</code></pre>
+<pre><code>##   x y z
+## 1 1 4 7
+## 2 2 5 8
+## 3 3 6 9
+</code></pre>
+<pre><code class="language-r">DF[ , c(&quot;y&quot;, &quot;z&quot;)]
+</code></pre>
+<pre><code>##   y z
+## 1 4 7
+## 2 5 8
+## 3 6 9
+</code></pre>
+<p>Que devuelve las dos columnas. En data.table, sabe que puede usar los nombres de las columnas directamente y podría intentar:</p>
+<pre><code class="language-r">DT = data.table(DF)
+DT[ , c(y, z)]
+</code></pre>
+<pre><code>## [1] 4 5 6 7 8 9
+</code></pre>
+<p>Pero esto devuelve un vector. Recuerde que la expresión <code>j</code> se evalúa en el entorno de <code>DT</code> y <code>c()</code> devuelve un vector. Si se requieren dos o más columnas, utilice <code>list()</code> o <code>.()</code> en su lugar:</p>
+<pre><code class="language-r">DT[ , .(y, z)]
+</code></pre>
+<pre><code>##        y     z
+##    &lt;int&gt; &lt;int&gt;
+## 1:     4     7
+## 2:     5     8
+## 3:     6     9
+</code></pre>
+<p><code>c()</code> también puede ser útil en una data.table, pero su comportamiento es diferente al de <code>[.data.frame</code>.</p>
+<h2 id="sec:he-creado-una-tabla-compleja-con-muchas-columnas-quiero-usarla-como-plantilla-para-una-nueva-tabla-es-decir-crear-una-tabla-sin-filas-pero-con-los-nombres-y-tipos-de-columna-copiados-de-mi-tabla-es-f-cil-hacerlo"><span class="section-number">2.4</span> He creado una tabla compleja con muchas columnas. Quiero usarla como plantilla para una nueva tabla; es decir, crear una tabla sin filas, pero con los nombres y tipos de columna copiados de mi tabla. ¿Es fácil hacerlo?</h2>
+<p>Sí. Si su tabla compleja se llama <code>DT</code>, intente <code>NEWDT = DT[0]</code>.</p>
+<h2 id="sec:es-un-data-table-nulo-lo-mismo-que-dt-0"><span class="section-number">2.5</span> ¿Es un data.table nulo lo mismo que <code>DT[0]</code>?</h2>
+<p>No. Por “data.table nulo” nos referimos al resultado de <code>data.table(NULL)</code> o <code>as.data.table(NULL)</code>; <em>es decir</em>,</p>
+<pre><code class="language-r">data.table(NULL)
+</code></pre>
+<pre><code>## data.table nulo (0 filas y 0 columnas)
+</code></pre>
+<pre><code class="language-r">data.frame(NULL)
+</code></pre>
+<pre><code>## data frame with 0 columns and 0 rows
+</code></pre>
+<pre><code class="language-r">as.data.table(NULL)
+</code></pre>
+<pre><code>## data.table nulo (0 filas y 0 columnas)
+</code></pre>
+<pre><code class="language-r">as.data.frame(NULL)
+</code></pre>
+<pre><code>## data frame with 0 columns and 0 rows
+</code></pre>
+<pre><code class="language-r">is.null(data.table(NULL))
+</code></pre>
+<pre><code>## [1] FALSE
+</code></pre>
+<pre><code class="language-r">is.null(data.frame(NULL))
+</code></pre>
+<pre><code>## [1] FALSE
+</code></pre>
+<p>El objeto data.table|<code>frame</code> nulo es <code>NULL</code> con algunos atributos adjuntos, lo que significa que ya no es <code>NULL</code>. En R, solo <code>NULL</code> puro es <code>NULL</code>, como se prueba con <code>is.null()</code>. Al referirnos al objeto “data.table” nulo, usamos <code>null</code> en minúscula para distinguirlo de <code>NULL</code> en mayúscula. Para comprobar si el objeto data.table es nulo, use <code>length(DT) == 0</code> o <code>ncol(DT) == 0</code> (<code>length</code> es ligeramente más rápido, ya que es una función primitiva).</p>
+<p>Una data.table <em>vacía</em> (<code>DT[0]</code>) tiene una o más columnas, todas ellas vacías. Estas columnas vacías aún conservan nombres y tipos.</p>
+<pre><code class="language-r">DT = data.table(a = 1:3, b = c(4, 5, 6), d = c(7L,8L,9L))
+DT[0]
+</code></pre>
+<pre><code>## data.table vacía (0 filas y 3 columnas): a,b,d
+</code></pre>
+<pre><code class="language-r">sapply(DT[0], class)
+</code></pre>
+<pre><code>##         a         b         d 
+## &quot;integer&quot; &quot;numeric&quot; &quot;integer&quot;
+</code></pre>
+<h2 id="DTremove1"><span class="section-number">2.6</span> ¿Por qué se ha eliminado el alias <code>DT()</code>?</h2>
+<p><code>DT</code> se introdujo originalmente como contenedor para una lista de expresiones <code>j</code>. Dado que <code>DT</code> era un alias de data.table, era una forma práctica de gestionar el reciclaje silencioso en casos en que cada elemento de la lista <code>j</code> evaluaba con longitudes diferentes. Sin embargo, el alias era una de las razones por las que la agrupación era lenta.</p>
+<p>A partir de la v1.3, se deben pasar <code>list()</code> o <code>.()</code> al argumento <code>j</code>. Esto es mucho más rápido, especialmente cuando hay muchos grupos. Internamente, este cambio no fue trivial. El reciclaje de vectores ahora se realiza internamente, junto con otras mejoras de velocidad para la agrupación.</p>
+<h2 id="DTremove2"><span class="section-number">2.7</span> Pero mi código usa <code>j = DT(...)</code> y funciona. Las preguntas frecuentes anteriores indican que se ha eliminado <code>DT()</code>.</h2>
+<p>Entonces estás usando una versión anterior a la 1.5.3. Antes de la 1.5.3, <code>[.data.table</code> detectaba el uso de <code>DT()</code> en <code>j</code> y lo reemplazaba automáticamente con una llamada a <code>list()</code>. Esto facilitaba la transición para los usuarios existentes.</p>
+<h2 id="sec:cu-les-son-las-reglas-de-alcance-para-las-expresiones-j"><span class="section-number">2.8</span> ¿Cuáles son las reglas de alcance para las expresiones ‘j’?</h2>
+<p>Piense en el subconjunto como un entorno donde todos los nombres de columna son variables. Cuando se utiliza la variable <code>foo</code> en la <code>j</code> de una consulta como <code>X[Y, sum(foo)]</code>, se busca <code>foo</code> en el siguiente orden:</p>
+<ol>
+<li>El alcance del subconjunto de <code>X</code>; <em>es decir</em>, los nombres de las columnas de <code>X</code>.</li>
+<li>El alcance de cada fila de <code>Y</code>; <em>es decir</em>, los nombres de las columnas de <code>Y</code> (<em>unir el alcance heredado</em>)</li>
+<li>El alcance del marco de llamada; <em>por ejemplo</em>, la línea que aparece antes de la consulta data.table.</li>
+<li>Ejercicio para el lector: ¿luego navega los marcos de llamada o va directamente a <code>globalenv()</code>?</li>
+<li>El entorno global</li>
+</ol>
+<p>Esto es <em>alcance léxico</em>, como se explica en <a href="https://cran.r-project.org/doc/FAQ/R-FAQ.html#Lexical-scoping">R FAQ 3.3.1</a>. Sin embargo, el entorno en el que se creó la función no es relevante, ya que <em>no hay función</em>. No se pasa ninguna <em>función</em> anónima a <code>j</code>. En su lugar, se pasa un <em>cuerpo</em> anónimo a <code>j</code>; por ejemplo,</p>
+<pre><code class="language-r">DT = data.table(x = rep(c(&quot;a&quot;, &quot;b&quot;), c(2, 3)), y = 1:5)
+DT
+</code></pre>
+<pre><code>##         x     y
+##    &lt;char&gt; &lt;int&gt;
+## 1:      a     1
+## 2:      a     2
+## 3:      b     3
+## 4:      b     4
+## 5:      b     5
+</code></pre>
+<pre><code class="language-r">DT[ , {z = sum(y); z + 3}, by = x]
+</code></pre>
+<pre><code>##         x    V1
+##    &lt;char&gt; &lt;num&gt;
+## 1:      a     6
+## 2:      b    15
+</code></pre>
+<p>Algunos lenguajes de programación llaman a esto un <em>lambda</em>.</p>
+<h2 id="j-trace"><span class="section-number">2.9</span> ¿Puedo rastrear la expresión ‘j’ a medida que se ejecuta a través de los grupos?</h2>
+<p>Pruebe algo como esto:</p>
+<pre><code class="language-r">DT[ , {
+  cat(&quot;Objects:&quot;, paste(objects(), collapse = &quot;,&quot;), &quot;\n&quot;)
+  cat(&quot;Trace: x=&quot;, as.character(x), &quot; y=&quot;, y, &quot;\n&quot;)
+  sum(y)},
+  by = x]
+</code></pre>
+<pre><code>## Objects: -.POSIXt,Cfastmean,print,x,y 
+## Trace: x= a  y= 1 2 
+## Objects: -.POSIXt,Cfastmean,print,x,y 
+## Trace: x= b  y= 3 4 5
+</code></pre>
+<pre><code>##         x    V1
+##    &lt;char&gt; &lt;int&gt;
+## 1:      a     3
+## 2:      b    12
+</code></pre>
+<h2 id="sec:dentro-de-cada-grupo-por-qu-las-variables-del-grupo-tienen-una-longitud-de-1"><span class="section-number">2.10</span> Dentro de cada grupo, ¿por qué las variables del grupo tienen una longitud de 1?</h2>
+<p><a href="#j-trace">Arriba</a>, <code>x</code> es una variable de agrupación y (a partir de la v1.6.1) tiene <code>length</code> 1 (si se inspecciona o se usa en <code>j</code>). Esto se hace por eficiencia y conveniencia. Por lo tanto, no hay diferencia entre las dos siguientes afirmaciones:</p>
+<pre><code class="language-r">DT[ , .(g = 1, h = 2, i = 3, j = 4, repeatgroupname = x, sum(y)), by = x]
+</code></pre>
+<pre><code>##         x     g     h     i     j repeatgroupname    V6
+##    &lt;char&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt;          &lt;char&gt; &lt;int&gt;
+## 1:      a     1     2     3     4               a     3
+## 2:      b     1     2     3     4               b    12
+</code></pre>
+<pre><code class="language-r">DT[ , .(g = 1, h = 2, i = 3, j = 4, repeatgroupname = x[1], sum(y)), by = x]
+</code></pre>
+<pre><code>##         x     g     h     i     j repeatgroupname    V6
+##    &lt;char&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt;          &lt;char&gt; &lt;int&gt;
+## 1:      a     1     2     3     4               a     3
+## 2:      b     1     2     3     4               b    12
+</code></pre>
+<p>Si necesita el tamaño del grupo actual, utilice <code>.N</code> en lugar de llamar a <code>length()</code> en cualquier columna.</p>
+<h2 id="sec:solo-se-imprimen-las-primeras-10-filas-c-mo-imprimo-m-s"><span class="section-number">2.11</span> Solo se imprimen las primeras 10 filas, ¿cómo imprimo más?</h2>
+<p>Aquí ocurren dos cosas. Primero, si el número de filas en una tabla data.table es grande (<code>&gt; 100</code> por defecto), se imprime un resumen de la tabla en la consola por defecto. Segundo, el resumen de una tabla data.table grande se imprime tomando las <code>n</code> filas superiores e inferiores (<code>= 5</code> por defecto) de la tabla data.table e imprimiendo solo esas. Ambos parámetros (cuándo activar un resumen y qué parte de la tabla usar como resumen) se pueden configurar mediante el mecanismo <code>options</code> de R o llamando directamente a la función <code>print</code>.</p>
+<p>Por ejemplo, para que el resumen de una tabla data.table solo se realice cuando esta tenga más de 50 filas, podría usar <code>options(datatable.print.nrows = 50)</code>. Para deshabilitar el resumen predeterminado por completo, podría usar <code>options(datatable.print.nrows = Inf)</code>. También podría llamar a <code>print</code> directamente, como en <code>print(your.data.table, nrows = Inf)</code>.</p>
+<p>Si desea mostrar más de las 10 filas superiores (e inferiores) de un resumen de data.table (digamos que prefiere 20), configure <code>options(datatable.print.topn = 20)</code>, por ejemplo. También puede llamar a <code>print</code> directamente, como en <code>print(your.data.table, topn = 20)</code>.</p>
+<h2 id="sec:con-una-uni-n-x-y-qu-pasa-si-x-contiene-una-columna-llamada-quot-y-quot"><span class="section-number">2.12</span> Con una unión <code>X[Y]</code>, ¿qué pasa si <code>X</code> contiene una columna llamada <code>&quot;Y&quot;</code>?</h2>
+<p>Cuando <code>i</code> es un nombre único, como <code>Y</code>, se evalúa en el marco de llamada. En todos los demás casos, como las llamadas a <code>.()</code> u otras expresiones, <code>i</code> se evalúa dentro del ámbito de <code>X</code>. Esto facilita las autouniones sencillas, como <code>X[J(unique(colA)), mult = &quot;first&quot;]</code>.</p>
+<h2 id="sec:x-z-y-falla-porque-x-contiene-una-columna-quot-y-quot-me-gustar-a-usar-la-tabla-y-en-el-mbito-de-llamada"><span class="section-number">2.13</span> <code>X[Z[Y]]</code> falla porque <code>X</code> contiene una columna <code>&quot;Y&quot;</code>. Me gustaría usar la tabla <code>Y</code> en el ámbito de llamada.</h2>
+<p>La parte <code>Z[Y]</code> no es un nombre único, por lo que se evalúa dentro del marco de <code>X</code> y surge el problema. Pruebe <code>tmp = Z[Y]; X[tmp]</code>. Esto es robusto para <code>X</code> que contiene una columna <code>&quot;tmp&quot;</code>, ya que <code>tmp</code> es un nombre único. Si se encuentran conflictos de este tipo con frecuencia, una solución sencilla podría ser nombrar todas las tablas en mayúsculas y todos los nombres de las columnas en minúsculas, o algún esquema similar.</p>
+<h2 id="sec:puedes-explicar-con-m-s-detalle-por-qu-data-table-est-inspirado-en-la-sintaxis-a-b-en-base"><span class="section-number">2.14</span> ¿Puedes explicar con más detalle por qué data.table está inspirado en la sintaxis ‘A[B]’ en ‘base’?</h2>
+<p>Considere la sintaxis <code>A[B]</code> usando una matriz de ejemplo <code>A</code>:</p>
+<pre><code class="language-r">A = matrix(1:12, nrow = 4)
+A
+</code></pre>
+<pre><code>##      [,1] [,2] [,3]
+## [1,]    1    5    9
+## [2,]    2    6   10
+## [3,]    3    7   11
+## [4,]    4    8   12
+</code></pre>
+<p>Para obtener las celdas <code>(1, 2) = 5</code> y <code>(3, 3) = 11</code> muchos usuarios (creemos) pueden intentar esto primero:</p>
+<pre><code class="language-r">A[c(1, 3), c(2, 3)]
+</code></pre>
+<pre><code>##      [,1] [,2]
+## [1,]    5    9
+## [2,]    7   11
+</code></pre>
+<p>Sin embargo, esto devuelve la unión de esas filas y columnas. Para referenciar las celdas, se requiere una matriz de dos columnas. <code>?Extract</code> dice:</p>
+<blockquote>
+<p>Al indexar matrices mediante <code>[</code>, un único argumento <code>i</code> puede ser una matriz con tantas columnas como dimensiones de <code>x</code>; el resultado es entonces un vector con elementos correspondientes a los conjuntos de índices en cada fila de <code>i</code>.</p>
+</blockquote>
+<p>Vamos a intentarlo de nuevo.</p>
+<pre><code class="language-r">B = cbind(c(1, 3), c(2, 3))
+B
+</code></pre>
+<pre><code>##      [,1] [,2]
+## [1,]    1    2
+## [2,]    3    3
+</code></pre>
+<pre><code class="language-r">A[B]
+</code></pre>
+<pre><code>## [1]  5 11
+</code></pre>
+<p>Una matriz es una estructura bidimensional con nombres de filas y columnas. ¿Podemos hacer lo mismo con los nombres?</p>
+<pre><code class="language-r">rownames(A) = letters[1:4]
+colnames(A) = LETTERS[1:3]
+A
+</code></pre>
+<pre><code>##   A B  C
+## a 1 5  9
+## b 2 6 10
+## c 3 7 11
+## d 4 8 12
+</code></pre>
+<pre><code class="language-r">B = cbind(c(&quot;a&quot;, &quot;c&quot;), c(&quot;B&quot;, &quot;C&quot;))
+A[B]
+</code></pre>
+<pre><code>## [1]  5 11
+</code></pre>
+<p>Sí, podemos. ¿Podemos hacer lo mismo con un data.frame?</p>
+<pre><code class="language-r">A = data.frame(A = 1:4, B = letters[11:14], C = pi*1:4)
+rownames(A) = letters[1:4]
+A
+</code></pre>
+<pre><code>##   A B         C
+## a 1 k  3.141593
+## b 2 l  6.283185
+## c 3 m  9.424778
+## d 4 n 12.566371
+</code></pre>
+<pre><code class="language-r">B
+</code></pre>
+<pre><code>##      [,1] [,2]
+## [1,] &quot;a&quot;  &quot;B&quot; 
+## [2,] &quot;c&quot;  &quot;C&quot;
+</code></pre>
+<pre><code class="language-r">A[B]
+</code></pre>
+<pre><code>## [1] &quot;k&quot;         &quot; 9.424778&quot;
+</code></pre>
+<p>Pero, observe que el resultado se convirtió a <code>character</code>. R convirtió <code>A</code> a <code>matrix</code> primero para que la sintaxis funcionara, pero el resultado no es ideal. Intentemos convertir <code>B</code> en <code>data.frame</code>.</p>
+<pre><code class="language-r">B = data.frame(c(&quot;a&quot;, &quot;c&quot;), c(&quot;B&quot;, &quot;C&quot;))
+cat(try(A[B], silent = TRUE))
+</code></pre>
+<pre><code>## Error in `[.default`(A, B) : invalid subscript type 'list'
+</code></pre>
+<p>Por lo tanto, no podemos filtrar un <code>data.frame</code> con otro <code>data.frame</code> en R base. ¿Qué sucede si queremos nombres de fila y de columna que no sean <code>character</code>, sino <code>entero</code> o <code>float</code>? ¿Qué sucede si queremos más de dos dimensiones de tipos mixtos? Introduzcamos data.table.</p>
+<p>Más aún, las matrices, en especial las dispersas, suelen almacenarse en una tupla de tres columnas: <code>(i, j, valor)</code>. Esto puede considerarse como un par clave-valor donde <code>i</code> y <code>j</code> forman una clave de dos columnas. Si tenemos más de un valor, quizás de diferentes tipos, podría ser <code>(i, j, val1, val2, val3, ...)</code>. Esto se parece mucho a un <code>data.frame</code>. Por lo tanto, data.table extiende <code>data.frame</code>, de modo que un <code>data.frame</code> <code>X</code> puede ser «filtrado» por un <code>data.frame</code> <code>Y</code>, lo que da lugar a la sintaxis <code>X[Y]</code>.</p>
+<h2 id="sec:se-puede-cambiar-r-base-para-que-haga-esto-en-lugar-de-un-nuevo-paquete"><span class="section-number">2.15</span> ¿Se puede cambiar R base para que haga esto, en lugar de un nuevo paquete?</h2>
+<p><code>data.frame</code> se usa <em>en todas partes</em>, por lo que es muy difícil modificarlo. data.table <em>hereda</em> de <code>data.frame</code>. También <em>es</em> un <code>data.frame</code>. Un data.table <em>puede</em> pasarse a cualquier paquete que <em>solo</em> acepte <code>data.frame</code>. Cuando ese paquete usa la sintaxis <code>[.data.frame</code> en el data.table, funciona. Esto se debe a que <code>[.data.table</code> verifica desde dónde se llamó. Si se llamó desde dicho paquete, <code>[.data.table</code> desvía a <code>[.data.frame</code>.</p>
+<h2 id="sec:he-o-do-que-la-sintaxis-data-table-es-an-loga-a-sql"><span class="section-number">2.16</span> He oído que la sintaxis data.table es análoga a SQL.</h2>
+<p>Sí:</p>
+<ul>
+<li><code>i</code> \(\Leftrightarrow\) donde</li>
+<li><code>j</code> \(\Leftrightarrow\) select</li>
+<li><code>:=</code> \(\Leftrightarrow\) actualizar</li>
+<li><code>por</code> \(\Leftrightarrow\) group by</li>
+<li><code>i</code> \(\Leftrightarrow\) order by (en sintaxis compuesta)</li>
+<li><code>i</code> \(\Leftrightarrow\) having (en sintaxis compuesta)</li>
+<li><code>nomatch = NA</code> \(\Leftrightarrow\) outer join</li>
+<li><code>nomatch = NULL</code> \(\Leftrightarrow\) inner join</li>
+<li><code>mult = &quot;first&quot;|&quot;last&quot;</code> \(\Leftrightarrow\) N/A porque SQL es inherentemente desordenado</li>
+<li><code>roll = TRUE</code> \(\Leftrightarrow\) N/A porque SQL es inherentemente desordenado</li>
+</ul>
+<p>La forma general es:</p>
+<pre><code class="language-r">DT[where, select|update, group by][order by][...] ... [...]
+</code></pre>
+<p>Una ventaja clave de los vectores columna en R es que están <em>ordenados</em>, a diferencia de SQL<sup class="footnote-ref"><a href="#fn-2" id="fnref-2" data-footnote-ref>2</a></sup>. Podemos usar funciones ordenadas en consultas <code>data.table</code>, como <code>diff()</code>, y cualquier función de R de cualquier paquete, no solo las definidas en SQL. Una desventaja es que los objetos de R deben caber en memoria; sin embargo, con varios paquetes de R como <code>ff</code>, <code>bigmemory</code>, <code>mmap</code> e <code>indexing</code>, esto está cambiando.</p>
+<h2 id="sec:cu-les-son-las-diferencias-de-sintaxis-m-s-peque-as-entre-data-frame-y-data-table-smallerdiffs"><span class="section-number">2.17</span> ¿Cuáles son las diferencias de sintaxis más pequeñas entre <code>data.frame</code> y data.table {#SmallerDiffs}?</h2>
+<ul>
+<li><code>DT[3]</code> se refiere a la 3ra <em>fila</em>, pero <code>DF[3]</code> se refiere a la 3ra <em>columna</em></li>
+<li><code>DT[3, ] == DT[3]</code>, pero <code>DF[ , 3] == DF[3]</code> (de manera algo confusa en data.frame, mientras que data.table es consistente)</li>
+<li>Por esta razón decimos que la coma es <em>opcional</em> en <code>DT</code>, pero no opcional en <code>DF</code></li>
+<li><code>DT[[3]] == DF[, 3] == DF[[3]]</code></li>
+<li><code>DT[i, ]</code>, donde <code>i</code> es un entero único, devuelve una sola fila, al igual que <code>DF[i, ]</code>, pero a diferencia de un filtro de de matriz de una sola fila, que devuelve un vector.</li>
+<li><code>DT[ , j]</code> donde <code>j</code> es un entero único, devuelve un data.table de una columna, a diferencia de <code>DF[, j]</code> que devuelve un vector de manera predeterminada</li>
+<li><code>DT[ , &quot;colA&quot;][[1]] == DF[ , &quot;colA&quot;]</code>.</li>
+<li><code>DT[ , colA] == DF[ , &quot;colA&quot;]</code> (actualmente en data.table v1.9.8 pero está a punto de cambiar, consulte las notas de la versión)</li>
+<li><code>DT[ , list(colA)] == DF[ , &quot;colA&quot;, drop = FALSE]</code></li>
+<li><code>DT[NA]</code> devuelve 1 fila de <code>NA</code>, pero <code>DF[NA]</code> devuelve una copia completa de <code>DF</code> que contiene <code>NA</code> en todas partes. El símbolo «NA» es de tipo «lógico» en R y, por lo tanto, se recicla mediante «[.data.frame». La intención del usuario probablemente era «DF[NA_integer_]». <code>[.data.table</code> desvía a esta probable intención automáticamente, por conveniencia.</li>
+<li><code>DT[c(TRUE, NA, FALSE)]</code> trata el <code>NA</code> como <code>FALSE</code>, pero <code>DF[c(TRUE, NA, FALSE)]</code> devuelve===== <code>NA</code> filas para cada <code>NA</code> ===== - <code>DT[ColA == ColB]</code> es más simple que <code>DF[!is.na(ColA) &amp; !is.na(ColB) &amp; ColA == ColB, ]</code></li>
+<li><code>data.frame(list(1:2, &quot;k&quot;, 1:4))</code> crea 3 columnas, data.table crea una columna <code>list</code>.</li>
+<li><code>check.names</code> es por defecto <code>TRUE</code> en <code>data.frame</code> pero <code>FALSE</code> en data.table, por conveniencia.</li>
+<li><code>data.table</code> siempre ha establecido <code>stringsAsFactors=FALSE</code> por defecto. En R 4.0.0 (abril de 2020), el valor predeterminado de <code>data.frame</code> se cambió de <code>TRUE</code> a <code>FALSE</code> y ya no existe diferencia en este aspecto. - Los vectores atómicos en las columnas <code>list</code> se contraen cuando se imprimen usando <code>&quot;, &quot;</code> en <code>data.frame</code>, pero <code>&quot;,&quot;</code> en data.table con una coma final después del sexto elemento para evitar la impresión accidental de objetos incrustados grandes.</li>
+<li>A diferencia de data.frames, un data.table no puede almacenar filas sin columnas, ya que las filas se consideran hijas de las columnas: <code>nrow(DF[, 0])</code> devuelve el número de filas, mientras que <code>nrow(DT[, 0])</code> siempre devuelve 0; pero vea el problema <a href="https://github.com/Rdatatable/data.table/issues/2422">#2422</a>.</li>
+</ul>
+<p>En <code>[.data.frame</code>, solemos configurar <code>drop = FALSE</code>. Si nos olvidamos, pueden surgir errores en casos extremos donde se seleccionan columnas individuales y, de repente, se devuelve un vector en lugar de una sola columna <code>data.frame</code>. En <code>[.data.table</code>, aprovechamos la oportunidad para hacerlo consistente y eliminamos <code>drop</code>.</p>
+<p>Cuando se pasa un data.table a un paquete que no lo tiene en cuenta, ese paquete no se preocupa por ninguna de estas diferencias; simplemente funciona.</p>
+<h2 id="sec:estoy-usando-j-solo-por-su-efecto-secundario-pero-sigo-obteniendo-datos-c-mo-puedo-detenerlo"><span class="section-number">2.18</span> Estoy usando <code>j</code> solo por su efecto secundario, pero sigo obteniendo datos. ¿Cómo puedo detenerlo?</h2>
+<p>En este caso, <code>j</code> se puede envolver con <code>invisible()</code>; por ejemplo, <code>DT[ , invisible(hist(colB)), by = colA]</code><sup class="footnote-ref"><a href="#fn-3" id="fnref-3" data-footnote-ref>3</a></sup></p>
+<h2 id="sec:por-qu-data-table-ahora-tiene-un-argumento-drop-desde-v1-5"><span class="section-number">2.19</span> ¿Por qué <code>[.data.table</code> ahora tiene un argumento <code>drop</code> desde v1.5?</h2>
+<p>Para que data.table pueda heredar de <code>data.frame</code> sin usar <code>...</code>. Si usáramos <code>...</code>, no se detectarían los nombres de argumentos no válidos.</p>
+<p>El argumento <code>drop</code> nunca se utiliza en <code>[.data.table</code>. Es un marcador de posición para paquetes que no son compatibles con data.table cuando usan la sintaxis <code>[.data.frame</code> directamente en un data.table.</p>
+<h2 id="sec:las-uniones-continuas-son-geniales-y-rapid-simas-fue-dif-cil-programarlas"><span class="section-number">2.20</span> ¡Las uniones continuas son geniales y rapidísimas! ¿Fue difícil programarlas?</h2>
+<p>La fila que prevalece en o antes de la fila <code>i</code> es la última fila que la búsqueda binaria prueba. Por lo tanto, <code>roll = TRUE</code> es básicamente un cambio en el código C de búsqueda binaria para devolver esa fila.</p>
+<h2 id="sec:por-qu-dt-i-col-value-devuelve-dt-completo-esperaba-que-no-hubiera-ning-n-valor-visible-consistente-con-lt-o-un-mensaje-o-valor-de-retorno-que-indicara-cu-ntas-filas-se-actualizaron-no-es-evidente-que-los-datos-se-hayan-actualizado-por-referencia"><span class="section-number">2.21</span> ¿Por qué <code>DT[i, col := value]</code> devuelve <code>DT</code> completo? Esperaba que no hubiera ningún valor visible (consistente con <code>&lt;-</code>), o un mensaje o valor de retorno que indicara cuántas filas se actualizaron. No es evidente que los datos se hayan actualizado por referencia.</h2>
+<p>Esto ha cambiado en la v1.8.3 para cumplir con sus expectativas. Actualice.</p>
+<p>Se devuelve la totalidad de <code>DT</code> (ahora de forma invisible) para que la sintaxis compuesta funcione; p. ej., <code>DT[i, done := TRUE][ , sum(done)]</code>. El número de filas actualizadas se devuelve cuando <code>verbose</code> es <code>TRUE</code>, ya sea por consulta o globalmente mediante <code>options(datatable.verbose = TRUE)</code>.</p>
+<h2 id="sec:bien-gracias-qu-ten-a-de-dif-cil-que-el-resultado-de-dt-i-col-valor-se-devolviera-de-forma-invisible"><span class="section-number">2.22</span> Bien, gracias. ¿Qué tenía de difícil que el resultado de <code>DT[i, col := valor]</code> se devolviera de forma invisible?</h2>
+<p>R activa internamente la visibilidad para <code>[</code>. El valor de la columna eval de FunTab (ver <a href="https://github.com/wch/r-source/blob/trunk/src/main/names.c">src/main/names.c</a>) para <code>[</code> es <code>0</code>, lo que significa que se activa <code>R_Visible</code> (ver <a href="https://cran.r-project.org/doc/manuals/r-release/R-ints.html#Autoprinting">R-Internals sección 1.6</a>). Por lo tanto, al intentar <code>invisible()</code> o configurar <code>R_Visible</code> a <code>0</code> directamente, <code>eval</code> en <a href="https://github.com/wch/r-source/blob/trunk/src/main/eval.c">src/main/eval.c</a> lo activaba de nuevo.</p>
+<p>Para solucionar este problema, la clave fue dejar de intentar detener la ejecución del método de impresión después de un <code>:=</code>. En su lugar, dentro de <code>:=</code> ahora (a partir de la v1.8.3) configuramos un indicador global que el método de impresión usa para determinar si imprimir o no.</p>
+<h2 id="sec:por-qu-a-veces-tengo-que-escribir-dt-dos-veces-despu-s-de-usar-para-imprimir-el-resultado-en-la-consola"><span class="section-number">2.23</span> ¿Por qué a veces tengo que escribir ‘DT’ dos veces después de usar ‘:=’ para imprimir el resultado en la consola?</h2>
+<p>Esta es una desventaja desafortunada para que <a href="https://github.com/Rdatatable/data.table/issues/869">#869</a> funcione. Si se usa un <code>:=</code> dentro de una función sin <code>DT[]</code> antes del final de la función, la próxima vez que se escriba <code>DT</code> en el prompt, no se imprimirá nada. Un <code>DT</code> repetido se imprimirá. Para evitar esto: incluya un <code>DT[]</code> después del último <code>:=</code> en su función. Si eso no es posible (por ejemplo, no es una función que pueda cambiar), se garantiza que <code>print(DT)</code> y <code>DT[]</code> en el prompt se imprimirán. Como antes, agregar un <code>[]</code> adicional al final de la consulta <code>:=</code> es un modismo recomendado para actualizar y luego imprimir; por ejemplo, <code>DT[,foo:=3L][]</code>.</p>
+<h2 id="sec:he-observado-que-base-cbind-data-frame-y-base-rbind-data-frame-parecen-ser-modificados-por-data-table-c-mo-es-posible-por-qu"><span class="section-number">2.24</span> He observado que <code>base::cbind.data.frame</code> (y <code>base::rbind.data.frame</code>) parecen ser modificados por data.table. ¿Cómo es posible? ¿Por qué?</h2>
+<p>Era una solución temporal de último recurso antes de que se corrigiera la resolución de métodos S3 de rbind y cbind en R &gt;= 4.0.0. En esencia, el problema residía en que <code>data.table</code> hereda de <code>data.frame</code>, <em>y</em> <code>base::cbind</code> y <code>base::rbind</code> (de forma única) realizan su propia resolución S3 internamente, como se documenta en <code>?cbind</code>. La solución alternativa para <code>data.table</code> consistía en añadir un bucle <code>for</code> al inicio de cada función directamente en <code>base</code>. Esta modificación se realizaba dinámicamente; es decir, se obtuvo la definición <code>base</code> de <code>cbind.data.frame</code>, se añadía el bucle <code>for</code> al inicio y luego se volvía a asignar a <code>base</code>. Esta solución se diseñó para ser robusta ante varias definiciones de <code>base::cbind.data.frame</code> en diferentes versiones de R, incluyendo cambios futuros desconocidos. Funcionó correctamente. Los requisitos en conflicto eran:</p>
+<ul>
+<li>
+<p><code>cbind(DT, DF)</code> debe funcionar. La definición de <code>cbind.data.table</code> no funcionaba porque <code>base::cbind</code> realizaba su propia resolución S3 y requería (antes de R 4.0.0) que el <em>primer</em> método <code>cbind</code> para cada objeto que se le pasa fuera <em>idéntico</em>. Esto no se cumple en <code>cbind(DT, DF)</code>, ya que el primer método para <code>DT</code> es <code>cbind.data.table</code>, pero el primer método para <code>DF</code> es <code>cbind.data.frame</code>. <code>base::cbind</code> entonces fallaba en su código interno <code>bind</code>, que parece tratar <code>DT</code> como una <code>lista</code> normal y devuelve una salida <code>matrix</code> de aspecto extraño e inutilizable. Véase <a href="#cbinderror">a continuación</a>. No podemos simplemente aconsejar a los usuarios que no llamen a <code>cbind(DT, DF)</code> porque paquetes como <code>ggplot2</code> hacen dicha llamada (<a href="https://github.com/Rdatatable/data.table/blob/master/inst/tests/tests.Rraw#L444-L447">prueba 167.2</a>).</p>
+</li>
+<li>
+<p>Esto, naturalmente, llevó a intentar enmascarar <code>cbind.data.frame</code>. Dado que un data.table es un <code>data.frame</code>, <code>cbind</code> encontraría el mismo método para <code>DT</code> y <code>DF</code>. Sin embargo, esto tampoco funcionó porque <code>base::cbind</code> parece encontrar primero los métodos en <code>base</code>; <em>es decir</em>, <code>base::cbind.data.frame</code> no es enmascarable.</p>
+</li>
+<li>
+<p>Finalmente, intentamos enmascarar <code>cbind</code> (v1.6.5 y v1.6.6). Esto permitió que <code>cbind(DT, DF)</code> funcionara, pero introdujo problemas de compatibilidad con el paquete <code>IRanges</code>, ya que <code>IRanges</code> también enmascara <code>cbind</code>. Funcionaba si <code>IRanges</code> estaba en una posición inferior a data.table en la ruta <code>search()</code>, pero si <code>IRanges</code> estaba en una posición superior a data.table, <code>cbind</code> nunca se llamaría y la salida de <code>matrix</code>, de aspecto extraño, volvía a aparecer (ver <a href="#cbinderror">abajo</a>).</p>
+</li>
+</ul>
+<p>Muchas gracias al equipo central de R por solucionar el problema en septiembre de 2019. data.table v1.12.6+ ya no aplica la solución alternativa en R &gt;= 4.0.0.</p>
+<h2 id="r-dispatch"><span class="section-number">2.25</span> He leído sobre la resolución de métodos (p. ej., “merge” puede o no derivar a “merge.data.table”), pero ¿cómo sabe R cómo derivar? ¿Son los puntos significativos o especiales? ¿Cómo sabe R a qué función resolver y cuándo?</h2>
+<p>Esto se menciona con frecuencia, pero es increíblemente simple. Una función como <code>merge</code> es <em>genérica</em> si consiste en una llamada a <code>UseMethod</code>. Cuando se habla de si las funciones son o no <em>genéricas</em>, simplemente se escribe la función sin <code>()</code> después, se revisa el código del programa que contiene y si ven una llamada a <code>UseMethod</code>, entonces es <em>genérica</em>. ¿Qué hace <code>UseMethod</code>? Literalmente, combina el nombre de la función con la clase del primer argumento, separados por un punto (<code>.</code>) y luego llama a esa función, pasando los mismos argumentos. Así de simple. Por ejemplo, <code>merge(X, Y)</code> contiene una llamada a <code>UseMethod</code>, lo que significa que luego <em>despacha</em> (es decir, llama) a <code>paste(&quot;merge&quot;, class(X), sep = &quot;.&quot;)</code>. Las funciones con puntos en su nombre pueden ser métodos o no. El punto es irrelevante, salvo que sea el separador que usa <code>UseMethod</code>. Conocer estos antecedentes debería ayudar a comprender por qué, por ejemplo, es obvio para los usuarios de R que <code>as.data.table.data.frame</code> es el método <code>data.frame</code> de la función genérica <code>as.data.table</code>. Además, puede ser útil aclarar que, sí, tienes razón, su nombre no indica que <code>ls.fit</code> no sea el método de ajuste de la función genérica <code>ls</code>. Solo se sabe escribiendo <code>ls</code> (no <code>ls()</code>) y observando que no se trata de una sola llamada a <code>UseMethod</code>.</p>
+<p>Quizás te preguntes: ¿dónde está documentado esto en R? Respuesta: Está bastante claro, pero primero debe saber que debe buscar en <code>?UseMethod</code> y <em>ese</em> archivo de ayuda contiene:</p>
+<blockquote>
+<p>Cuando se aplica una función que llama a <code>UseMethod('fun')</code> a un objeto con el atributo de clase <code>c('first', 'second')</code>, el sistema busca una función llamada <code>fun.first</code> y, si la encuentra, la aplica al objeto. Si no se encuentra dicha función, se prueba con una función llamada <code>fun.second</code>. Si ningún nombre de clase produce una función adecuada, se utiliza la función <code>fun.default</code>, si existe, o se produce un error.</p>
+</blockquote>
+<p>Afortunadamente, una búsqueda en internet de “How does R method dispatch work” (N. de T.:”¿Cómo funciona el despacho de métodos en R?”), al momento de escribir esto muestra la página de ayuda “UseMethod” entre los primeros enlaces. Es cierto que otros enlaces profundizan rápidamente en las complejidades de S3 vs. S4, genéricos internos, etc.</p>
+<p>Sin embargo, características como el despacho básico de S3 (pegar el nombre de la función junto con el de la clase) son la razón por la que a algunos usuarios de R les encanta. Es muy simple. No se requieren registros ni firmas complejas. No hay mucho que aprender. Para crear el método <code>merge</code> para data.table, literalmente, solo se necesitó crear una función llamada <code>merge.data.table</code>.</p>
+<h2 id="sec:por-qu-t-y-f-se-comportan-de-manera-diferente-a-true-y-false-en-algunas-consultas-data-table"><span class="section-number">2.26</span> ¿Por qué <code>T</code> y <code>F</code> se comportan de manera diferente a <code>TRUE</code> y <code>FALSE</code> en algunas consultas <code>data.table</code>?</h2>
+<p>Usar <code>T</code> y <code>F</code> como abreviaturas de <code>TRUE</code> y <code>FALSE</code> en <code>data.table</code> puede provocar un comportamiento inesperado. Esto se debe a que <code>T</code> y <code>F</code> son variables globales redefinibles, lo que hace que se traten como nombres de variable en lugar de constantes lógicas. Este problema no ocurre con <code>TRUE</code> y <code>FALSE</code>. Se recomienda evitar <code>T</code> y <code>F</code> para usar R en general, pero se presenta en <code>data.table</code> de maneras sorprendentes, por ejemplo:</p>
+<pre><code class="language-r">DT &lt;- data.table(x=rep(c(&quot;a&quot;, &quot;b&quot;, &quot;c&quot;), each = 3), y=c(1, 3, 6), v=1:9)
+
+# Using TRUE/FALSE works as expected in cases like the ones below:
+
+DT[, .SD, .SDcols=c(TRUE, TRUE, FALSE)]
+# A) This selects the first two columns (x and y) and excludes the third one (v). Output:
+#&gt;    x y
+#&gt; 1: a 1
+#&gt; 2: a 3
+#&gt; 3: a 6
+#&gt; 4: b 1
+#&gt; 5: b 3
+#&gt; 6: b 6
+#&gt; 7: c 1
+#&gt; 8: c 3
+#&gt; 9: c 6
+
+DT[, .SD, .SDcols=c(T, T, F), with=FALSE]
+# B) This forces data.table to treat T/F as logical constants.
+# Same output as DT[, .SD, .SDcols=c(TRUE, TRUE, FALSE)]
+
+# But, using T/F may lead to unexpected behavior in cases like:
+
+DT[, .SD, .SDcols=c(T, T, F)]
+# data.table treats T and F as variable names here, not logical constants. Output:
+#&gt; Detected that j uses these columns: &lt;none&gt;
+#&gt; [1]  TRUE  TRUE FALSE
+</code></pre>
+<p>Como consejo general, <code>lintr::T_and_F_symbol_linter()</code> detecta el uso de <code>T</code> y <code>F</code> y sugiere reemplazarlos con <code>TRUE</code> y <code>FALSE</code> para evitar tales problemas.</p>
+<h1 id="chp:preguntas-relacionadas-con-el-tiempo-de-c-mputo"><span class="section-number main-number">3</span> Preguntas relacionadas con el tiempo de cómputo</h1>
+<h2 id="sec:tengo-20-columnas-y-muchas-filas-por-qu-una-expresi-n-de-una-sola-columna-es-tan-r-pida"><span class="section-number">3.1</span> Tengo 20 columnas y muchas filas. ¿Por qué una expresión de una sola columna es tan rápida?</h2>
+<p>Varias razones:</p>
+<ul>
+<li>Solo se agrupa esa columna; las otras 19 se ignoran porque data.table inspecciona la expresión <code>j</code> y detecta que no utiliza las demás columnas.</li>
+<li>Se realiza una asignación de memoria solo para el grupo más grande, y luego esa memoria se reutiliza para los demás grupos. Hay muy poca basura que recolectar.</li>
+<li>R es un almacén de columnas en memoria; es decir, las columnas son contiguas en la RAM. Se minimiza la recuperación de páginas de la RAM a la caché L2.</li>
+</ul>
+<h2 id="sec:no-tengo-una-clave-en-una-tabla-grande-pero-aun-as-la-agrupaci-n-es-muy-r-pida-por-qu"><span class="section-number">3.2</span> No tengo una clave en una tabla grande, pero aun así la agrupación es muy rápida. ¿Por qué?</h2>
+<p>data.table utiliza ordenamiento <em>radix</em>. Esto es significativamente más rápido que otros algoritmos de ordenamiento. Para más información, consulte <a href="https://github.com/Rdatatable/data.table/wiki/Presentations">nuestras presentaciones</a>, en particular las de useR!2015 Dinamarca.</p>
+<p>Esta es también una razón por la que <code>setkey()</code> es rápido.</p>
+<p>Cuando no se establece ninguna <code>clave</code>, o agrupamos en un orden diferente al de la clave, lo llamamos un <code>por</code> <em>ad hoc</em>.</p>
+<h2 id="sec:por-qu-la-agrupaci-n-por-columnas-en-la-clave-es-m-s-r-pida-que-un-por-ad-hoc"><span class="section-number">3.3</span> ¿Por qué la agrupación por columnas en la clave es más rápida que un <code>por</code> <em>ad hoc</em>?</h2>
+<p>Debido a que cada grupo es contiguo en RAM, se minimizan las búsquedas de páginas y la memoria se puede copiar en masa (<code>memcpy</code> en C) en lugar de realizar un bucle en C.</p>
+<h2 id="sec:qu-son-los-ndices-primarios-y-secundarios-en-data-table"><span class="section-number">3.4</span> ¿Qué son los índices primarios y secundarios en data.table?</h2>
+<p>Manual: <a href="https://www.rdocumentation.org/packages/data.table/functions/setkey"><code>?setkey</code></a> SO: <a href="https://stackoverflow.com/questions/20039335/what-is-the-purpose-of-setting-a-key-in-data-table/20057411#20057411">¿Cuál es el propósito de establecer una clave en data.table?</a></p>
+<p><code>setkey(DT, col1, col2)</code> ordena las filas por la columna <code>col1</code> y, dentro de cada grupo de <code>col1</code>, las ordena por <code>col2</code>. Este es un <em>índice primario</em>. El orden de las filas se modifica <em>por referencia</em> en la RAM. Las uniones y agrupaciones posteriores en esas columnas clave aprovechan el orden de ordenación para mayor eficiencia. (Imagine lo difícil que sería buscar un número de teléfono en una guía telefónica impresa si no estuviera ordenado por apellido y nombre. Eso es literalmente todo lo que hace <code>setkey</code>: ordena las filas por las columnas que especifique). El índice no utiliza RAM. Simplemente modifica el orden de las filas en la RAM y marca las columnas clave. Análogo a un <em>índice agrupado</em> en SQL.</p>
+<p>Sin embargo, solo puede tener una clave principal porque los datos solo se pueden ordenar físicamente en RAM de una manera a la vez. Elija el índice principal para que sea el que use con más frecuencia (por ejemplo, <code>[id,date]</code>). A veces no hay una elección obvia para la clave principal o necesita unir y agrupar muchas columnas diferentes en diferentes órdenes. Ingrese un índice secundario. Esto usa memoria (<code>4*nrow</code> bytes independientemente del número de columnas en el índice) para almacenar el orden de las filas por las columnas que especifique, pero en realidad no reordena las filas en RAM. Las uniones y grupos posteriores aprovechan el orden de la clave secundaria, pero necesitan <em>saltar</em> a través de ese índice, por lo que no son tan eficientes como los índices primarios. Pero aún así, mucho más rápido que un escaneo vectorial completo. No hay límite para el número de índices secundarios, ya que cada uno es solo un vector de ordenación diferente. Normalmente no necesita crear índices secundarios. Se crean automáticamente y se usan automáticamente para usted usando data.table normalmente; <em>p. ej.</em> <code>DT[someCol == someVal, ]</code> y <code>DT[someCol %in% someVals, ]</code> crearán, adjuntarán y usarán el índice secundario. Esto es más rápido en data.table que un escaneo vectorial, por lo que la indexación automática está activada por defecto, ya que no hay penalización inicial. Existe una opción para desactivar la indexación automática; <em>p. ej.</em>, si se crean muchos índices e incluso la relativamente pequeña cantidad de memoria adicional resulta excesiva.</p>
+<p>Usamos las palabras <em>índice</em> y <em>clave</em> indistintamente.</p>
+<h1 id="chp:mensajes-de-error"><span class="section-number main-number">4</span> Mensajes de error</h1>
+<h2 id="sec:no-se-pudo-encontrar-la-funci-n-dt"><span class="section-number">4.1</span> “No se pudo encontrar la función <code>DT</code>”</h2>
+<p>Ver arriba <a href="#DTremove1">aquí</a> y <a href="#DTremove2">aquí</a>.</p>
+<h2 id="sec:argumentos-no-utilizados-mysum-sum-v"><span class="section-number">4.2</span> “argumentos no utilizados (<code>MySum = sum(v)</code>)”</h2>
+<p>Este error es generado por <code>DT[ , MySum = sum(v)]</code>. Se pretendía <code>DT[ , .(MySum = sum(v))]</code>, o <code>DT[ , j = .(MySum = sum(v))]</code>.</p>
+<h2 id="sec:translatecharutf8-debe-llamarse-en-un-charsxp"><span class="section-number">4.3</span> “<code>translateCharUTF8</code> debe llamarse en un <code>CHARSXP</code>”</h2>
+<p>Este error (y otros similares, por ejemplo, “<code>getCharCE</code> debe llamarse en un <code>CHARSXP</code>”) podría no tener nada que ver con los datos de caracteres ni con la configuración regional. En realidad, podría ser un síntoma de una corrupción de memoria previa. Hasta la fecha, estos errores se han podido reproducir y se han solucionado rápidamente. Por favor, repórtelo a nuestro <a href="https://github.com/Rdatatable/data.table/issues">rastreador de problemas</a>.</p>
+<h2 id="cbinderror"><span class="section-number">4.4</span> <code>cbind(DT, DF)</code> devuelve un formato extraño, <em>por ejemplo</em> <code>Integer,5</code></h2>
+<p>Esto también ocurre antes de la v1.6.5, con <code>rbind(DT, DF)</code>. Actualice a la v1.6.7 o posterior.</p>
+<h2 id="sec:no-se-puede-cambiar-el-valor-del-enlace-bloqueado-para-sd"><span class="section-number">4.5</span> “no se puede cambiar el valor del enlace bloqueado para <code>.SD</code>”</h2>
+<p><code>.SD</code> está bloqueado por diseño. Consulte <code>?data.table</code>. Si desea manipular <code>.SD</code> antes de usarlo o devolverlo, y no desea modificar <code>DT</code> con <code>:=</code>, primero haga una copia (consulte <code>?copy</code>), por ejemplo:</p>
+<pre><code class="language-r">DT = data.table(a = rep(1:3, 1:3), b = 1:6, c = 7:12)
+DT
+</code></pre>
+<pre><code>##        a     b     c
+##    &lt;int&gt; &lt;int&gt; &lt;int&gt;
+## 1:     1     1     7
+## 2:     2     2     8
+## 3:     2     3     9
+## 4:     3     4    10
+## 5:     3     5    11
+## 6:     3     6    12
+</code></pre>
+<pre><code class="language-r">DT[ , { mySD = copy(.SD)
+      mySD[1, b := 99L]
+      mySD},
+    by = a]
+</code></pre>
+<pre><code>##        a     b     c
+##    &lt;int&gt; &lt;int&gt; &lt;int&gt;
+## 1:     1    99     7
+## 2:     2    99     8
+## 3:     2     3     9
+## 4:     3    99    10
+## 5:     3     5    11
+## 6:     3     6    12
+</code></pre>
+<h2 id="sec:no-se-puede-cambiar-el-valor-del-enlace-bloqueado-para-n"><span class="section-number">4.6</span> “no se puede cambiar el valor del enlace bloqueado para <code>.N</code>”</h2>
+<p>Actualice a la versión 1.8.1 o posterior. A partir de esta versión, si <code>.N</code> se devuelve mediante <code>j</code>, se renombra como <code>N</code> para evitar ambigüedades en cualquier agrupación posterior entre la variable especial <code>.N</code> y una columna llamada <code>&quot;.N&quot;</code>.</p>
+<p>El comportamiento anterior se puede reproducir forzando a que <code>.N</code> se llame <code>.N</code>, de la siguiente manera:</p>
+<pre><code class="language-r">DT = data.table(a = c(1,1,2,2,2), b = c(1,2,2,2,1))
+DT
+</code></pre>
+<pre><code>##        a     b
+##    &lt;num&gt; &lt;num&gt;
+## 1:     1     1
+## 2:     1     2
+## 3:     2     2
+## 4:     2     2
+## 5:     2     1
+</code></pre>
+<pre><code class="language-r">DT[ , list(.N = .N), list(a, b)]   # show intermediate result for exposition
+</code></pre>
+<pre><code>##        a     b    .N
+##    &lt;num&gt; &lt;num&gt; &lt;int&gt;
+## 1:     1     1     1
+## 2:     1     2     1
+## 3:     2     2     2
+## 4:     2     1     1
+</code></pre>
+<pre><code class="language-r">cat(try(
+    DT[ , list(.N = .N), by = list(a, b)][ , unique(.N), by = a]   # compound query more typical
+, silent = TRUE))
+</code></pre>
+<pre><code>## Error in `[.data.table`(DT[, list(.N = .N), by = list(a, b)], , unique(.N),  : 
+##   La columna '.N' no se puede agrupar porque entra en conflicto con la variable especial .N. Pruebe setnames(DT,'.N','N') primero.
+</code></pre>
+<p>Si ya está ejecutando v1.8.1 o posterior, entonces el mensaje de error ahora es más útil que el error “no se puede cambiar el valor del enlace bloqueado”, como puede ver arriba, ya que esta viñeta se produjo usando v1.8.1 o posterior.</p>
+<p>Ahora funciona la sintaxis más natural:</p>
+<pre><code class="language-r">if (packageVersion(&quot;data.table&quot;) &gt;= &quot;1.8.1&quot;) {
+    DT[ , .N, by = list(a, b)][ , unique(N), by = a]
+  }
+</code></pre>
+<pre><code>##        a    V1
+##    &lt;num&gt; &lt;int&gt;
+## 1:     1     1
+## 2:     2     2
+## 3:     2     1
+</code></pre>
+<pre><code class="language-r">if (packageVersion(&quot;data.table&quot;) &gt;= &quot;1.9.3&quot;) {
+    DT[ , .N, by = .(a, b)][ , unique(N), by = a]   # same
+}
+</code></pre>
+<pre><code>##        a    V1
+##    &lt;num&gt; &lt;int&gt;
+## 1:     1     1
+## 2:     2     2
+## 3:     2     1
+</code></pre>
+<h1 id="chp:mensajes-de-advertencia"><span class="section-number main-number">5</span> Mensajes de advertencia</h1>
+<h2 id="sec:los-siguientes-objetos-est-n-enmascarados-de-paquete-base-cbind-rbind"><span class="section-number">5.1</span> “Los siguientes objetos están enmascarados de <code>paquete:base</code>: <code>cbind</code>, <code>rbind</code>”</h2>
+<p>Esta advertencia solo aparecía en las versiones 1.6.5 y 1.6.6 al cargar el paquete. El objetivo era permitir que <code>cbind(DT, DF)</code> funcionara, pero resultó que esto interrumpía la compatibilidad total con el paquete <code>IRanges</code>. Actualice a la versión 1.6.7 o posterior.</p>
+<h2 id="sec:se-convirti-el-rhs-num-rico-a-entero-para-que-coincida-con-el-tipo-de-la-columna"><span class="section-number">5.2</span> “Se convirtió el RHS numérico a entero para que coincida con el tipo de la columna”</h2>
+<p>Espero que esto se explique por sí solo. El mensaje completo es:</p>
+<p>Se ha convertido el RHS numérico a entero para que coincida con el tipo de la columna; puede tener precisión truncada. Cambie la columna a numérica primero creando un nuevo vector numérico de longitud 5 (n filas de toda la tabla) y asignándolo (es decir, “reemplazar columna”), o convierta el RHS a entero (por ejemplo, 1L o as.integer) para aclarar su intención (y para mayor rapidez). O bien, configure el tipo de columna correctamente desde el principio al crear la tabla y manténgalo.</p>
+<p>Para generarlo, prueba:</p>
+<pre><code class="language-r">DT = data.table(a = 1:5, b = 1:5)
+suppressWarnings(
+DT[2, b := 6]         # works (slower) with warning
+)
+class(6)              # numeric not integer
+</code></pre>
+<pre><code>## [1] &quot;numeric&quot;
+</code></pre>
+<pre><code class="language-r">DT[2, b := 7L]        # works (faster) without warning
+class(7L)             # L makes it an integer
+</code></pre>
+<pre><code>## [1] &quot;integer&quot;
+</code></pre>
+<pre><code class="language-r">DT[ , b := rnorm(5)]  # 'replace' integer column with a numeric column
+</code></pre>
+<h2 id="sec:lectura-de-data-table-desde-un-archivo-rds-o-rdata"><span class="section-number">5.3</span> Lectura de data.table desde un archivo RDS o RData</h2>
+<p><code>*.RDS</code> y <code>*.RData</code> son tipos de archivo que permiten almacenar objetos R en memoria en disco de forma eficiente. Sin embargo, al almacenar <code>data.table</code> en un archivo binario, se pierde la sobreasignación de columnas (véase también <code>?truelength</code>). Esto no supone un gran problema: su <code>data.table</code> se copiará en memoria en la siguiente operación <em>por referencia</em> y generará una advertencia. Por lo tanto, se recomienda ejecutar <code>setDT()</code> en cada <code>data.table</code> cargado con <code>readRDS()</code> o <code>load()</code> para restaurar sus atributos internos. Si solo necesita preasignar espacio para nuevas columnas, también puede usar <code>setalloccol()</code>.</p>
+<p>Para obtener más detalles, consulte <code>?setDT</code> y <code>?truelength</code>.</p>
+<h1 id="chp:preguntas-generales-sobre-el-paquete"><span class="section-number main-number">6</span> Preguntas generales sobre el paquete</h1>
+<h2 id="sec:parece-que-la-versi-n-v1-3-falta-en-el-archivo-cran"><span class="section-number">6.1</span> ¿Parece que la versión v1.3 falta en el archivo CRAN?</h2>
+<p>Así es. La versión 1.3 solo estaba disponible en R-Forge. Se implementaron varios cambios importantes internamente, y las pruebas en desarrollo llevaron tiempo.</p>
+<h2 id="sec:es-data-table-compatible-con-s-plus"><span class="section-number">6.2</span> ¿Es data.table compatible con S-plus?</h2>
+<p>No actualmente.</p>
+<ul>
+<li>Algunas partes principales del paquete están escritas en C y utilizan funciones y estructuras internas de R.</li>
+<li>El paquete utiliza alcance léxico, que es una de las diferencias entre R y <strong>S-plus</strong> explicadas en <a href="https://cran.r-project.org/doc/FAQ/R-FAQ.html#Lexical-scoping">R FAQ 3.3.1</a></li>
+</ul>
+<h2 id="sec:est-disponible-para-linux-mac-y-windows"><span class="section-number">6.3</span> ¿Está disponible para Linux, Mac y Windows?</h2>
+<p>Sí, tanto para 32 bits como para 64 bits en todas las plataformas. Gracias a CRAN. No se utilizan bibliotecas especiales ni específicas del sistema operativo.</p>
+<h2 id="sec:me-parece-genial-qu-puedo-hacer"><span class="section-number">6.4</span> Me parece genial. ¿Qué puedo hacer?</h2>
+<p>Envíe sugerencias, informes de errores y solicitudes de mejora a nuestro <a href="https://github.com/Rdatatable/data.table/issues">seguimiento de problemas</a>. Esto contribuye a mejorar el paquete.</p>
+<p>Por favor, marque el paquete con una estrella en <a href="https://github.com/Rdatatable/data.table">GitHub</a>. Esto anima a los desarrolladores y ayuda a otros usuarios de R a encontrarlo.</p>
+<p>Puede enviar solicitudes de extracción para cambiar el código y/o la documentación usted mismo; consulte nuestras <a href="https://github.com/Rdatatable/data.table/blob/master/.github/CONTRIBUTING.md">Pautas de contribución</a>.</p>
+<h2 id="sec:no-me-parece-bien-c-mo-puedo-advertir-a-los-dem-s-sobre-mi-experiencia"><span class="section-number">6.5</span> No me parece bien. ¿Cómo puedo advertir a los demás sobre mi experiencia?</h2>
+<p>Añadimos todos los artículos que conocemos (ya sean positivos o negativos) a la página <a href="https://github.com/Rdatatable/data.table/wiki/Articles">Artículos</a>. Todas las páginas de la wiki del proyecto en GitHub son de acceso abierto sin restricciones de modificación. Siéntase libre de escribir un artículo, enlazar a uno negativo que haya encontrado o añadir una nueva página a nuestra wiki para recopilar sus críticas. Por favor, que sea constructivo para que podamos mejorar.</p>
+<h2 id="sec:tengo-una-pregunta-s-que-la-gu-a-de-publicaci-n-de-r-help-me-indica-que-contacte-al-responsable-no-a-r-help-pero-hay-alg-n-grupo-m-s-amplio-a-quien-pueda-preguntar"><span class="section-number">6.6</span> Tengo una pregunta. Sé que la guía de publicación de r-help me indica que contacte al responsable (no a r-help), pero ¿hay algún grupo más amplio a quien pueda preguntar?</h2>
+<p>Consulte la <a href="https://github.com/Rdatatable/data.table/wiki/Support">guía de soporte</a> en la página de inicio del proyecto, que contiene enlaces actualizados.</p>
+<h2 id="sec:d-nde-est-n-los-archivos-de-ayuda-de-datatable"><span class="section-number">6.7</span> ¿Dónde están los archivos de ayuda de datatable?</h2>
+<p>La <a href="https://github.com/Rdatatable/data.table/wiki">página de inicio</a> contiene enlaces a los archivos en varios formatos.</p>
+<h2 id="sec:preferir-a-no-publicar-en-la-p-gina-de-problemas-puedo-enviar-un-correo-electr-nico-privado-a-una-o-dos-personas"><span class="section-number">6.8</span> Preferiría no publicar en la página de Problemas, ¿puedo enviar un correo electrónico privado a una o dos personas?</h2>
+<p>Claro. Sin embargo, es más probable que obtenga una respuesta más rápida en la página de Problemas o en Stack Overflow. Además, preguntar públicamente en esos lugares ayuda a ampliar la base de conocimientos general.</p>
+<h2 id="sec:he-creado-un-paquete-que-usa-data-table-c-mo-puedo-asegurarme-de-que-mi-paquete-sea-compatible-con-data-table-para-que-la-herencia-de-data-frame-funcione"><span class="section-number">6.9</span> He creado un paquete que usa data.table. ¿Cómo puedo asegurarme de que mi paquete sea compatible con data.table para que la herencia de <code>data.frame</code> funcione?</h2>
+<p>Consulte <a href="https://stackoverflow.com/a/10529888/403310">esta respuesta</a>.</p>
+<section class="footnotes" data-footnotes>
+<ol>
+<li id="fn-1">
+<p>Nos referimos al método <code>merge</code> para data.table o al método <code>merge</code> para <code>data.frame</code>, ya que ambos funcionan de la misma manera. Consulte <code>?merge.data.table</code> y <a href="#r-dispatch">a continuación</a> para obtener más información sobre el envío de métodos. <a href="#fnref-1" class="footnote-backref" data-footnote-backref data-footnote-backref-idx="1" aria-label="Back to reference 1">↩</a></p>
+</li>
+<li id="fn-2">
+<p>Puede resultar sorprendente saber que <code>select top 10 * from ...</code> no devuelve las mismas filas de forma fiable a lo largo del tiempo en SQL. Es necesario incluir una cláusula <code>order by</code> o usar un índice agrupado para garantizar el orden de las filas; es decir, SQL es inherentemente desordenado. <a href="#fnref-2" class="footnote-backref" data-footnote-backref data-footnote-backref-idx="2" aria-label="Back to reference 2">↩</a></p>
+</li>
+<li id="fn-3">
+<p><em>por ejemplo</em>, <code>hist()</code> devuelve los puntos de interrupción además de trazar en el dispositivo gráfico. <a href="#fnref-3" class="footnote-backref" data-footnote-backref data-footnote-backref-idx="3" aria-label="Back to reference 3">↩</a></p>
+</li>
+</ol>
+</section>
+</div>
+<script src="https://cdn.jsdelivr.net/combine/npm/katex@0.16.21/dist/katex.min.js,npm/katex@0.16.21/dist/contrib/auto-render.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/@xiee/utils@1.14.10/js/render-katex.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-core.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/autoloader/prism-autoloader.min.js" defer></script>
+</body>
+</html>

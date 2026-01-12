@@ -1,54 +1,48 @@
 ---
 title: "Introducción a data.table"
-date: "`r Sys.Date()`"
+date: "`{r} Sys.Date()`"
 output:
-  markdown::html_format
+  litedown::html_format
 vignette: >
   %\VignetteIndexEntry{Introduction to data.table}
-  %\VignetteEngine{knitr::knitr}
+  %\VignetteEngine{litedown::vignette}
   \usepackage[utf8]{inputenc}
 ---
 
-Las traducciones de este documento están disponibles en
+```{r, echo=FALSE, file='../_translation_links.R'}
+```
 
-* [Francés](https://rdatatable.gitlab.io/data.table/articles/fr/datatable-intro.html)
-* [Ruso](https://rdatatable.gitlab.io/data.table/articles/ru/datatable-intro.html)
+`{r} .write.translation.links("Las traducciones de este documento están disponibles en: %s")`
 
 ```{r, echo = FALSE, message = FALSE}
-require(data.table)
-knitr::opts_chunk$set(
-  comment = "#",
-    error = FALSE,
-     tidy = FALSE,
-    cache = FALSE,
- collapse = TRUE
-)
+library(data.table)
+litedown::reactor(comment = "# ")
 .old.th = setDTthreads(1)
 ```
 
-Esta viñeta presenta la sintaxis de `data.table`, su forma general, cómo crear *subconjuntos* de filas, *seleccionar y calcular* columnas y realizar agregaciones *por grupo*. Es útil estar familiarizado con la estructura de datos `data.frame` de R básico, pero no es esencial para seguir esta viñeta.
+Esta viñeta presenta la sintaxis de `data.table`, su forma general, cómo filtrar filas, seleccionar y calcular columnas, y realizar agregaciones por grupo. Estar familiarizado con la estructura de datos `data.frame` de R base es útil, pero no es esencial para seguir esta viñeta.
 
 ***
 
 ## Análisis de datos utilizando `data.table`
 
-Las operaciones de manipulación de datos como *subconjunto*, *grupo*, *actualización*, *unión*, etc. están todas relacionadas de manera inherente. Mantener juntas estas *operaciones relacionadas* permite:
+Las operaciones de manipulación de datos como *filtro*, *agrupación*, *actualización*, *unión*, etc., están intrínsecamente relacionadas. Mantener estas *operaciones relacionadas* permite:
 
 * Sintaxis *concisa* y *consistente* independientemente del conjunto de operaciones que desee realizar para lograr su objetivo final.
 
 * realizar análisis *de manera fluida* sin la carga cognitiva de tener que asignar cada operación a una función particular de un conjunto potencialmente enorme de funciones disponibles antes de realizar el análisis.
 
-* optimizar *automáticamente* las operaciones internamente y de manera muy efectiva al conocer con precisión los datos necesarios para cada operación, lo que genera un código muy rápido y con uso eficiente de la memoria.
+* *optimizando automáticamente* las operaciones de manera interna y muy efectiva al conocer con precisión los datos necesarios para cada operación, lo que genera un código muy rápido y con uso eficiente de la memoria.
 
-En resumen, si estás interesado en reducir enormemente el tiempo de *programación* y *computación*, este paquete es para tí. La filosofía a la que se adhiere `data.table` lo hace posible. Nuestro objetivo es ilustrarte a través de esta serie de viñetas.
+En resumen, si le interesa reducir drásticamente el tiempo de *programación* y *computación*, este paquete es para usted. La filosofía de `data.table` lo hace posible. Nuestro objetivo es ilustrarlo mediante esta serie de viñetas.
 
 ## Datos {#data}
 
-En esta viñeta, utilizaremos los datos de [NYC-flights14](https://raw.githubusercontent.com/Rdatatable/data.table/master/vignettes/flights14.csv) obtenidos del paquete [flights](https://github.com/arunsrinivasan/flights) (disponible solo en GitHub). Contiene datos de vuelos puntuales de la Oficina de Estadísticas de Transporte para todos los vuelos que partieron de los aeropuertos de la ciudad de Nueva York en 2014 (inspirados en [nycflights13](https://github.com/tidyverse/nycflights13)). Los datos están disponibles solo para enero-octubre de 2014.
+En esta viñeta, utilizaremos datos de [NYC-flights14](https://raw.githubusercontent.com/Rdatatable/data.table/master/vignettes/flights14.csv) obtenidos del paquete [flights](https://github.com/arunsrinivasan/flights) (disponible solo en GitHub). Este paquete contiene datos de vuelos puntuales de la Oficina de Estadísticas de Transporte para todos los vuelos que salieron de los aeropuertos de la ciudad de Nueva York en 2014 (inspirado en [nycflights13](https://github.com/tidyverse/nycflights13)). Los datos solo están disponibles para el período de enero a octubre de 2014.
 
-Podemos usar el lector de archivos rápido y amigable `fread` de `data.table` para cargar `flights` directamente de la siguiente manera:
+Podemos usar el lector de archivos rápido y fácil de usar `fread` de `data.table` para cargar `flights` directamente de la siguiente manera:
 
-```{r echo = FALSE}
+```{r, echo = FALSE}
 options(width = 100L)
 ```
 
@@ -63,21 +57,21 @@ flights
 dim(flights)
 ```
 
-Nota: `fread` acepta URL `http` y `https` directamente, así como comandos del sistema operativo como `sed` y `awk`. Consulta `?fread` para ver ejemplos.
+Nota: `fread` acepta URLs `http` y `https` directamente, así como comandos del sistema operativo como `sed` y `awk`. Consulte `?fread` para ver ejemplos.
 
 ## Introducción
 
-En esta viñeta, vamos a
+En esta viñeta, vamos a:
 
-1. Comience con lo básico: qué es una `data.table`, su forma general, cómo crear *subconjuntos* de filas, cómo *seleccionar y calcular* columnas;
+1. Comience con lo básico: qué es una `data.table`, su formato general, cómo *filtrar* filas, cómo seleccionar y calcular columnas;
 
-2. Luego veremos cómo realizar agregaciones de datos por grupo
+2. Luego, veremos cómo realizar agregaciones de datos por grupo
 
 ## 1. Conceptos básicos {#basics-1}
 
 ### a) ¿Qué es `data.table`? {#what-is-datatable-1a}
 
-`data.table` es un paquete R que proporciona **una versión mejorada** de un `data.frame`, la estructura de datos estándar para almacenar datos en `base` R. En la sección [Data](#data) anterior, vimos cómo crear un `data.table` usando `fread()`, pero también podemos crear uno usando la función `data.table()`. Aquí hay un ejemplo:
+`data.table` es un paquete de R que proporciona **una versión mejorada** de un `data.frame`, la estructura de datos estándar para almacenar datos en `base` R. En la sección [Data](#data) anterior, vimos cómo crear un `data.table` usando `fread()`, pero también podemos crear uno usando la función `data.table()`. Aquí hay un ejemplo:
 
 ```{r}
 DT = data.table(
@@ -90,55 +84,55 @@ DT
 class(DT$ID)
 ```
 
-También puede convertir objetos existentes en una tabla `data.table` utilizando `setDT()` (para estructuras `data.frame` y `list`) o `as.data.table()` (para otras estructuras). Para obtener más detalles sobre la diferencia (que va más allá del alcance de esta viñeta), consulte `?setDT` y `?as.data.table`.
+También puede convertir objetos existentes a una tabla `data.table` mediante `setDT()` (para estructuras `data.frame` y `list`) o `as.data.table()` (para otras estructuras). Para más detalles sobre la diferencia (que excede el alcance de este artículo), consulte `?setDT` y `?as.data.table`.
 
-#### Ten en cuenta que:
+#### Tenga en cuenta que:
 
 * Los números de fila se imprimen con un `:` para separar visualmente el número de fila de la primera columna.
 
-* Cuando el número de filas a imprimir excede la opción global `datatable.print.nrows` (predeterminado = `r getOption("datatable.print.nrows")`), imprime automáticamente solo las primeras 5 y las últimas 5 filas (como se puede ver en la sección [Data](#data)). Para un `data.frame` grande, es posible que se haya encontrado esperando mientras se imprimen y paginan tablas más grandes, a veces aparentemente sin fin. Esta restricción ayuda con eso, y puede consultar el número predeterminado de la siguiente manera:
+* Cuando el número de filas a imprimir excede la opción global `datatable.print.nrows` (predeterminado = `r getOption("datatable.print.nrows")`), se imprimen automáticamente solo las 5 primeras y las 5 últimas filas (como se puede ver en la sección [Data](#data)). Con un `data.frame` grande, es posible que haya tenido que esperar mientras tablas más grandes se imprimen y paginan, a veces sin parar. Esta restricción ayuda con esto, y puede consultar el número predeterminado de la siguiente manera:
 
     ```{.r}
     getOption("datatable.print.nrows")
     ```
 
-* `data.table` nunca establece ni utiliza *nombres de fila*. Veremos por qué en la viñeta [`vignette("datatable-keys-fast-subset", package="data.table")`](datatable-keys-fast-subset.html).
+* `data.table` nunca establece ni usa *nombres de fila*. Veremos por qué en la viñeta [`vignette("datatable-keys-fast-subset", package="data.table")`](datatable-keys-fast-subset.html).
 
-### b) Forma general: ¿de qué manera se *mejora* una tabla `data.table`? {#enhanced-1b}
+### b) Forma general: ¿de qué manera se *mejora* una `data.table`? {#enhanced-1b}
 
-A diferencia de un `data.frame`, puedes hacer *mucho más* que simplemente crear subconjuntos de filas y seleccionar columnas dentro del marco de un `data.table`, es decir, dentro de `[...]` (NB: también podríamos referirnos a escribir cosas dentro de `DT[...]` como "consultar `DT`", como una analogía o en relación con SQL). Para entenderlo, primero tendremos que mirar la *forma general* de la sintaxis de `data.table`, como se muestra a continuación:
+A diferencia de un `data.frame`, se puede hacer *mucho más* que simplemente filtrar filas y seleccionar columnas dentro del marco de un `data.table`, es decir, dentro de `[ ... ]` (Nota: también podríamos referirnos a escribir dentro de `DT[...]` como "consultar `DT`", como analogía o en relación con SQL). Para comprenderlo, primero debemos analizar la *forma general* de la sintaxis de `data.table`, como se muestra a continuación:
 
-```{r eval = FALSE}
+```r
 DT[i, j, by]
 
 ##   R:                 i                 j        by
 ## SQL:  where | order by   select | update  group by
 ```
 
-Los usuarios con conocimientos de SQL quizás se sientan inmediatamente identificados con esta sintaxis.
+Los usuarios con conocimientos de SQL probablemente se sentirán inmediatamente identificados con esta sintaxis.
 
 #### La forma de leerlo (en voz alta) es:
 
-Toma `DT`, subconjunto/reordene filas usando `i`, luego calcula `j`, agrupado por `by`.
+Tomar `DT`, filtrar/reordenar filas usando `i`, luego calcular `j`, agrupado por `by`.
 
-Comencemos mirando primero `i` y `j`: subconjuntando filas y operando en columnas.
+Comencemos mirando primero `i` y `j`: filtrando filas y operando en columnas.
 
-### c) Subconjunto de filas en `i` {#subset-i-1c}
+### c) Filtrar filas en `i` {#subset-i-1c}
 
-#### -- Obtén todos los vuelos con "JFK" como aeropuerto de origen en el mes de junio.
+#### -- Obtenga todos los vuelos con "JFK" como aeropuerto de origen en el mes de junio.
 
 ```{r}
 ans <- flights[origin == "JFK" & month == 6L]
 head(ans)
 ```
 
-* Dentro del marco de una `data.table`, se puede hacer referencia a las columnas *como si fueran variables*, de forma muy similar a SQL o Stata. Por lo tanto, simplemente hacemos referencia a `origin` y `month` como si fueran variables. No necesitamos agregar el prefijo `flights$` cada vez. Sin embargo, usar `flights$origin` y `flights$month` funcionaría perfectamente.
+* Dentro de una tabla `data.table`, se puede hacer referencia a las columnas *como si fueran variables*, de forma similar a SQL o Stata. Por lo tanto, simplemente nos referimos a `origin` y `month` como si fueran variables. No es necesario añadir el prefijo `flights$` cada vez. Sin embargo, usar `flights$origin` y `flights$month` funcionaría perfectamente.
 
-* Se calculan los *índices de fila* que satisfacen la condición `origin == "JFK" & month == 6L` y, dado que no hay nada más que hacer, todas las columnas de `flights` en las filas correspondientes a esos *índices de fila* simplemente se devuelven como una `data.table`.
+* Se calculan los *índices de fila* que satisfacen la condición `origin == "JFK" & month == 6L` y, como no queda nada más por hacer, todas las columnas de `flights` en las filas correspondientes a esos *índices de fila* simplemente se devuelven como una `data.table`.
 
-* No es necesario incluir una coma después de la condición en `i`. Pero `flights[origin == "JFK" & month == 6L, ]` funcionaría perfectamente. Sin embargo, en un `data.frame`, la coma es necesaria.
+* No se requiere una coma después de la condición en `i`. Pero `flights[origin == "JFK" & month == 6L, ]` funcionaría perfectamente. Sin embargo, en un `data.frame`, la coma es necesaria.
 
-#### -- Obtener las dos primeras filas de `flights`. {#subset-rows-integer}
+#### -- Obtener las dos primeras filas de `vuelos`. {#subset-rows-integer}
 
 ```{r}
 ans <- flights[1:2]
@@ -147,7 +141,7 @@ ans
 
 * En este caso, no hay ninguna condición. Los índices de fila ya se proporcionan en `i`. Por lo tanto, devolvemos una `data.table` con todas las columnas de `flights` en las filas para esos *índices de fila*.
 
-#### -- Ordena `flights` primero por la columna `origin` en orden *ascendente*, y luego por `dest` en orden *descendente*:
+#### -- Ordena `vuelos` primero por la columna `origen` en orden *ascendente*, y luego por `dest` en orden *descendente*:
 
 Podemos utilizar la función R `order()` para lograr esto.
 
@@ -158,43 +152,43 @@ head(ans)
 
 #### `order()` está optimizado internamente
 
-* Podemos usar "-" en columnas de `caracteres` dentro del marco de una `data.table` para ordenar en orden decreciente.
+* Podemos usar "-" en columnas de `carácter` dentro del marco de una `data.table` para ordenar en orden decreciente.
 
-* Además, `order(...)` dentro del marco de una `data.table` utiliza el ordenamiento rápido interno de `data.table` `forder()`. Esta ordenación proporcionó una mejora tan convincente con respecto a `base::order` de R que el proyecto R adoptó el algoritmo `data.table` como su ordenamiento predeterminado en 2016 para R 3.3.0 (para referencia, consulta `?sort` y las [NOTICIAS de la versión R](https://cran.r-project.org/doc/manuals/r-release/NEWS.pdf)).
+* Además, `order(...)` dentro del marco de `data.table` utiliza el ordenamiento radix rápido interno de `data.table`, `forder()`. Este ordenamiento proporcionó una mejora tan convincente respecto a `base::order` de R que el proyecto R adoptó el algoritmo `data.table` como su ordenamiento predeterminado en 2016 para R 3.3.0 (para referencia, consulte `?sort` y las [NOTICIAS de la versión de R](https://cran.r-project.org/doc/manuals/r-release/NEWS.pdf)).
 
-Discutiremos el orden rápido de `data.table` con más detalle en la viñeta *Aspectos internos de `data.table`*.
+Discutiremos el orden rápido de `data.table` con más detalle en la viñeta *internos de `data.table`*.
 
-### d) Selecciona la(s) columna(s) en `j` {#select-j-1d}
+### d) Seleccione la(s) columna(s) en `j` {#select-j-1d}
 
-#### -- Selecciona la columna `arr_delay`, pero devuélvela como un *vector*.
+#### -- Seleccione la columna `arr_delay`, pero devuélvala como un *vector*.
 
 ```{r}
 ans <- flights[, arr_delay]
 head(ans)
 ```
 
-* Dado que se puede hacer referencia a las columnas como si fueran variables dentro del marco de una `data.table`, hacemos referencia directamente a la *variable* sobre la que queremos un subconjunto. Como queremos *todas las filas*, simplemente omitimos `i`.
+* Dado que las columnas se pueden referenciar como variables dentro de una tabla `data.table`, nos referimos directamente a la *variable* que queremos filtrar. Como queremos *todas las filas*, simplemente omitimos `i`.
 
 * Devuelve *todas* las filas de la columna `arr_delay`.
 
-#### -- Selecciona la columna `arr_delay`, pero devuélvala como `data.table` en su lugar.
+#### -- Seleccione la columna `arr_delay`, pero devuélvala como `data.table` en su lugar.
 
 ```{r}
 ans <- flights[, list(arr_delay)]
 head(ans)
 ```
 
-* Envolvemos las *variables* (nombres de columnas) dentro de `list()`, lo que garantiza que se devuelva una `data.table`. En el caso de un solo nombre de columna, no envolver con `list()` devuelve un vector en su lugar, como se ve en el [ejemplo anterior](#select-j-1d).
+* Envolvemos las *variables* (nombres de columna) dentro de `list()`, lo que garantiza que se devuelva `data.table`. En el caso de un solo nombre de columna, al no envolver con `list()` se devuelve un vector, como se vio en el [ejemplo anterior](#select-j-1d).
 
-* `data.table` también permite encapsular columnas con `.()` en lugar de `list()`. Es un *alias* de `list()`; ambos significan lo mismo. Siéntete libre de usar el que prefieras; hemos notado que la mayoría de los usuarios parecen preferir `.()` por concisión, por lo que continuaremos usando `.()` de aquí en adelante.
+* `data.table` también permite encapsular columnas con `.()` en lugar de `list()`. Es un *alias* de `list()`; ambos significan lo mismo. Puedes usar el que prefieras; hemos notado que la mayoría de los usuarios prefieren `.()` por concisión, por lo que seguiremos usando `.()` de aquí en adelante.
 
-Una tabla `data.table` (y también un `data.frame`) es internamente una lista (`list`) también, con la condición de que cada elemento tiene la misma longitud y la lista tiene un atributo `class`. Al permitir que `j` devuelva una `lista`, se oyede convertir y devolver una `data.table` de manera muy eficiente.
+Un `data.table` (y también un `data.frame`) es internamente una `lista`, con la condición de que cada elemento tenga la misma longitud y que la `lista` tenga un atributo `class`. Permitir que `j` devuelva una `lista` permite convertir y devolver `data.table` de forma muy eficiente.
 
 #### Consejo: {#tip-1}
 
-Mientras `j-expression` devuelva una `lista`, cada elemento de la lista se convertirá en una columna en la `data.table` resultante. Esto hace que `j` sea bastante potente, como veremos en breve. ¡También es muy importante comprender esto para cuando desee realizar consultas más complicadas!
+Mientras `j-expression` devuelva una `list`, cada elemento de la lista se convertirá en una columna en la `data.table` resultante. Esto hace que `j` sea bastante potente, como veremos en breve. También es muy importante comprender esto para cuando se deseen realizar consultas más complejas.
 
-#### -- Selecciona las columnas `arr_delay` y `dep_delay`.
+#### - Seleccione las columnas `arr_delay` y `dep_delay`.
 
 ```{r}
 ans <- flights[, .(arr_delay, dep_delay)]
@@ -204,9 +198,9 @@ head(ans)
 # ans <- flights[, list(arr_delay, dep_delay)]
 ```
 
-* Envuelve ambas columnas dentro de `.()` o `list()`. Eso es todo.
+* Envuelve ambas columnas dentro de `.()` o `list()`. Listo.
 
-#### -- Selecciona las columnas `arr_delay` y `dep_delay` *y* cámbieles el nombre a `delay_arr` y `delay_dep`.
+#### -- Seleccione las columnas `arr_delay` y `dep_delay` *y* cámbieles el nombre a `delay_arr` y `delay_dep`.
 
 Dado que `.()` es solo un alias de `list()`, podemos nombrar las columnas como lo haríamos al crear una `lista`.
 
@@ -226,11 +220,11 @@ ans
 
 #### ¿Que está pasando aquí?
 
-* La función `j` de `data.table` puede manejar más que simplemente *seleccionar columnas* - puede manejar *expresiones*, es decir, *hacer cálculos sobre columnas*. Esto no debería sorprender, ya que se puede hacer referencia a las columnas como si fueran variables. Entonces deberíamos poder *hacer cálculos* llamando a funciones sobre esas variables. Y eso es precisamente lo que sucede aquí.
+* La función `j` de `data.table` puede gestionar más que simplemente *seleccionar columnas*; también puede gestionar *expresiones*, es decir, *calcular sobre columnas*. Esto no debería sorprender, ya que se puede hacer referencia a las columnas como si fueran variables. Entonces, deberíamos poder *calcular* invocando funciones sobre esas variables. Y eso es precisamente lo que ocurre aquí.
 
-### f) Subconjunto en `i` *y* hacer en `j`
+### f) Filtrar en `i` *y* en `j`
 
-#### -- Calcular el retraso medio de llegada y salida para todos los vuelos con aeropuerto de origen "JFK" en el mes de junio.
+#### -- Calcular el retraso promedio de llegada y salida para todos los vuelos con aeropuerto de origen "JFK" en el mes de junio.
 
 ```{r}
 ans <- flights[origin == "JFK" & month == 6L,
@@ -238,11 +232,11 @@ ans <- flights[origin == "JFK" & month == 6L,
 ans
 ```
 
-* Primero creamos un subconjunto en `i` para encontrar los *índices de fila* coincidentes donde el aeropuerto `origin` es igual a `"JFK"`, y el mes es igual a `6L`. *Todavía* no creamos un subconjunto de la tabla de datos *completa* correspondiente a esas filas.
+* Primero filtramos en `i` para encontrar los *índices de fila* coincidentes donde `origen` aeropuerto es igual a `"JFK"` y `mes` es igual a `6L`. *Aún* no filtramos *data.table` *completa* correspondiente a esas filas.
 
-* Ahora, observamos `j` y descubrimos que utiliza solo *dos columnas*. Y lo que tenemos que hacer es calcular su `media()`. Por lo tanto, creamos un subconjunto de las columnas que corresponden a las filas coincidentes y calculamos su `media()`.
+* Ahora, analizamos `j` y descubrimos que solo usa *dos columnas*. Lo que tenemos que hacer es calcular su `media()`. Por lo tanto, filtramos solo las columnas correspondientes a las filas coincidentes y calculamos su media (`mean()`).
 
-Debido a que los tres componentes principales de la consulta (`i`, `j` y `by`) están *juntos* dentro de `[...]`, `data.table` puede ver los tres y optimizar la consulta en conjunto *antes de la evaluación*, en lugar de optimizar cada uno por separado. Por lo tanto, podemos evitar el subconjunto completo (es decir, crear subconjuntos de las columnas *además de* `arr_delay` y `dep_delay`), tanto por velocidad como por eficiencia de memoria.
+Dado que los tres componentes principales de la consulta (`i`, `j` y `by`) están *juntos* dentro de `[...]`, `data.table` puede verlos a los tres y optimizar la consulta en su conjunto *antes de la evaluación*, en lugar de optimizar cada uno por separado. Por lo tanto, podemos evitar el filtrado completo (es decir, subdividir las columnas *además de* `arr_delay` y `dep_delay`), tanto por velocidad como por eficiencia de memoria.
 
 #### --¿Cuántos viajes se han realizado en el año 2014 desde el aeropuerto “JFK” en el mes de junio?
 
@@ -251,13 +245,13 @@ ans <- flights[origin == "JFK" & month == 6L, length(dest)]
 ans
 ```
 
-La función length() requiere un argumento de entrada. Solo necesitamos calcular la cantidad de filas en el subconjunto. Podríamos haber usado cualquier otra columna como argumento de entrada para length(). Este enfoque recuerda a SELECT COUNT(dest) FROM flights WHERE origin = 'JFK' AND month = 6 en SQL.
+La función `length()` requiere un argumento de entrada. Solo necesitamos calcular el número de filas del subconjunto. Podríamos haber usado cualquier otra columna como argumento de entrada para `length()`. Este enfoque recuerda a `SELECT COUNT(dest) FROM flights WHERE origin = 'JFK' AND month = 6` en SQL.
 
-Este tipo de operación ocurre con bastante frecuencia, especialmente durante la agrupación (como veremos en la siguiente sección), hasta el punto donde `data.table` proporciona un *símbolo especial* `.N` para ello.
+Este tipo de operación ocurre con bastante frecuencia, especialmente durante la agrupación (como veremos en la siguiente sección), hasta el punto que `data.table` proporciona un *símbolo especial* `.N` para ello.
 
 ### g) Manejar elementos inexistentes en `i`
 
-#### --¿Qué sucede cuando se consultan elementos no existentes?
+#### --¿Qué sucede cuando se consultan elementos inexistentes?
 
 Al consultar una `data.table` en busca de elementos que no existen, el comportamiento difiere según el método utilizado.
 
@@ -265,9 +259,9 @@ Al consultar una `data.table` en busca de elementos que no existen, el comportam
 setkeyv(flights, "origin")
 ```
 
-* **Subconjunto basado en clave: `dt["d"]`**
+* **Filtro basado en clave: `dt["d"]`**
 
-Esto realiza una unión a la derecha en la columna de clave `x`, lo que da como resultado una fila con `d` y `NA` para las columnas que no se encuentran. Al utilizar `setkeyv`, la tabla se ordena por las claves especificadas y se crea un índice interno, lo que permite la búsqueda binaria para una subdivisión eficiente.
+Esto realiza una unión a la derecha en la columna de clave `x`, lo que genera una fila con `d` y `NA` para las columnas no encontradas. Al usar `setkeyv`, la tabla se ordena según las claves especificadas y se crea un índice interno, lo que permite la búsqueda binaria para una subdivisión eficiente.
 
 ```r
 flights["XYZ"]
@@ -276,9 +270,9 @@ flights["XYZ"]
 # 1:    XYZ   NA    NA  NA       NA             NA        NA       NA             NA        NA      NA     NA      NA ...
 ```
 
-* **Subconjunto lógico: `dt[x == "d"]`**
+* **Filtro lógico: `dt[x == "d"]`**
 
-Esto realiza una operación de subconjunto estándar que no encuentra ninguna fila coincidente y, por lo tanto, devuelve una `data.table` vacía.
+Esto realiza una operación filtrado estándar que no encuentra ninguna fila coincidente y, por lo tanto, devuelve una `data.table` vacía.
 
 ```r
   flights[origin == "XYZ"]
@@ -288,7 +282,7 @@ Esto realiza una operación de subconjunto estándar que no encuentra ninguna fi
 
 * **Coincidencia exacta usando `nomatch=NULL`**
 
-Para coincidencias exactas sin `NA` para elementos inexistentes, utiliza `nomatch=NULL`:
+Para coincidencias exactas sin `NA` para elementos inexistentes, utilice `nomatch=NULL`:
 
 ```r
 flights["XYZ", nomatch=NULL]
@@ -300,7 +294,7 @@ Comprender estos comportamientos puede ayudar a evitar confusiones al tratar con
 
 #### Símbolo especial `.N`: {#special-N}
 
-`.N` es una variable incorporada especial que contiene la cantidad de observaciones *en el grupo actual*. Es particularmente útil cuando se combina con `by` como veremos en la siguiente sección. En ausencia de operaciones de agrupamiento por, simplemente devuelve la cantidad de filas en el subconjunto.
+`.N` es una variable integrada especial que contiene el número de observaciones *en el grupo actual*. Es especialmente útil cuando se combina con `by`, como veremos en la siguiente sección. En ausencia de operaciones de agrupación por, simplemente devuelve el número de filas del subconjunto.
 
 Ahora que lo sabemos, podemos realizar la misma tarea utilizando `.N` de la siguiente manera:
 
@@ -309,19 +303,19 @@ ans <- flights[origin == "JFK" & month == 6L, .N]
 ans
 ```
 
-* Una vez más, subconjunto en `i` para obtener los *índices de fila* donde el aeropuerto `origen` es igual a *"JFK"*, y el mes es igual a *6*.
+* Una vez más, filtramos en `i` para obtener los *índices de fila* donde el aeropuerto `origen` es igual a *"JFK"*, y el mes es igual a *6*.
 
-* Vemos que `j` utiliza solo `.N` y ninguna otra columna. Por lo tanto, no se materializa el subconjunto completo. Simplemente devolvemos la cantidad de filas en el subconjunto (que es solo la longitud de los índices de fila).
+* Vemos que `j` usa solo `.N` y ninguna otra columna. Por lo tanto, no se materializa el subconjunto completo. Simplemente devolvemos el número de filas del subconjunto (que es simplemente la longitud de los índices de fila).
 
-* Ten en cuenta que no hemos incluido `.N` en `list()` o `.()`. Por lo tanto, se devuelve un vector.
+* Tenga en cuenta que no envolvimos `.N` con `list()` ni `.()`. Por lo tanto, se devuelve un vector.
 
-Podríamos haber realizado la misma operación haciendo `nrow(flights[origin == "JFK" & month == 6L])`. Sin embargo, tendríamos que crear primero un subconjunto de toda la `data.table` correspondiente a los *índices de fila* en `i` *y luego* devolver las filas usando `nrow()`, lo cual es innecesario e ineficiente. Trataremos este y otros aspectos de optimización en detalle en la viñeta de *diseño de `data.table`*.
+Podríamos haber realizado la misma operación con `nrow(flights[origin == "JFK" & month == 6L])`. Sin embargo, primero tendría que filtrar la `data.table` completa correspondiente a los *índices de fila* en `i` *y luego* devolver las filas usando `nrow()`, lo cual es innecesario e ineficiente. Abordaremos este y otros aspectos de optimización en detalle en la viñeta de *diseño de `data.table`*.
 
-### h) ¡Genial! Pero, ¿cómo puedo hacer referencia a columnas por nombres en `j` (como en un `data.frame`)? {#refer-j}
+### h) ¡Genial! Pero ¿cómo puedo referirme a las columnas por sus nombres en `j` (como en un `data.frame`)? {#refer-j}
 
 Si escribe los nombres de las columnas explícitamente, no hay diferencia en comparación con un `data.frame` (desde v1.9.8).
 
-#### -- Selecciona las columnas `arr_delay` y `dep_delay` mediante el método `data.frame`.
+#### -- Seleccione las columnas `arr_delay` y `dep_delay` mediante el método `data.frame`.
 
 ```{r j_cols_no_with}
 ans <- flights[, c("arr_delay", "dep_delay")]
@@ -337,7 +331,7 @@ select_cols = c("arr_delay", "dep_delay")
 flights[ , ..select_cols]
 ```
 
-Para aquellos familiarizados con la terminal Unix, el prefijo `..` debería recordar al comando "up-one-level", que es análogo a lo que sucede aquí: `..` indica a `data.table` que busque la variable `select_cols` "up-one-level", es decir, dentro del entorno global en este caso.
+Para aquellos familiarizados con la terminal Unix, el prefijo `..` debería recordar al comando "up-one-level", que es análogo a lo que sucede aquí: las señales `..` a `data.table` para buscar la variable `select_cols` "up-one-level", es decir, dentro del entorno global en este caso.
 
 #### -- Seleccionar columnas nombradas en una variable usando `with = FALSE`
 
@@ -345,7 +339,7 @@ Para aquellos familiarizados con la terminal Unix, el prefijo `..` debería reco
 flights[ , select_cols, with = FALSE]
 ```
 
-El argumento se llama `with` en honor a la función R `with()` debido a que su funcionalidad es similar. Supongamos que tiene un `data.frame` `DF` y desea crear un subconjunto de todas las filas donde `x > 1`. En `base` R puede hacer lo siguiente:
+El argumento se llama `with`, en honor a la función `with()` de R, debido a su funcionalidad similar. Supongamos que tiene un `data.frame` `DF` y desea filtrar todas las filas donde `x > 1`. En `base` de R, puede hacer lo siguiente:
 
 ```{r}
 DF = data.frame(x = c(1,1,1,2,2,3,3,3), y = 1:8)
@@ -361,9 +355,9 @@ DF[with(DF, x > 1), ]
 
     Hence, the argument name `with` in `data.table`. Setting `with = FALSE` disables the ability to refer to columns as if they are variables, thereby restoring the "`data.frame` mode".
 
-* También podemos *deseleccionar* columnas usando `-` o `!`. Por ejemplo:
+* También podemos deseleccionar columnas usando `-` o `!`. Por ejemplo:
 
-    ```{r eval = FALSE}
+    ```r
     ## not run
     
     # returns all columns except arr_delay and dep_delay
@@ -374,7 +368,7 @@ DF[with(DF, x > 1), ]
 
 * Desde `v1.9.5+`, también podemos seleccionar especificando los nombres de las columnas de inicio y fin, por ejemplo, `año:día` para seleccionar las primeras tres columnas.
 
-    ```{r eval = FALSE}
+    ```r
     ## not run
     
     # returns year,month and day
@@ -392,7 +386,7 @@ DF[with(DF, x > 1), ]
 
 ## 2. Agregaciones
 
-Ya hemos visto `i` y `j` de la forma general de `data.table` en la sección anterior. En esta sección, veremos cómo se pueden combinar con `by` para realizar operaciones *por grupo*. Veamos algunos ejemplos.
+Ya vimos `i` y `j` de la forma general de `data.table` en la sección anterior. En esta sección, veremos cómo se pueden combinar con `by` para realizar operaciones *por grupo*. Veamos algunos ejemplos.
 
 ### a) Agrupación mediante `by`
 
@@ -406,15 +400,15 @@ ans
 # ans <- flights[, .(.N), by = "origin"]
 ```
 
-* Sabemos que `.N` [es una variable especial](#special-N) que contiene la cantidad de filas del grupo actual. Al agrupar por `origen` se obtiene la cantidad de filas, `.N`, para cada grupo.
+* Sabemos que `.N` [es una variable especial](#special-N) que contiene el número de filas del grupo actual. Al agrupar por `origen` se obtiene el número de filas, `.N`, de cada grupo.
 
-* Al ejecutar `head(flights)`, puede ver que los aeropuertos de origen aparecen en el orden *"JFK"*, *"LGA"* y *"EWR"*. El orden original de agrupación de las variables se conserva en el resultado. *¡Es importante tener esto en cuenta!*
+* Al ejecutar `head(flights)`, se puede ver que los aeropuertos de origen aparecen en el orden *"JFK"*, *"LGA"* y *"EWR"*. El orden original de agrupación de las variables se conserva en el resultado. *¡Es importante tener esto en cuenta!*
 
 * Dado que no proporcionamos un nombre para la columna devuelta en `j`, se la denominó `N` automáticamente al reconocer el símbolo especial `.N`.
 
-* `by` también acepta un vector de caracteres de nombres de columnas. Esto es particularmente útil para la codificación programática, por ejemplo, para diseñar una función con las columnas de agrupación (en forma de un vector de `carácter`) como argumento de función.
+* `by` también acepta un vector de caracteres de nombres de columnas. Esto es especialmente útil para la programación; por ejemplo, al diseñar una función con las columnas de agrupación (en forma de un vector de caracteres) como argumento.
 
-* Cuando solo hay una columna o expresión a la que hacer referencia en `j` y `by`, podemos omitir la notación `.()`. Esto es puramente por conveniencia. En su lugar, podríamos hacer lo siguiente:
+* Cuando solo hay una columna o expresión a la que hacer referencia en `j` y `by`, podemos omitir la notación `.()`. Esto es puramente por conveniencia. Podríamos hacer lo siguiente:
 
     ```{r}
     ans <- flights[, .N, by = origin]
@@ -423,9 +417,9 @@ ans
     
     We'll use this convenient form wherever applicable hereafter.
 
-#### -- ¿Cómo podemos calcular el número de viajes para cada aeropuerto de origen para el código de aerolínea `"AA"`? {#origin-N}
+#### ¿Cómo podemos calcular el número de viajes por aeropuerto de origen para el código de aerolínea `"AA"`? {#origin-N}
 
-El código único de aerolínea `"AA"` corresponde a *American Airlines Inc.*
+El código de aerolínea único `"AA"` corresponde a *American Airlines Inc.*
 
 ```{r}
 ans <- flights[carrier == "AA", .N, by = origin]
@@ -434,9 +428,9 @@ ans
 
 * Primero obtenemos los índices de fila para la expresión `carrier == "AA"` de `i`.
 
-* Al utilizar esos *índices de fila*, obtenemos la cantidad de filas agrupadas por `origin`. Una vez más, aquí no se materializan columnas, ya que la `j-expression` no requiere que se creen subconjuntos de ninguna columna y, por lo tanto, es rápida y eficiente en el uso de la memoria.
+* Usando estos *índices de fila*, obtenemos el número de filas agrupadas por `origen`. Nuevamente, no se materializan columnas, ya que la expresión en `j` no requiere filtrar sobre ninguna columna y, por lo tanto, es rápida y eficiente en el uso de memoria.
 
-#### -- ¿Cómo podemos obtener el número total de viajes para cada par `origen, destino` para el código de transportista `"AA"`? {#origin-dest-N}
+#### ¿Cómo podemos obtener el número total de viajes para cada par «origen-destino» para el código de operador «"AA"`? {#origin-dest-N}
 
 ```{r}
 ans <- flights[carrier == "AA", .N, by = .(origin, dest)]
@@ -446,9 +440,9 @@ head(ans)
 # ans <- flights[carrier == "AA", .N, by = c("origin", "dest")]
 ```
 
-* `by` acepta múltiples columnas. Simplemente proporcionamos todas las columnas por las que se agrupará. Observe el uso de `.()` nuevamente en `by`; nuevamente, esto es solo una forma abreviada de `list()`, y `list()` también se puede usar aquí. Nuevamente, nos quedaremos con `.()` en esta viñeta.
+* `by` acepta varias columnas. Simplemente proporcionamos todas las columnas por las que se agrupará. Observe el uso de `.()` nuevamente en `by`; nuevamente, esto es solo una abreviatura de `list()`, y `list()` también se puede usar aquí. De nuevo, seguiremos usando `.()` en esta viñeta.
 
-#### -- ¿Cómo podemos obtener el retraso promedio de llegada y salida para cada par `orig,dest` para cada mes para el código de operador `"AA"`? {#origin-dest-month}
+#### ¿Cómo podemos obtener el retraso promedio de llegada y salida para cada par `orig,dest` para cada mes para el código de operador `"AA"`? {#origin-dest-month}
 
 ```{r}
 ans <- flights[carrier == "AA",
@@ -459,13 +453,13 @@ ans
 
 * Dado que no proporcionamos nombres de columnas para las expresiones en `j`, se generaron automáticamente como `V1` y `V2`.
 
-* Una vez más, Ten en cuenta que el orden de entrada de las columnas de agrupación se conserva en el resultado.
+* Una vez más, tenga en cuenta que el orden de entrada de las columnas de agrupación se conserva en el resultado.
 
-¿Y ahora qué pasa si queremos ordenar el resultado por las columnas de agrupación `origin`, `dest` y `month`?
+¿Y ahora qué pasa si queremos ordenar el resultado por las columnas de agrupación `origen`, `dest` y `mes`?
 
 ### b) Ordenado `por`: `keyby`
 
-El hecho de que `data.table` conserve el orden original de los grupos es intencional y está diseñado de esa manera. Hay casos en los que es esencial conservar el orden original, pero en ocasiones nos gustaría ordenar automáticamente por variables en nuestra agrupación.
+Que `data.table` conserve el orden original de los grupos es intencional y está diseñado así. En algunos casos, es esencial conservar el orden original. Sin embargo, a veces deseamos ordenar automáticamente según las variables de nuestra agrupación.
 
 #### --Entonces, ¿cómo podemos ordenar directamente por todas las variables de agrupación?
 
@@ -476,11 +470,11 @@ ans <- flights[carrier == "AA",
 ans
 ```
 
-* Todo lo que hicimos fue cambiar `by` por `keyby`. Esto ordena automáticamente el resultado por las variables de agrupación en orden creciente. De hecho, debido a que la implementación interna de `by` requiere primero una clasificación antes de recuperar el orden de la tabla original, `keyby` es típicamente más rápido que `by` porque no requiere este segundo paso.
+* Solo cambiamos `by` por `keyby`. Esto ordena automáticamente el resultado según las variables de agrupación en orden creciente. De hecho, debido a que la implementación interna de `by` requiere primero una ordenación antes de recuperar el orden original de la tabla, `keyby` suele ser más rápido que `by` porque no requiere este segundo paso.
 
-**Claves:** En realidad, `keyby` hace un poco más que *simplemente ordenar*. También *establece una clave* después de ordenar, estableciendo un `atributo` llamado `sorted`.
+Claves: En realidad, `keyby` hace algo más que simplemente ordenar. También establece una clave después de ordenar, estableciendo un atributo llamado `sorted`.
 
-Aprenderemos más sobre `keys` en la viñeta [`vignette("datatable-keys-fast-subset", package="data.table")`](datatable-keys-fast-subset.html); por ahora, todo lo que tienes que saber es que puedes usar `keyby` para ordenar automáticamente el resultado por las columnas especificadas en `by`.
+Aprenderemos más sobre `claves` en la viñeta [`vignette("datatable-keys-fast-subset", package="data.table")`](datatable-keys-fast-subset.html); por ahora, todo lo que tienes que saber es que puedes usar `keyby` para ordenar automáticamente el resultado por las columnas especificadas en `by`.
 
 ### c) Encadenamiento
 
@@ -490,7 +484,7 @@ Reconsideremos la tarea de [obtener el número total de viajes para cada par `or
 ans <- flights[carrier == "AA", .N, by = .(origin, dest)]
 ```
 
-#### -- ¿Cómo podemos ordenar `ans` utilizando las columnas `origin` en orden ascendente y `dest` en orden descendente?
+#### -- ¿Cómo podemos ordenar 'ans' utilizando las columnas 'origin' en orden ascendente y 'dest' en orden descendente?
 
 Podemos almacenar el resultado intermedio en una variable y luego usar `order(origin, -dest)` en esa variable. Parece bastante sencillo.
 
@@ -499,11 +493,11 @@ ans <- ans[order(origin, -dest)]
 head(ans)
 ```
 
-* Recordemos que podemos usar `-` en una columna de caracteres en `order()` dentro del marco de un `data.table`. Esto es posible gracias a la optimización de consultas internas de `data.table`.
+* Recordemos que podemos usar `-` en una columna `character` en `order()` dentro del marco de `data.table`. Esto es posible gracias a la optimización de consultas interna de `data.table`.
 
-* Recuerde también que `order(...)` con el marco de una `data.table` se *optimiza automáticamente* para usar el orden de radio rápido interno de `data.table` `forder()` para mayor velocidad. 
+* Recuerde también que `order(...)` con el marco de un `data.table` se *optimiza automáticamente* para usar el orden de base rápido interno `forder()` de `data.table` para mayor velocidad. 
 
-Pero esto requiere tener que asignar el resultado intermedio y luego sobrescribirlo. Podemos hacer algo mejor y evitar por completo esta asignación intermedia a una variable temporal *encadenando* expresiones.
+Pero esto requiere asignar el resultado intermedio y luego sobrescribirlo. Podemos mejorarlo y evitar por completo esta asignación intermedia a una variable temporal *encadenando* expresiones.
 
 ```{r}
 ans <- flights[carrier == "AA", .N, by = .(origin, dest)][order(origin, -dest)]
@@ -514,7 +508,7 @@ head(ans, 10)
 
 * O también puedes encadenarlos verticalmente:
 
-    ```{r eval = FALSE}
+    ```r
     DT[ ...
        ][ ...
          ][ ...
@@ -523,34 +517,34 @@ head(ans, 10)
 
 ### d) Expresiones en `by`
 
-#### -- ¿Puede `by` también aceptar *expresiones* o sólo toma columnas?
+#### -- ¿`by` también puede aceptar *expresiones* o sólo toma columnas?
 
-Sí, lo hace. Por ejemplo, si queremos saber cuántos vuelos empezaron con retraso pero llegaron antes (o a tiempo), empezaron y llegaron con retraso, etc.
+Sí. Por ejemplo, si queremos saber cuántos vuelos salieron con retraso pero llegaron antes (o a tiempo), salieron y llegaron con retraso, etc.
 
 ```{r}
 ans <- flights[, .N, .(dep_delay>0, arr_delay>0)]
 ans
 ```
 
-* La última fila corresponde a `dep_delay > 0 = TRUE` y `arr_delay > 0 = FALSE`. Podemos ver que `r flights[!is.na(arr_delay) & !is.na(dep_delay), .N, .(dep_delay>0, arr_delay>0)][, N[4L]]` los vuelos partieron tarde pero llegaron temprano (o a tiempo).
+* La última fila corresponde a `dep_delay > 0 = TRUE` y `arr_delay > 0 = FALSE`. Podemos ver que `r flights[!is.na(arr_delay) & !is.na(dep_delay), .N, .(dep_delay>0, arr_delay>0)][, N[4L]]` vuelos salieron tarde pero llegaron temprano (o a tiempo).
 
-* Ten en cuenta que no proporcionamos ningún nombre a `by-expression`. Por lo tanto, los nombres se han asignado automáticamente en el resultado. Al igual que con `j`, puede nombrar estas expresiones como lo haría para los elementos de cualquier `lista`, como por ejemplo `DT[, .N, .(dep_delayed = dep_delay>0, arr_delayed = arr_delay>0)]`.
+* Tenga en cuenta que no le asignamos ningún nombre a `by-expression`. Por lo tanto, los nombres se asignaron automáticamente en el resultado. Al igual que con `j`, puede nombrar estas expresiones como lo haría con los elementos de cualquier `list`, por ejemplo, `DT[, .N, .(dep_delayed = dep_delay>0, arr_delayed = arr_delay>0)]`.
 
-* Puedes proporcionar otras columnas junto con expresiones, por ejemplo: `DT[, .N, by = .(a, b>0)]`.
+* Puede proporcionar otras columnas junto con expresiones, por ejemplo: `DT[, .N, by = .(a, b>0)]`.
 
 ### e) Varias columnas en `j` - `.SD`
 
 #### -- ¿Tenemos que calcular `mean()` para cada columna individualmente?
 
-Por supuesto, no es práctico tener que escribir `mean(myCol)` para cada columna una por una. ¿Qué sucedería si tuviera 100 columnas para calcular el promedio de `mean()`?
+Por supuesto, no es práctico tener que escribir `mean(myCol)` para cada columna, una por una. ¿Qué sucedería si se tuvieran 100 columnas para promediar `mean()`?
 
-¿Cómo podemos hacer esto de manera eficiente y concisa? Para lograrlo, repasemos [este consejo](#tip-1): *«Siempre que la expresión `j` devuelva una `lista`, cada elemento de la `list` se convertirá en una columna en la `data.table` resultante»*. Si podemos hacer referencia al *subconjunto de datos de cada grupo* como una variable *mientras agrupamos*, podemos recorrer todas las columnas de esa variable utilizando la función base `lapply()`, que ya nos resulta familiar o que pronto nos resultará familiar. No hay que aprender nuevos nombres específicos de `data.table`.
+¿Cómo podemos hacer esto de forma eficiente y concisa? Para ello, revise [este consejo](#tip-1): *"Siempre que la expresión `j` devuelva una `lista`, cada elemento de la `lista` se convertirá en una columna en la `data.table` resultante"*. Si podemos referirnos al *subconjunto de datos* de cada grupo como una variable *al agrupar*, podemos recorrer todas las columnas de esa variable usando la función base `lapply()`, ya conocida o que pronto conoceremos. No hay que aprender nuevos nombres específicos de `data.table`.
 
 #### Símbolo especial `.SD`: {#special-SD}
 
-`data.table` proporciona un símbolo *especial* llamado `.SD`. Significa **S**subset of **D**ata. Es en sí mismo una `data.table` que contiene los datos para *el grupo actual* definido usando `by`.
+`data.table` proporciona un símbolo *especial* llamado `.SD`. Significa **S**subset of **D**ata`. Es en sí mismo un `data.table` que contiene los datos del *grupo actual* definido mediante `by`.
 
-Recuerda que una `data.table` es internamente también una `lista` con todas sus columnas de igual longitud.
+Recuerde que una `data.table` es internamente también una `lista` con todas sus columnas de igual longitud.
 
 Utilicemos la [`data.table` `DT` de antes](#what-is-datatable-1a) para tener una idea de cómo se ve `.SD`.
 
@@ -570,21 +564,21 @@ Para calcular en (múltiples) columnas, podemos simplemente usar la función bas
 DT[, lapply(.SD, mean), by = ID]
 ```
 
-* `.SD` contiene las filas correspondientes a las columnas `a`, `b` y `c` de ese grupo. Calculamos la `media()` de cada una de estas columnas utilizando la función base `lapply()`, que ya conocemos.
+* `.SD` contiene las filas correspondientes a las columnas `a`, `b` y `c` de ese grupo. Calculamos la `mean()` de cada una de estas columnas utilizando la función base `lapply()`, ya conocida.
 
-* Cada grupo devuelve una lista de tres elementos que contienen el valor medio que se convertirán en las columnas de la tabla `data.table` resultante.
+* Cada grupo devuelve una lista de tres elementos que contienen el valor medio que se convertirá en las columnas de la tabla `data.table` resultante.
 
 * Dado que `lapply()` devuelve una `lista`, no es necesario envolverla con un `.()` adicional (si es necesario, consulte [este consejo](#tip-1)).
 
-Ya casi estamos listos. Queda un pequeño detalle por resolver. En nuestra tabla de datos `flights`, solo queríamos calcular la `mean()` de las dos columnas `arr_delay` y `dep_delay`. Pero `.SD` contendría todas las columnas excepto las variables de agrupamiento de forma predeterminada.
+Ya casi terminamos. Queda un pequeño detalle por resolver. En nuestra tabla de datos `flights`, solo queríamos calcular la `mean()` de las columnas `arr_delay` y `dep_delay`. Sin embargo, `.SD` contendría todas las columnas excepto las variables de agrupación por defecto.
 
 #### -- ¿Cómo podemos especificar sólo las columnas en las que nos gustaría calcular la `media()`?
 
 #### .SDcols
 
-Utilizando el argumento `.SDcols`. Acepta nombres de columnas o índices de columnas. Por ejemplo, `.SDcols = c("arr_delay", "dep_delay")` garantiza que `.SD` contenga solo estas dos columnas para cada grupo.
+Usando el argumento `.SDcols`. Acepta nombres o índices de columna. Por ejemplo, `.SDcols = c("arr_delay", "dep_delay")` garantiza que `.SD` contenga solo estas dos columnas para cada grupo.
 
-De manera similar a [parte g)](#refer-j), también puede especificar las columnas que desea eliminar en lugar de las columnas que desea conservar utilizando `-` o `!`. Además, puede seleccionar columnas consecutivas como `colA:colB` y deseleccionarlas como `!(colA:colB)` o `-(colA:colB)`.
+Similar a [parte g)](#refer-j), también puede especificar las columnas que desea eliminar en lugar de las que desea conservar usando `-` o `!`. Además, puede seleccionar columnas consecutivas como `colA:colB` y deseleccionarlas como `!(colA:colB)` o `-(colA:colB)`.
 
 Ahora intentemos usar `.SD` junto con `.SDcols` para obtener la `media()` de las columnas `arr_delay` y `dep_delay` agrupadas por `origen`, `dest` y `mes`.
 
@@ -595,22 +589,22 @@ flights[carrier == "AA",                       ## Only on trips with carrier "AA
         .SDcols = c("arr_delay", "dep_delay")] ## for just those specified in .SDcols
 ```
 
-### f) Subconjunto `.SD` para cada grupo:
+### f) Filtrar `.SD` para cada grupo:
 
-#### -- ¿Cómo podemos devolver las dos primeras filas de cada "mes"?
+#### --¿Cómo podemos devolver las dos primeras filas de cada mes?
 
 ```{r}
 ans <- flights[, head(.SD, 2), by = month]
 head(ans)
 ```
 
-* `.SD` es una `data.table` que contiene todas las filas de *ese grupo*. Simplemente creamos un subconjunto de las dos primeras filas como ya hemos visto [aquí](#subset-rows-integer).
+* `.SD` es una `data.table` que contiene todas las filas de *ese grupo*. Simplemente creamos un subconjunto de las dos primeras filas, como ya vimos [aquí](#subset-rows-integer).
 
 * Para cada grupo, `head(.SD, 2)` devuelve las primeras dos filas como una `data.table`, que también es una `lista`, por lo que no tenemos que envolverla con `.()`.
 
 ### g) ¿Por qué mantener `j` tan flexible?
 
-Para que tengamos una sintaxis consistente y sigamos usando funciones base ya existentes (y conocidas) en lugar de aprender nuevas funciones, para ilustrarlo, usemos la tabla `data.table` `DT` que creamos al principio en la sección [¿Qué es una tabla data.table?](#what-is-datatable-1a).
+Para mantener una sintaxis consistente y seguir usando funciones base ya existentes (y conocidas), en lugar de tener que aprender nuevas funciones. Para ilustrar, usemos el `data.table` `DT` que creamos al principio, en la sección [¿Qué es un data.table?](#what-is-datatable-1a).
 
 #### -- ¿Cómo podemos concatenar las columnas `a` y `b` para cada grupo en `ID`?
 
@@ -618,9 +612,9 @@ Para que tengamos una sintaxis consistente y sigamos usando funciones base ya ex
 DT[, .(val = c(a,b)), by = ID]
 ```
 
-* Eso es todo. No se requiere ninguna sintaxis especial. Todo lo que necesitamos saber es la función base `c()` que concatena vectores y [la sugerencia de antes](#tip-1).
+* Eso es todo. No se requiere sintaxis especial. Solo necesitamos saber la función base `c()`, que concatena vectores, y [la sugerencia anterior](#tip-1).
 
-#### -- ¿Qué pasa si queremos tener todos los valores de las columnas `a` y `b` concatenados, pero devueltos como una columna de lista?
+#### --¿Qué sucede si queremos tener todos los valores de las columnas `a` y `b` concatenados, pero devueltos como una columna de lista?
 
 ```{r}
 DT[, .(val = list(c(a,b))), by = ID]
@@ -628,9 +622,9 @@ DT[, .(val = list(c(a,b))), by = ID]
 
 * Aquí, primero concatenamos los valores con `c(a,b)` para cada grupo y los envolvemos con `list()`. Por lo tanto, para cada grupo, devolvemos una lista de todos los valores concatenados.
 
-* Ten en cuenta que esas comas son solo para visualización. Una columna de lista puede contener cualquier objeto en cada celda y, en este ejemplo, cada celda es en sí misma un vector y algunas celdas contienen vectores más largos que otras.
+* Tenga en cuenta que estas comas son solo para visualización. Una columna de lista puede contener cualquier objeto en cada celda; en este ejemplo, cada celda es un vector, y algunas celdas contienen vectores más largos que otras.
 
-Una vez que comiences a internalizar el uso de `j`, te darás cuenta de lo poderosa que puede ser la sintaxis. Una forma muy útil de entenderla es jugando con ella, con la ayuda de `print()`.
+Una vez que empiece a internalizar el uso de `j`, se dará cuenta de lo poderosa que puede ser la sintaxis. Una forma muy útil de comprenderla es experimentando con la ayuda de `print()`.
 
 Por ejemplo:
 
@@ -642,9 +636,13 @@ DT[, print(c(a,b)), by = ID] # (1)
 DT[, print(list(c(a,b))), by = ID] # (2)
 ```
 
-En (1), para cada grupo, se devuelve un vector, con longitud = 6,4,2 aquí. Sin embargo, (2) devuelve una lista de longitud 1 para cada grupo, con su primer elemento que contiene vectores de longitud 6,4,2. Por lo tanto, (1) da como resultado una longitud de `6+4+2 =`r 6+4+2``, mientras que (2) devuelve `1+1+1=`r 1+1+1``.
+```{r, echo = FALSE}
+p = function(x) paste0('<code>', paste(deparse(substitute(x)), collapse = ' '), ' = ', x, '</code>')
+```
 
-La flexibilidad de j nos permite almacenar cualquier objeto de lista como un elemento de data.table. Por ejemplo, cuando los modelos estadísticos se ajustan a grupos, estos modelos se pueden almacenar en una tabla data.table. El código es conciso y fácil de entender.
+En (1), para cada grupo, se devuelve un vector, con longitud = 6,4,2. Sin embargo, (2) devuelve una lista de longitud 1 para cada grupo, cuyo primer elemento contiene vectores de longitud 6,4,2. Por lo tanto, (1) da como resultado una longitud de `{r} p(6+4+2)`, mientras que (2) devuelve `{r} p(1+1+1)`.
+
+La flexibilidad de j nos permite almacenar cualquier objeto de lista como elemento de data.table. Por ejemplo, cuando los modelos estadísticos se ajustan a grupos, estos modelos pueden almacenarse en una tabla data.table. El código es conciso y fácil de entender.
 
 ```{r}
 ## Do long distance flights cover up departure delay more than short distance flights?
@@ -662,7 +660,10 @@ setDF(flights)
 flights.split <- split(flights, f = flights$month)
 makeup.models.list <- lapply(flights.split, function(df) c(month = df$month[1], fit = list(lm(makeup ~ distance, data = df))))
 makeup.models.df <- do.call(rbind, makeup.models.list)
-sapply(makeup.models.df[, "fit"], function(model) c(coefdist = coef(model)[2], rsq =  summary(model)$r.squared)) |> t() |> data.frame()
+data.frame(t(sapply(
+  makeup.models.df[, "fit"],
+  function(model) c(coefdist = coef(model)[2L], rsq =  summary(model)$r.squared)
+)))
 setDT(flights)
 ```
 
@@ -670,7 +671,7 @@ setDT(flights)
 
 La forma general de la sintaxis de `data.table` es:
 
-```{r eval = FALSE}
+```r
 DT[i, j, by]
 ```
 
@@ -678,33 +679,33 @@ Hemos visto hasta ahora que,
 
 #### Usando `i`:
 
-* Podemos crear subconjuntos de filas de manera similar a un `data.frame`, excepto que no es necesario usar `DT$` repetidamente, ya que las columnas dentro del marco de un `data.table` se ven como si fueran *variables*.
+* Podemos filtrar filas de manera similar a un `data.frame`, excepto que no es necesario usar `DT$` repetidamente, ya que las columnas dentro del marco de un `data.table` se ven como si fueran *variables*.
 
 * También podemos ordenar una `data.table` usando `order()`, que internamente usa el orden rápido de data.table para un mejor rendimiento.
 
-Podemos hacer mucho más en `i` si introducimos claves en `data.table`, lo que permite crear subconjuntos y uniones increíblemente rápidos. Veremos esto en las viñetas [`vignette("datatable-keys-fast-subset", package="data.table")`](datatable-keys-fast-subset.html) y [`vignette("datatable-joins", package="data.table")`](datatable-joins.html).
+Podemos hacer mucho más en `i` al introducir claves en `data.table`, lo que permite filtrados y uniones ultrarrápidos. Veremos esto en las viñetas [`vignette("datatable-keys-fast-subset", package="data.table")`](datatable-keys-fast-subset.html) y [`vignette("datatable-joins", package="data.table")`](datatable-joins.html).
 
 #### Usando `j`:
 
-1. Selecciona columnas con el método `data.table`: `DT[, .(colA, colB)]`.
+1. Seleccione columnas a la manera de `data.table`: `DT[, .(colA, colB)]`.
 
-2. Selecciona columnas con el método `data.frame`: `DT[, c("colA", "colB")]`.
+2. Seleccione columnas a la manera de `data.frame`: `DT[, c("colA", "colB")]`.
 
 3. Calcular en las columnas: `DT[, .(sum(colA), mean(colB))]`.
 
-4. Proporciona nombres si es necesario: `DT[, .(sA = suma(colA), mB = media(colB))]`.
+4. Proporcione nombres si es necesario: `DT[, .(sA = suma(colA), mB = media(colB))]`.
 
-5. Combina con `i`: `DT[colA > valor, suma(colB)]`.
+5. Combinar con `i`: `DT[colA > valor, suma(colB)]`.
 
-#### Usando `por`:
+#### Usando `by`:
 
-* Al usar `by`, podemos agrupar por columnas especificando una *lista de columnas* o un *vector de caracteres de nombres de columnas* o incluso *expresiones*. La flexibilidad de `j`, combinada con `by` e `i`, crea una sintaxis muy poderosa.
+* Usando `by`, podemos agrupar por columnas especificando una *lista de columnas*, un *vector de caracteres de nombres de columnas* o incluso *expresiones*. La flexibilidad de `j`, combinada con `by` e `i`, crea una sintaxis muy potente.
 
 * `by` puede manejar múltiples columnas y también *expresiones*.
 
-* Podemos agrupar columnas mediante clave para ordenar automáticamente el resultado agrupado.
+* Podemos agrupar columnas mediante `keyby` para ordenar automáticamente el resultado agrupado.
 
-* Podemos usar `.SD` y `.SDcols` en `j` para operar en múltiples columnas usando funciones base que ya conocemos. A continuación se muestran algunos ejemplos:
+* Podemos usar `.SD` y `.SDcols` en `j` para operar en múltiples columnas usando funciones base ya conocidas. Aquí hay algunos ejemplos:
 
     1. `DT[, lapply(.SD, fun), by = ..., .SDcols = ...]` - aplica `fun` a todas las columnas especificadas en `.SDcols` mientras agrupa por las columnas especificadas en `by`.
 

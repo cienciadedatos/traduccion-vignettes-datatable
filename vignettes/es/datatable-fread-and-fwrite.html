@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<meta name="generator" content="litedown 0.9">
+<title>Lectura y escritura rápida: fread()/fwrite()</title>
+<style type="text/css">
+body {
+  font-family: sans-serif;
+  max-width: 800px;
+  margin: auto;
+  padding: 1em;
+  line-height: 1.5;
+  print-color-adjust: exact;
+  -webkit-print-color-adjust: exact;
+}
+body, .abstract, code, .footnotes, footer, #refs, .caption { font-size: .9em; }
+li li { font-size: .95em; }
+ul:has(li > input[type="checkbox"]) { list-style: none; padding-left: 1em; }
+*, :before, :after { box-sizing: border-box; }
+a { color: steelblue; }
+pre, img { max-width: 100%; }
+pre { white-space: pre-wrap; word-break: break-word; }
+pre code { display: block; padding: 1em; overflow-x: auto; }
+code { font-family: 'DejaVu Sans Mono', 'Droid Sans Mono', 'Lucida Console', Consolas, Monaco, monospace; }
+:not(pre, th) > code, code[class], div > .caption { background: #f8f8f8; }
+pre > code:is(:not([class]), .language-plain, .language-none, .plain), .box, .figure, .table { background: inherit; border: 1px solid #eee; }
+pre > code {
+  &.message { border-color: #9eeaf9; }
+  &.warning { background: #fff3cd; border-color: #fff3cd; }
+  &.error { background: #f8d7da; border-color: #f8d7da; }
+}
+.fenced-chunk { border-left: 1px solid #666; }
+.code-fence {
+  opacity: .4;
+  border: 1px dashed #666;
+  border-left: 2px solid;
+  &:hover { opacity: inherit; }
+}
+.box, .figure, .table, table { margin: 1em auto; }
+div > .caption { padding: 1px 1em; }
+.figure { p:has(img, svg), pre:has(svg) { text-align: center; } }
+.flex-col { display: flex; justify-content: space-between; }
+table {
+  &:only-child:not(.table > *) { margin: auto; }
+  th, td { padding: 5px; font-variant-numeric: tabular-nums; }
+  thead, tfoot, tr:nth-child(even) { background: whitesmoke; }
+  thead th { border-bottom: 1px solid #ddd; }
+  &:not(.datatable-table) {
+    border-top: 1px solid #666;
+    border-bottom: 1px solid #666;
+  }
+}
+blockquote {
+  color: #666;
+  margin: 0;
+  padding: 1px 1em;
+  border-left: .5em solid #eee;
+}
+hr, .footnotes::before { border: 1px dashed #ddd; }
+.frontmatter { text-align: center; }
+#TOC {
+  a { text-decoration: none; }
+  ul { list-style: none; padding-left: 1em; }
+  & > ul { padding: 0; }
+  ul ul { border-left: 1px solid lightsteelblue; }
+}
+.body h2 { border-bottom: 1px solid #666; }
+.body .appendix, .appendix ~ h2 { border-bottom-style: dashed; }
+.main-number::after { content: "."; }
+span[class^="ref-number-"] { font-weight: bold; }
+.ref-number-fig::after, .ref-number-tab::after { content: ":"; }
+.cross-ref-chp::before { content: "Chapter "; }
+.cross-ref-sec::before { content: "Section "; }
+.cross-ref-fig::before, .ref-number-fig::before { content: "Figure "; }
+.cross-ref-tab::before, .ref-number-tab::before { content: "Table "; }
+.cross-ref-eqn::before, .MathJax_ref:has(mjx-mtext > mjx-c + mjx-c)::before { content: "Equation "; }
+.abstract, #refs {
+  &::before { display: block; margin: 1em auto; font-weight: bold; }
+}
+.abstract::before { content: "Abstract"; text-align: center; }
+#refs::before { content: "Bibliography"; font-size: 1.5em; }
+.ref-paren-open::before { content: "("; }
+.ref-paren-close::after { content: ")"; }
+.ref-semicolon::after { content: "; "; }
+.ref-and::after { content: " and "; }
+.ref-et-al::after { content: " et al."; font-style: italic; }
+.footnote-ref a {
+  &::before { content: "["; }
+  &::after { content: "]"; }
+}
+section.footnotes {
+  margin-top: 2em;
+  &::before { content: ""; display: block; max-width: 20em; }
+}
+.fade {
+  background: repeating-linear-gradient(135deg, white, white 30px, #ddd 32px, #ddd 32px);
+  opacity: 0.6;
+}
+
+@media print {
+  body { max-width: 100%; }
+  tr, img { break-inside: avoid; }
+}
+@media only screen and (min-width: 992px) {
+  body:not(.pagesjs) pre:has(.line-numbers):not(:hover) { white-space: pre; }
+}
+</style>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@xiee/utils@1.14.10/css/prism-xcode.min.css">
+</head>
+<body>
+<div class="frontmatter">
+<div class="title"><h1>Lectura y escritura rápida: fread()/fwrite()</h1></div>
+<div class="date"><h3>2026-01-12</h3></div>
+</div>
+<div class="body">
+<p>Las traducciones de este documento están disponibles en: <a href="https://rdatatable.gitlab.io/data.table/articles/datatable-fread-and-fwrite.html">en</a> | es</p>
+<p>Las funciones <code>fread()</code> y <code>fwrite()</code> del paquete <code>data.table</code> de R no solo están optimizadas para la velocidad con archivos grandes, sino que también ofrecen funciones potentes y prácticas para trabajar con conjuntos de datos pequeños. Esta viñeta destaca su usabilidad, flexibilidad y rendimiento para una importación y exportación de datos eficiente.</p>
+<hr />
+<h2 id="sec:1-fread">1. fread()</h2>
+<h3 id="sec:1-1-uso-directo-de-herramientas-de-l-nea-de-comandos"><strong>1.1 Uso directo de herramientas de línea de comandos</strong></h3>
+<p>La función <code>fread()</code> de <code>data.table</code> puede leer datos canalizados desde comandos de shell, lo que le permite filtrar o preprocesar datos incluso antes de que ingresen a R.</p>
+<pre><code class="language-r"># Create a sample file with some unwanted lines
+writeLines(
+'HEADER: Some metadata
+HEADER: More metadata
+1 2.0 3.0
+2 4.5 6.7
+HEADER: Yet more
+3 8.9 0.1
+4 1.2 3.4',
+&quot;example_data.txt&quot;)
+
+library(data.table)
+fread(&quot;grep -v HEADER example_data.txt&quot;)
+</code></pre>
+<pre><code>##       V1    V2    V3
+##    &lt;int&gt; &lt;num&gt; &lt;num&gt;
+## 1:     1   2.0   3.0
+## 2:     2   4.5   6.7
+## 3:     3   8.9   0.1
+## 4:     4   1.2   3.4
+</code></pre>
+<p>La opción <code>-v</code> hace que <code>grep</code> devuelva todas las líneas excepto aquellas que contienen la cadena ‘HEADER’.</p>
+<blockquote>
+<p>Dada la cantidad de ingenieros de alto nivel que han analizado la herramienta de comandos grep a lo largo de los años, es muy probable que sea la más rápida posible, además de ser correcta, práctica, estar bien documentada en línea y ser fácil de aprender y de buscar soluciones para tareas específicas. Si necesita realizar un filtrado de cadenas más complejo (por ejemplo, buscar cadenas al principio o al final de las líneas), la sintaxis de grep es muy potente. Aprender su sintaxis es una habilidad transferible a otros lenguajes y entornos.</p>
+<p>—Matt Dowle</p>
+</blockquote>
+<p>Mira este <a href="https://stackoverflow.com/questions/36256706/fread-together-with-grepl/36270543#36270543">ejemplo</a> para obtener más detalles.</p>
+<p>En Windows, las herramientas de línea de comandos como <code>grep</code> están disponibles a través de diversos entornos, como Rtools, Cygwin o el Subsistema de Windows para Linux (WSL). En Linux y macOS, estas herramientas suelen estar incluidas en el sistema operativo.</p>
+<h4 id="sec:1-1-1-lectura-directa-de-una-cadena-de-texto">1.1.1 Lectura directa de una cadena de texto</h4>
+<p><code>fread()</code> puede leer datos directamente de una cadena de caracteres en R usando el argumento <code>text</code>. Esto es especialmente útil para crear ejemplos reproducibles, probar fragmentos de código o trabajar con datos generados programáticamente en la sesión de R. Cada línea de la cadena debe estar separada por un carácter de nueva línea <code>\n</code>.</p>
+<pre><code class="language-r">my_data_string = &quot;colA,colB,colC\n1,apple,TRUE\n2,banana,FALSE\n3,orange,TRUE&quot;
+dt_from_text = fread(text = my_data_string)
+print(dt_from_text)
+</code></pre>
+<pre><code>##     colA   colB   colC
+##    &lt;int&gt; &lt;char&gt; &lt;lgcl&gt;
+## 1:     1  apple   TRUE
+## 2:     2 banana  FALSE
+## 3:     3 orange   TRUE
+</code></pre>
+<h4 id="sec:1-1-2-lectura-desde-url">1.1.2 Lectura desde URL</h4>
+<p><code>fread()</code> puede leer datos directamente de URLs web al pasar la URL como una cadena de caracteres a su argumento <code>file</code>. Esto permite descargar y leer datos de internet en un solo paso.</p>
+<pre><code class="language-r"># dt = fread(&quot;https://people.sc.fsu.edu/~jburkardt/data/csv/airtravel.csv&quot;)
+# print(dt)
+</code></pre>
+<h4 id="sec:1-1-3-descompresi-n-autom-tica-de-archivos-comprimidos">1.1.3 Descompresión automática de archivos comprimidos</h4>
+<p>En muchos casos, <code>fread()</code> puede detectar y descomprimir automáticamente archivos con extensiones de compresión comunes, sin necesidad de un objeto de conexión explícito ni comandos de shell. Esto funciona comprobando la extensión del archivo.</p>
+<p><strong>Las extensiones compatibles generalmente incluyen:</strong> =====- <code>.gz</code> / <code>.bz2</code> (gzip / bzip2): Compatible y funciona de inmediato.</p>
+<ul>
+<li><code>.zip</code> / <code>.tar</code> (archivos ZIP / tar, archivo único): Compatible: <code>fread()</code> leerá el primer archivo del archivo si solo hay un archivo presente.=====</li>
+</ul>
+<p><strong>Nota</strong>: Si hay varios archivos en el archivo, <code>fread()</code> fallará con un error.</p>
+<h3 id="sec:1-2-separador-autom-tico-y-detecci-n-de-saltos">1.2 Separador automático y detección de saltos</h3>
+<p><code>fread</code> automatiza la detección de delimitadores y encabezados, eliminando la necesidad de especificar manualmente en la mayoría de los casos. Simplemente proporcione el nombre del archivo; <code>fread</code> detecta la estructura de forma inteligente:</p>
+<p><strong>Detección de separadores</strong></p>
+<p><code>fread</code> prueba separadores comunes (<code>,</code>,<code>\t</code>, <code>|</code>, espacio, <code>:</code>, <code>;</code>) y selecciona el que genera el número más consistente de campos en las filas muestreadas. Para delimitadores no estándar, puede anular esto con el parámetro <code>sep=</code>.</p>
+<p><strong>Detección de encabezado</strong></p>
+<p>Después de aplicar cualquier configuración <code>skip</code> o <code>nrows</code> (si se especifica), se examina la primera fila con una cantidad constante de campos:</p>
+<p>Si todos los campos de esta línea son interpretables como caracteres y los valores no se parecen mucho a una fila de datos (por ejemplo, una fila de cadenas de apariencia puramente numérica aún podría considerarse datos), normalmente se utiliza como encabezado (nombres de columnas).</p>
+<p>De lo contrario (por ejemplo, si la línea contiene tipos numéricos detectados o cadenas de caracteres que se parecen mucho a números y podrían ser datos), se trata como una fila de datos y se asignan nombres de columna predeterminados (<code>V1</code>, <code>V2</code>, …).</p>
+<p>Puedes decirle explícitamente a fread si existe un encabezado usando <code>header = TRUE</code> o <code>header = FALSE</code>.</p>
+<p><strong>Detección de saltos</strong></p>
+<p>De forma predeterminada (<code>skip=&quot;auto&quot;</code>), <code>fread</code> omitirá automáticamente las líneas en blanco y las líneas de comentario (p. ej., las que empiezan por <code>#</code>) antes del encabezado de datos. Para especificar manualmente un número diferente de líneas a omitir, utilice</p>
+<ul>
+<li><code>skip=n</code> para omitir las primeras <code>n</code> líneas.</li>
+<li><code>skip=&quot;string&quot;</code> para buscar una línea que contenga una subcadena (normalmente de los nombres de columna, como <code>skip=&quot;Date&quot;</code>). La lectura comienza en la primera línea coincidente. Esto es útil para omitir metadatos o seleccionar subtablas en archivos multitabla. Esta función está inspirada en la función <code>read.xls</code> del paquete <code>gdata</code>.</li>
+</ul>
+<h3 id="sec:1-3-detecci-n-autom-tica-de-tipo-de-columna-de-alta-calidad">1.3 Detección automática de tipo de columna de alta calidad</h3>
+<p>Muchos conjuntos de datos reales contienen columnas que inicialmente están en blanco, se rellenan con ceros o parecen numéricas, pero luego contienen caracteres. Para gestionar estas inconsistencias, <code>fread()</code> emplea una robusta estrategia de detección de tipos de columna.</p>
+<p>Desde la versión 1.10.5, <code>fread()</code> muestrea filas leyendo bloques de filas contiguas desde varios puntos equidistantes del archivo, incluyendo el inicio, el centro y el final. El número total de filas muestreadas se selecciona dinámicamente en función del tamaño y la estructura del archivo, y suele rondar las 10 000, aunque puede ser menor o ligeramente mayor. Este amplio muestreo ayuda a detectar cambios de tipo que se producen posteriormente en los datos (por ejemplo, de <code>001</code> a <code>0A0</code> o espacios en blanco que se rellenan).</p>
+<p><strong>Acceso eficiente a archivos con mmap</strong></p>
+<p>Para implementar este muestreo eficientemente, <code>fread()</code> utiliza el acceso a archivos mapeados en memoria del sistema operativo (<code>mmap</code>), lo que le permite saltar a posiciones arbitrarias en el archivo sin necesidad de escaneo secuencial. Esta estrategia perezosa y bajo demanda hace que el muestreo sea casi instantáneo, incluso para archivos muy grandes.</p>
+<p>Si un salto cae dentro de un campo entre comillas que incluye nuevas líneas, <code>fread()</code> prueba las líneas subsiguientes hasta que encuentra 5 filas consecutivas con la cantidad esperada de campos, lo que garantiza un análisis correcto incluso en archivos complejos.</p>
+<p><strong>Detección de tipos precisa y optimizada</strong></p>
+<p>El tipo de cada columna se infiere en función del tipo requerido más bajo de la siguiente lista ordenada:</p>
+<p><code>lógico</code> &lt; <code>entero</code> &lt; <code>entero64</code> &lt; <code>doble</code> &lt; <code>carácter</code></p>
+<p>Esto garantiza:</p>
+<ul>
+<li>Asignación única de memoria por adelantado utilizando el tipo correcto</li>
+<li>Evita tener que volver a leer el archivo o configurar manualmente <code>colClasses</code></li>
+<li>Mayor velocidad y eficiencia de la memoria</li>
+</ul>
+<p><strong>Excepciones de tipo fuera de muestra</strong></p>
+<p>Si se produce un cambio de tipo fuera de las filas muestreadas, <code>fread()</code> lo detecta automáticamente y relee el archivo para garantizar la correcta asignación de tipo, sin necesidad de intervención del usuario. Por ejemplo, una columna muestreada como entero podría contener posteriormente <code>00A</code>, lo que activaría una relectura automática como carácter.</p>
+<p>Toda la lógica de detección y cualquier relectura se detallan cuando <code>verbose=TRUE</code> está habilitado.</p>
+<h3 id="sec:1-4-detecci-n-temprana-de-errores-al-final-del-archivo">1.4 Detección temprana de errores al final del archivo</h3>
+<p>Dado que la muestra grande incluye explícitamente el final del archivo, se pueden detectar y reportar casi al instante problemas críticos, como un número inconsistente de columnas, un pie de página incorrecto o una comilla inicial sin su comilla de cierre correspondiente. Esta detección temprana de errores evita la sobrecarga innecesaria de procesar todo el archivo o asignar memoria excesiva para luego encontrar un fallo en el paso final. Garantiza una retroalimentación más rápida y un uso más eficiente de los recursos, especialmente al trabajar con grandes conjuntos de datos.</p>
+<h3 id="sec:1-5-compatibilidad-con-integer64">1.5 Compatibilidad con <code>integer64</code></h3>
+<p>De forma predeterminada, <code>fread</code> detecta enteros mayores que 2<sup>31</sup> y los lee como <code>bit64::integer64</code> para mantener la precisión total. Este comportamiento se puede anular de tres maneras:</p>
+<ul>
+<li>
+<p>Por columna: utilice el argumento <code>colClasses</code> para especificar el tipo de columnas individuales.</p>
+</li>
+<li>
+<p>Por llamada: use el argumento <code>integer64</code> en <code>fread()</code> para establecer cómo se leen todas las columnas <code>integer64</code> detectadas.</p>
+</li>
+<li>
+<p>Globalmente: Establezca la opción <code>datatable.integer64</code> en su sesión R o en el archivo <code>.Rprofile</code> para cambiar el comportamiento predeterminado para todas las llamadas fread.</p>
+</li>
+</ul>
+<p>El argumento integer64 (y la opción correspondiente) acepta los siguientes valores:</p>
+<ul>
+<li>
+<p><code>&quot;integer64&quot;</code> (predeterminado): lee números enteros grandes como <code>bit64::integer64</code> con total precisión.</p>
+</li>
+<li>
+<p><code>&quot;double&quot;</code> o <code>&quot;numeric&quot;</code>: lee números enteros grandes como números de doble precisión, perdiendo potencialmente la precisión de forma silenciosa (similar a <code>utils::read.csv</code> en base R).</p>
+</li>
+<li>
+<p><code>&quot;carácter&quot;</code>: Lee números enteros grandes como cadenas de caracteres.</p>
+</li>
+</ul>
+<p>Para comprobar o establecer el valor predeterminado global, utilice:</p>
+<pre><code class="language-r"># fread's default behavior is to treat large integers as &quot;integer64&quot;; however, this global setting can be changed:
+options(datatable.integer64 = &quot;double&quot;)   # Example: set globally to &quot;double&quot;
+getOption(&quot;datatable.integer64&quot;)
+</code></pre>
+<pre><code>## [1] &quot;double&quot;
+</code></pre>
+<h3 id="sec:1-6-eliminar-o-seleccionar-columnas-por-nombre-o-posici-n">1.6 Eliminar o seleccionar columnas por nombre o posición</h3>
+<p>Para ahorrar memoria y mejorar el rendimiento, utilice los argumentos <code>select</code> o <code>drop</code> de <code>fread()</code> para leer solo las columnas que necesita.</p>
+<ul>
+<li>Si solo necesita unas pocas columnas, utilice <code>select</code>.</li>
+<li>Si desea excluir solo algunas, utilice <code>drop</code>—esto evita tener que listar todo lo que desea conservar.</li>
+</ul>
+<p>Puntos clave: =====- <code>select</code>: Vector de nombres/posiciones de columnas a conservar (descarta las demás).</p>
+<ul>
+<li><code>drop</code>: Vector de nombres/posiciones de columnas a descartar (descarta las demás).</li>
+<li>No utilice <code>select</code> y <code>drop</code> juntos, son mutuamente excluyentes.</li>
+<li><code>fread()</code> le avisará si falta alguna columna especificada en el archivo.=====</li>
+</ul>
+<p>Para obtener más detalles, consulte la página del manual ejecutando <code>?fread</code> en R.</p>
+<h3 id="sec:1-7-detecci-n-autom-tica-de-escape-de-comillas-incluida-la-ausencia-de-escape">1.7 Detección automática de escape de comillas (incluida la ausencia de escape)</h3>
+<p><code>fread</code> detecta automáticamente cómo se escapan las comillas, incluidas las comillas dobles (””) o las comillas con barra invertida (”), sin necesidad de intervención del usuario. Esto se determina mediante una muestra amplia de datos (véase el punto 3) y se valida con todo el archivo.</p>
+<p>Escenarios admitidos: =====- Comillas sin escape dentro de campos entre comillas===== p. ej., <code>&quot;Esta &quot;comilla&quot; no es válida, pero fread funciona de todos modos&quot;</code> — admitido siempre que el recuento de columnas permanezca constante:</p>
+<pre><code class="language-r">data.table::fread(text='x,y\n&quot;This &quot;quote&quot; is invalid, but fread works anyway&quot;,1')
+</code></pre>
+<pre><code>## Warning in data.table::fread(text = &quot;x,y\n\&quot;This \&quot;quote\&quot; is invalid, but fread works
+## anyway\&quot;,1&quot;): Se encontraron y resolvieron comillas incorrectas en las primeras 100 filas. Si los
+## campos no están entrecomillados (por ejemplo, el separador de campos no aparece dentro de ningún
+## campo), intente quote=&quot;&quot; para evitar esta advertencia.
+</code></pre>
+<pre><code>##                                                  x     y
+##                                             &lt;char&gt; &lt;int&gt;
+## 1: This &quot;quote&quot; is invalid, but fread works anyway     1
+</code></pre>
+<p>=====- Campos sin comillas que comienzan con comillas===== p. ej., <code>Invalid&quot;Field,10,20</code> — se reconoce correctamente como un campo no entre comillas.</p>
+<pre><code class="language-r">data.table::fread(text='x,y\nNot&quot;Valid,1')
+</code></pre>
+<pre><code>##            x     y
+##       &lt;char&gt; &lt;int&gt;
+## 1: Not&quot;Valid     1
+</code></pre>
+<p>Requisitos y limitaciones: =====- Las reglas de escape y los recuentos de columnas deben ser consistentes en todo el archivo.=====</p>
+<ul>
+<li>No compatible cuando <code>fill=TRUE</code> — en ese caso, el archivo debe seguir las comillas y el escape compatibles con RFC4180.</li>
+</ul>
+<p>Robustez específica de la versión: A partir de la versión 1.10.6, <code>fread</code> resuelve ambigüedades de forma más fiable en todo el archivo mediante la consistencia de recuento de columnas completo (el valor predeterminado es <code>fill=FALSE</code>). Se emiten advertencias si el análisis falla debido a una ambigüedad.</p>
+<h2 id="sec:2-fwrite">2. fwrite()</h2>
+<p><code>fwrite()</code> es el complemento rápido para la escritura de archivos de <code>fread()</code>. Está diseñado para ofrecer velocidad, valores predeterminados sensatos y facilidad de uso, reflejando muchas de las ventajas de <code>fread</code>.</p>
+<h3 id="sec:2-1-entrecomillado-inteligente-y-minimalista-quote-auto">2.1 Entrecomillado inteligente y minimalista (quote=“auto”)</h3>
+<p>Cuando los datos se escriben como cadenas (ya sea de manera inherente, como columnas de caracteres, o por elección, como <code>dateTimeAs=&quot;ISO&quot;</code>), <code>quote=&quot;auto&quot;</code> (predeterminado) usa comillas en los campos de manera inteligente:</p>
+<p><strong>Entrecomillado contextual</strong>: Los campos se ponen entre comillas solo cuando es necesario. Esto ocurre si contienen el delimitador <code>(sep)</code>, una comilla doble <code>(&quot;)</code>, un salto de línea <code>(\n)</code>, un retorno de carro <code>(\r)</code> o si el campo es una cadena vacía <code>(&quot;&quot;)</code>. La cadena vacía se entrecomilla  para distinguirla de un valor NA al leer el archivo.</p>
+<p><strong>Omitido para salida numérica directa</strong>: si se escriben columnas específicas como sus tipos numéricos subyacentes (por ejemplo, a través de <code>dateTimeAs=&quot;epoch&quot;</code> para <code>POSIXct</code>, o si un usuario preconvierte Date a entero), entonces la lógica de comillas se omite naturalmente para esos campos numéricos, lo que contribuye a la eficiencia.</p>
+<pre><code class="language-r">dt_quoting_scenario = data.table(
+  text_field = c(&quot;Contains,a,comma&quot;, &quot;Contains \&quot;a quote\&quot;&quot;, &quot;Clean_text&quot;, &quot;&quot;, NA),
+  numeric_field = 1:5
+)
+temp_quote_adv = tempfile(fileext = &quot;.csv&quot;)
+
+fwrite(dt_quoting_scenario, temp_quote_adv)
+# Note the output: the empty string is quoted (&quot;&quot;), but the NA is not.
+cat(readLines(temp_quote_adv), sep = &quot;\n&quot;)
+</code></pre>
+<pre><code>## text_field,numeric_field
+## &quot;Contains,a,comma&quot;,1
+## &quot;Contains &quot;&quot;a quote&quot;&quot;&quot;,2
+## Clean_text,3
+## &quot;&quot;,4
+## ,5
+</code></pre>
+<h3 id="sec:2-2-serializaci-n-de-fecha-y-hora-de-grano-fino-argumento-datetimeas">2.2 Serialización de fecha y hora de grano fino (argumento <code>dateTimeAs</code>)</h3>
+<p>Ofrece un control preciso para los tipos POSIXct/Date:</p>
+<ul>
+<li>
+<p><code>dateTimeAs=&quot;ISO&quot;</code> (predeterminado para POSIXct): formato ISO 8601 (por ejemplo, AAAA-MM-DDTHH:MM:SS.ffffffZ), que conserva una precisión de subsegundos para un intercambio inequívoco.</p>
+</li>
+<li>
+<p><code>dateTimeAs=&quot;epoch&quot;</code>: POSIXct como segundos desde la época (numérico).</p>
+</li>
+</ul>
+<pre><code class="language-r">dt_timestamps = data.table(
+  ts = as.POSIXct(&quot;2023-10-26 14:35:45.123456&quot;, tz = &quot;GMT&quot;),
+  dt = as.Date(&quot;2023-11-15&quot;)
+)
+temp_dt_iso = tempfile(fileext = &quot;.csv&quot;)
+fwrite(dt_timestamps, temp_dt_iso, dateTimeAs = &quot;ISO&quot;)
+cat(readLines(temp_dt_iso), sep = &quot;\n&quot;)
+</code></pre>
+<pre><code>## ts,dt
+## 2023-10-26T14:35:45.123456Z,2023-11-15
+</code></pre>
+<pre><code class="language-r">unlink(temp_dt_iso)
+</code></pre>
+<h3 id="sec:2-3-manejo-de-bit64-integer64">2.3 Manejo de <code>bit64::integer64</code></h3>
+<p><strong>Precisión completa para enteros grandes</strong>: <code>fwrite</code> escribe columnas <code>bit64::integer64</code> convirtiéndolas en cadenas con precisión completa. Esto evita la pérdida de datos o la conversión silenciosa a dobles que podrían ocurrir con escritores menos especializados. Esto es crucial para identificadores o mediciones que requieren un rango de enteros superior al estándar de R de <code>32 bits</code> o una precisión doble de <code>53 bits</code>.</p>
+<p><strong>Manejo directo</strong>: Este manejo directo y cuidadoso de datos numéricos especializados garantiza la integridad de los datos y una E/S eficiente, sin conversiones intermedias innecesarias a tipos menos precisos.</p>
+<pre><code class="language-r">if (requireNamespace(&quot;bit64&quot;, quietly = TRUE)) {
+  dt_i64 = data.table(uid = bit64::as.integer64(&quot;1234567890123456789&quot;), val = 100)
+  temp_i64_out = tempfile(fileext = &quot;.csv&quot;)
+  fwrite(dt_i64, temp_i64_out)
+  cat(readLines(temp_i64_out), sep = &quot;\n&quot;)
+  unlink(temp_i64_out)
+}
+</code></pre>
+<pre><code>## uid,val
+## 1234567890123456789,100
+</code></pre>
+<h3 id="sec:2-4-orden-de-columnas-y-control-de-filtrado">2.4 Orden de columnas y control de filtrado</h3>
+<p>Para controlar el orden y el filtrado de columnas que se escriben en el archivo, filtre la <code>data.table</code> antes de llamar a <code>fwrite()</code>. El argumento <code>col.names</code> en <code>fwrite()</code> es un valor lógico (VERDADERO/FALSO) que controla si se escribe la fila del encabezado, no qué columnas se escriben.</p>
+<pre><code class="language-r">dt = data.table(A = 1:3, B = 4:6, C = 7:9)
+
+# Write only columns C and A, in that order
+fwrite(dt[, .(C, A)], &quot;out.csv&quot;)
+cat(readLines(&quot;out.csv&quot;), sep = &quot;\n&quot;)
+</code></pre>
+<pre><code>## C,A
+## 7,1
+## 8,2
+## 9,3
+</code></pre>
+<pre><code class="language-r">file.remove(&quot;out.csv&quot;)
+</code></pre>
+<pre><code>## [1] TRUE
+</code></pre>
+<h2 id="sec:3-una-nota-sobre-el-rendimiento">3. Una nota sobre el rendimiento</h2>
+<p>Si bien esta viñeta se centra en las características y la facilidad de uso, la motivación principal para <code>fread</code> y <code>fwrite</code> es la velocidad.</p>
+<p>Para los usuarios interesados ​​en comparaciones de rendimiento detalladas y actualizadas, recomendamos estas publicaciones de blog externas que utilizan el paquete <code>atime</code> para un análisis riguroso:</p>
+<ul>
+<li><strong><a href="https://tdhock.github.io/blog/2023/dt-atime-figures/">Tiempos asintóticos de data.table</a></strong>: Compara el rendimiento de <code>fread</code> y <code>fwrite</code> con otros paquetes R populares como <code>readr</code> y <code>arrow</code>.</li>
+<li><strong><a href="https://tdhock.github.io/blog/2024/pandas-dt/">Evaluación comparativa de data.table con polares, duckdb y pandas</a></strong>: Compara el rendimiento de E/S y agrupación de <code>data.table</code> con las principales bibliotecas de Python.</li>
+</ul>
+<p>Estos puntos de referencia muestran consistentemente que <code>fread</code> y <code>fwrite</code> son altamente competitivos y, a menudo, están a la vanguardia en términos de rendimiento en el ecosistema R.</p>
+<hr />
+</div>
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-core.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/autoloader/prism-autoloader.min.js" defer></script>
+</body>
+</html>

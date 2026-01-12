@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<meta name="generator" content="litedown 0.9">
+<title>Índices secundarios y auto indexación</title>
+<style type="text/css">
+body {
+  font-family: sans-serif;
+  max-width: 800px;
+  margin: auto;
+  padding: 1em;
+  line-height: 1.5;
+  print-color-adjust: exact;
+  -webkit-print-color-adjust: exact;
+}
+body, .abstract, code, .footnotes, footer, #refs, .caption { font-size: .9em; }
+li li { font-size: .95em; }
+ul:has(li > input[type="checkbox"]) { list-style: none; padding-left: 1em; }
+*, :before, :after { box-sizing: border-box; }
+a { color: steelblue; }
+pre, img { max-width: 100%; }
+pre { white-space: pre-wrap; word-break: break-word; }
+pre code { display: block; padding: 1em; overflow-x: auto; }
+code { font-family: 'DejaVu Sans Mono', 'Droid Sans Mono', 'Lucida Console', Consolas, Monaco, monospace; }
+:not(pre, th) > code, code[class], div > .caption { background: #f8f8f8; }
+pre > code:is(:not([class]), .language-plain, .language-none, .plain), .box, .figure, .table { background: inherit; border: 1px solid #eee; }
+pre > code {
+  &.message { border-color: #9eeaf9; }
+  &.warning { background: #fff3cd; border-color: #fff3cd; }
+  &.error { background: #f8d7da; border-color: #f8d7da; }
+}
+.fenced-chunk { border-left: 1px solid #666; }
+.code-fence {
+  opacity: .4;
+  border: 1px dashed #666;
+  border-left: 2px solid;
+  &:hover { opacity: inherit; }
+}
+.box, .figure, .table, table { margin: 1em auto; }
+div > .caption { padding: 1px 1em; }
+.figure { p:has(img, svg), pre:has(svg) { text-align: center; } }
+.flex-col { display: flex; justify-content: space-between; }
+table {
+  &:only-child:not(.table > *) { margin: auto; }
+  th, td { padding: 5px; font-variant-numeric: tabular-nums; }
+  thead, tfoot, tr:nth-child(even) { background: whitesmoke; }
+  thead th { border-bottom: 1px solid #ddd; }
+  &:not(.datatable-table) {
+    border-top: 1px solid #666;
+    border-bottom: 1px solid #666;
+  }
+}
+blockquote {
+  color: #666;
+  margin: 0;
+  padding: 1px 1em;
+  border-left: .5em solid #eee;
+}
+hr, .footnotes::before { border: 1px dashed #ddd; }
+.frontmatter { text-align: center; }
+#TOC {
+  a { text-decoration: none; }
+  ul { list-style: none; padding-left: 1em; }
+  & > ul { padding: 0; }
+  ul ul { border-left: 1px solid lightsteelblue; }
+}
+.body h2 { border-bottom: 1px solid #666; }
+.body .appendix, .appendix ~ h2 { border-bottom-style: dashed; }
+.main-number::after { content: "."; }
+span[class^="ref-number-"] { font-weight: bold; }
+.ref-number-fig::after, .ref-number-tab::after { content: ":"; }
+.cross-ref-chp::before { content: "Chapter "; }
+.cross-ref-sec::before { content: "Section "; }
+.cross-ref-fig::before, .ref-number-fig::before { content: "Figure "; }
+.cross-ref-tab::before, .ref-number-tab::before { content: "Table "; }
+.cross-ref-eqn::before, .MathJax_ref:has(mjx-mtext > mjx-c + mjx-c)::before { content: "Equation "; }
+.abstract, #refs {
+  &::before { display: block; margin: 1em auto; font-weight: bold; }
+}
+.abstract::before { content: "Abstract"; text-align: center; }
+#refs::before { content: "Bibliography"; font-size: 1.5em; }
+.ref-paren-open::before { content: "("; }
+.ref-paren-close::after { content: ")"; }
+.ref-semicolon::after { content: "; "; }
+.ref-and::after { content: " and "; }
+.ref-et-al::after { content: " et al."; font-style: italic; }
+.footnote-ref a {
+  &::before { content: "["; }
+  &::after { content: "]"; }
+}
+section.footnotes {
+  margin-top: 2em;
+  &::before { content: ""; display: block; max-width: 20em; }
+}
+.fade {
+  background: repeating-linear-gradient(135deg, white, white 30px, #ddd 32px, #ddd 32px);
+  opacity: 0.6;
+}
+
+@media print {
+  body { max-width: 100%; }
+  tr, img { break-inside: avoid; }
+}
+@media only screen and (min-width: 992px) {
+  body:not(.pagesjs) pre:has(.line-numbers):not(:hover) { white-space: pre; }
+}
+</style>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@xiee/utils@1.14.10/css/prism-xcode.min.css">
+</head>
+<body>
+<div class="frontmatter">
+<div class="title"><h1>Índices secundarios y auto indexación</h1></div>
+<div class="date"><h3><code>{r} Sys.Date()</code></h3></div>
+</div>
+<div class="body">
+<p><code>{r} .write.translation.links(&quot;Las traducciones de este documento están disponibles en: %s&quot;)</code></p>
+<p>Esta viñeta asume que el lector está familiarizado con la sintaxis <code>[i, j, by]</code> de data.table y cómo crear subconjuntos rápidos basados ​​en claves. Si no está familiarizado con estos conceptos, lea primero las siguientes viñetas:</p>
+<ul>
+<li><a href="datatable-intro.html"><code>viñeta(&quot;datatable-intro&quot;, paquete=&quot;data.table&quot;)</code></a></li>
+<li><a href="datatable-reference-semantics.html"><code>viñeta(&quot;datatable-reference-semantics&quot;, paquete=&quot;data.table&quot;)</code></a></li>
+<li><a href="datatable-keys-fast-subset.html"><code>viñeta(&quot;datatable-keys-fast-subset&quot;, paquete=&quot;data.table&quot;)</code></a></li>
+</ul>
+<hr />
+<h2 id="data">Datos</h2>
+<p>Utilizaremos los mismos datos de <code>flights</code> que en la viñeta <a href="datatable-intro.html"><code>vignette(&quot;datatable-intro&quot;, package=&quot;data.table&quot;)</code></a>.</p>
+<pre><code class="language-r">flights &lt;- fread(&quot;../flights14.csv&quot;)
+head(flights)
+</code></pre>
+<pre><code>##     year month   day dep_delay arr_delay carrier origin   dest air_time distance  hour
+##    &lt;int&gt; &lt;int&gt; &lt;int&gt;     &lt;int&gt;     &lt;int&gt;  &lt;char&gt; &lt;char&gt; &lt;char&gt;    &lt;int&gt;    &lt;int&gt; &lt;int&gt;
+## 1:  2014     1     1        14        13      AA    JFK    LAX      359     2475     9
+## 2:  2014     1     1        -3        13      AA    JFK    LAX      363     2475    11
+## 3:  2014     1     1         2         9      AA    JFK    LAX      351     2475    19
+## 4:  2014     1     1        -8       -26      AA    LGA    PBI      157     1035     7
+## 5:  2014     1     1         2         1      AA    JFK    LAX      350     2475    13
+## 6:  2014     1     1         4         0      AA    EWR    LAX      339     2454    18
+</code></pre>
+<pre><code class="language-r">dim(flights)
+</code></pre>
+<pre><code>## [1] 253316     11
+</code></pre>
+<h2 id="sec:introducci-n">Introducción</h2>
+<p>En esta viñeta, vamos a:</p>
+<ul>
+<li>
+<p>analizar los <em>índices secundarios</em> y justificar por qué los necesitamos citando casos en los que configurar claves no es necesariamente ideal,</p>
+</li>
+<li>
+<p>realizar filtros rápidos, una vez más, pero usando el nuevo argumento <code>on</code>, que calcula índices secundarios internamente para la tarea (temporalmente) y reutiliza si ya existe uno,</p>
+</li>
+<li>
+<p>y finalmente veremos la <em>indexación automática</em> que va un paso más allá y crea índices secundarios automáticamente, pero lo hace en sintaxis nativa de R para filtrar.</p>
+</li>
+</ul>
+<h2 id="sec:1-ndices-secundarios">1. Índices secundarios</h2>
+<h3 id="sec:a-qu-son-los-ndices-secundarios">a) ¿Qué son los índices secundarios?</h3>
+<p>Los índices secundarios son similares a las “claves” en <em>data.table</em>, excepto por dos diferencias importantes:</p>
+<ul>
+<li>
+<p>No reordena físicamente toda la tabla data.table en RAM. En su lugar, solo calcula el orden del conjunto de columnas proporcionado y almacena ese vector de orden en un atributo adicional llamado <code>index</code>.</p>
+</li>
+<li>
+<p>Puede haber más de un índice secundario para una tabla de datos (como veremos a continuación).</p>
+</li>
+</ul>
+<h4 id="sec:subconjuntos-con-clave-vs-subconjuntos-indexados">Subconjuntos con clave vs. subconjuntos indexados</h4>
+<p>Si bien tanto las <strong>claves</strong> como los <strong>índices</strong> permiten la subdivisión rápida de búsquedas binarias, difieren significativamente en su uso:</p>
+<p><strong>filtrado mediante clave</strong> (coincidencia de columnas implícita)</p>
+<pre><code class="language-r">DT = data.table(a = c(TRUE, FALSE), b = 1:2)
+setkey(DT, a)                # Set key, reordering DT
+DT[.(TRUE)]                  # 'on' is optional; if omitted, the key is used
+</code></pre>
+<pre><code>## Clave &lt;a&gt;
+##         a     b
+##    &lt;lgcl&gt; &lt;int&gt;
+## 1:   TRUE     1
+</code></pre>
+<p><strong>Filtrado mediante índice</strong> (especificación de columna explícita)</p>
+<pre><code class="language-r">DT = data.table(a = c(TRUE, FALSE), b = 1:2)
+setindex(DT, a)              # Set index only (no reorder)
+DT[.(TRUE), on = &quot;a&quot;]        # 'on' is required
+</code></pre>
+<pre><code>##         a     b
+##    &lt;lgcl&gt; &lt;int&gt;
+## 1:   TRUE     1
+</code></pre>
+<h3 id="sec:b-establecer-y-obtener-ndices-secundarios">b) Establecer y obtener índices secundarios</h3>
+<h4 id="sec:c-mo-podemos-establecer-la-columna-origin-como-un-ndice-secundario-en-la-tabla-de-datos-vuelos">– ¿Cómo podemos establecer la columna <code>origin</code> como un índice secundario en la <em>tabla de datos</em> <code>vuelos</code>?</h4>
+<pre><code class="language-r">setindex(flights, origin)
+head(flights)
+</code></pre>
+<pre><code>##     year month   day dep_delay arr_delay carrier origin   dest air_time distance  hour
+##    &lt;int&gt; &lt;int&gt; &lt;int&gt;     &lt;int&gt;     &lt;int&gt;  &lt;char&gt; &lt;char&gt; &lt;char&gt;    &lt;int&gt;    &lt;int&gt; &lt;int&gt;
+## 1:  2014     1     1        14        13      AA    JFK    LAX      359     2475     9
+## 2:  2014     1     1        -3        13      AA    JFK    LAX      363     2475    11
+## 3:  2014     1     1         2         9      AA    JFK    LAX      351     2475    19
+## 4:  2014     1     1        -8       -26      AA    LGA    PBI      157     1035     7
+## 5:  2014     1     1         2         1      AA    JFK    LAX      350     2475    13
+## 6:  2014     1     1         4         0      AA    EWR    LAX      339     2454    18
+</code></pre>
+<pre><code class="language-r">## alternatively we can provide character vectors to the function 'setindexv()'
+# setindexv(flights, &quot;origin&quot;) # useful to program with
+
+# 'index' attribute added
+names(attributes(flights))
+</code></pre>
+<pre><code>## [1] &quot;names&quot;             &quot;row.names&quot;         &quot;class&quot;             &quot;.internal.selfref&quot;
+## [5] &quot;index&quot;
+</code></pre>
+<ul>
+<li>
+<p><code>setindex</code> y <code>setindexv()</code> permiten agregar un índice secundario a la tabla de datos.</p>
+</li>
+<li>
+<p>Tenga en cuenta que <code>flights</code> <strong>no</strong> se reordena físicamente en orden creciente de <code>origen</code>, como habría sido el caso con <code>setkey()</code>.</p>
+</li>
+<li>
+<p>Tenga en cuenta también que se ha añadido el atributo <code>index</code> a <code>flights</code>.</p>
+</li>
+<li>
+<p><code>setindex(flights, NULL)</code> eliminaría todos los índices secundarios.</p>
+</li>
+</ul>
+<h4 id="sec:c-mo-podemos-obtener-todos-los-ndices-secundarios-establecidos-hasta-ahora-en-vuelos">– ¿Cómo podemos obtener todos los índices secundarios establecidos hasta ahora en <code>vuelos</code>?</h4>
+<pre><code class="language-r">indices(flights)
+</code></pre>
+<pre><code>## [1] &quot;origin&quot;
+</code></pre>
+<pre><code class="language-r">setindex(flights, origin, dest)
+indices(flights)
+</code></pre>
+<pre><code>## [1] &quot;origin&quot;       &quot;origin__dest&quot;
+</code></pre>
+<ul>
+<li>
+<p>La función <code>indices()</code> devuelve todos los índices secundarios actuales en la tabla data.table. Si no existe ninguno, se devuelve <code>NULL</code>.</p>
+</li>
+<li>
+<p>Nótese que al crear otro índice en las columnas <code>origin, dest</code>, no perdemos el primer índice creado en la columna <code>origin</code>, es decir, podemos tener múltiples índices secundarios.</p>
+</li>
+</ul>
+<h3 id="sec:c-por-qu-necesitamos-ndices-secundarios">c) ¿Por qué necesitamos índices secundarios?</h3>
+<h4 id="sec:reordenar-una-tabla-de-datos-puede-ser-costoso-y-no-siempre-ideal">– Reordenar una tabla de datos puede ser costoso y no siempre ideal.</h4>
+<p>Considere el caso en el que desea realizar un subconjunto rápido basado en clave en la columna <code>origen</code> para el valor “JFK”. Lo haríamos así:</p>
+<pre><code class="language-r">## not run
+setkey(flights, origin)
+flights[&quot;JFK&quot;] # or flights[.(&quot;JFK&quot;)]
+</code></pre>
+<h4 id="sec:setkey-requiere"><code>setkey()</code> requiere:</h4>
+<p>a) calcular el vector de orden para la(s) columna(s) proporcionada(s), aquí, <code>origen</code>, y</p>
+<p>b) reordenar toda la tabla de datos, por referencia, en función del vector de orden calculado.</p>
+<h1></h1>
+<p>Calcular el orden no es la parte más laboriosa, ya que data.table utiliza un ordenamiento por radix real en vectores enteros, de caracteres y numéricos. Sin embargo, reordenar data.table podría requerir mucho tiempo (dependiendo del número de filas y columnas).</p>
+<p>A menos que nuestra tarea implique la subconfiguración repetida de la misma columna, la subconfiguración rápida basada en clave podría anularse efectivamente al momento de reordenar, dependiendo de las dimensiones de nuestra tabla de datos.</p>
+<h4 id="sec:solo-puede-haber-una-clave-como-m-ximo">– Solo puede haber una <code>clave</code> como máximo</h4>
+<p>Ahora, si quisiéramos repetir la misma operación pero en la columna <code>dest</code>, para el valor “LAX”, entonces tenemos que usar <code>setkey()</code>, <em>nuevamente</em>.</p>
+<pre><code class="language-r">## not run
+setkey(flights, dest)
+flights[&quot;LAX&quot;]
+</code></pre>
+<p>Y esto reordena <code>flights</code> por <code>dest</code>, <em>de ​​nuevo</em>. Lo que realmente nos gustaría es poder realizar el filtrado rápido eliminando el paso de reordenación.</p>
+<p>¡Y esto es precisamente lo que permiten los <em>índices secundarios</em>!</p>
+<h4 id="sec:los-ndices-secundarios-se-pueden-reutilizar">– Los índices secundarios se pueden reutilizar</h4>
+<p>Dado que puede haber múltiples índices secundarios, y crear un índice es tan simple como almacenar el vector de orden como un atributo, esto nos permite incluso eliminar el tiempo para volver a calcular el vector de orden si ya existe un índice.</p>
+<h4 id="sec:el-nuevo-argumento-on-permite-una-sintaxis-m-s-limpia-y-la-creaci-n-y-reutilizaci-n-autom-tica-de-ndices-secundarios">– El nuevo argumento <code>on</code> permite una sintaxis más limpia y la creación y reutilización automática de índices secundarios.</h4>
+<p>Como veremos en la siguiente sección, el argumento <code>on</code> proporciona varias ventajas:</p>
+<h4 id="sec:argumento-on">argumento <code>on</code></h4>
+<ul>
+<li>
+<p>Permite la creación de subconjuntos calculando índices secundarios sobre la marcha. Esto elimina la necesidad de ejecutar <code>setindex()</code> cada vez.</p>
+</li>
+<li>
+<p>permite la reutilización sencilla de índices existentes simplemente verificando los atributos.</p>
+</li>
+</ul>
+<p>=====* permite una sintaxis más clara al incluir las columnas en las que se ejecuta el subconjunto como parte de la sintaxis. Esto facilita la lectura del código al revisarlo posteriormente.</p>
+<pre><code>Note that `on` argument can also be used on keyed subsets as well. In fact, we encourage providing the `on` argument even when subsetting using keys for better readability.
+</code></pre>
+<h1></h1>
+<h2 id="sec:2-subconjunto-r-pido-utilizando-el-argumento-on-e-ndices-secundarios">2. Subconjunto rápido utilizando el argumento <code>on</code> e índices secundarios</h2>
+<h3 id="sec:a-subconjuntos-r-pidos-en-i">a) Subconjuntos rápidos en <code>i</code></h3>
+<h4 id="sec:subconjunto-de-todas-las-filas-donde-el-aeropuerto-de-origen-coincide-con-jfk-usando-on">– Subconjunto de todas las filas donde el aeropuerto de origen coincide con <em>“JFK”</em> usando <code>on</code></h4>
+<pre><code class="language-r">flights[&quot;JFK&quot;, on = &quot;origin&quot;]
+</code></pre>
+<pre><code>##         year month   day dep_delay arr_delay carrier origin   dest air_time distance  hour
+##        &lt;int&gt; &lt;int&gt; &lt;int&gt;     &lt;int&gt;     &lt;int&gt;  &lt;char&gt; &lt;char&gt; &lt;char&gt;    &lt;int&gt;    &lt;int&gt; &lt;int&gt;
+##     1:  2014     1     1        14        13      AA    JFK    LAX      359     2475     9
+##     2:  2014     1     1        -3        13      AA    JFK    LAX      363     2475    11
+##     3:  2014     1     1         2         9      AA    JFK    LAX      351     2475    19
+##     4:  2014     1     1         2         1      AA    JFK    LAX      350     2475    13
+##     5:  2014     1     1        -2       -18      AA    JFK    LAX      338     2475    21
+##    ---                                                                                    
+## 81479:  2014    10    31        -4       -21      UA    JFK    SFO      337     2586    17
+## 81480:  2014    10    31        -2       -37      UA    JFK    SFO      344     2586    18
+## 81481:  2014    10    31         0       -33      UA    JFK    LAX      320     2475    17
+## 81482:  2014    10    31        -6       -38      UA    JFK    SFO      343     2586     9
+## 81483:  2014    10    31        -6       -38      UA    JFK    LAX      323     2475    11
+</code></pre>
+<pre><code class="language-r">## alternatively
+# flights[.(&quot;JFK&quot;), on = &quot;origin&quot;] (or)
+# flights[list(&quot;JFK&quot;), on = &quot;origin&quot;]
+</code></pre>
+<p>=====* Esta instrucción también realiza una búsqueda binaria rápida basada en subconjuntos, calculando el índice sobre la marcha. Sin embargo, tenga en cuenta que no guarda el índice como atributo automáticamente. Esto podría cambiar en el futuro.</p>
+<ul>
+<li>
+<p>Si ya hubiéramos creado un índice secundario con <code>setindex()</code>, <code>on</code> lo reutilizaría en lugar de recalcularlo. Podemos comprobarlo con <code>verbose = TRUE</code>:</p>
+<pre><code class="language-r">setindex(flights, origin)
+flights[&quot;JFK&quot;, on = &quot;origin&quot;, verbose = TRUE][1:5]
+</code></pre>
+<pre><code>## i.V1 tiene el mismo tipo (character) que x.origin. No se requiere coerción.
+## on= coincide con índice existente, usando índice
+## Inidiando bmerge ...
+## &lt;forder.c&gt;: recibió 1 filas y 1 columnas
+## forderReuseSorting: opt=-1, tomó 0.001s
+## bmerge: bucle bmerge_r tomó 0.000s
+## bmerge: tomó 0.001s
+## bmerge finalizado en 0.000s elapsed (0.000s cpu)
+## Construyendo irows para '!byjoin || nqbyjoin' ... 0.000s elapsed (0.000s cpu)
+</code></pre>
+<pre><code>##     year month   day dep_delay arr_delay carrier origin   dest air_time distance  hour
+##    &lt;int&gt; &lt;int&gt; &lt;int&gt;     &lt;int&gt;     &lt;int&gt;  &lt;char&gt; &lt;char&gt; &lt;char&gt;    &lt;int&gt;    &lt;int&gt; &lt;int&gt;
+## 1:  2014     1     1        14        13      AA    JFK    LAX      359     2475     9
+## 2:  2014     1     1        -3        13      AA    JFK    LAX      363     2475    11
+## 3:  2014     1     1         2         9      AA    JFK    LAX      351     2475    19
+## 4:  2014     1     1         2         1      AA    JFK    LAX      350     2475    13
+## 5:  2014     1     1        -2       -18      AA    JFK    LAX      338     2475    21
+</code></pre>
+</li>
+</ul>
+<h4 id="sec:c-mo-puedo-filtrar-en-funci-n-de-las-columnas-origin-y-dest">– ¿Cómo puedo filtrar en función de las columnas <code>origin</code> <em>y</em> <code>dest</code>?</h4>
+<p>Por ejemplo, si queremos filtrar la combinación <code>&quot;JFK&quot;, &quot;LAX&quot;</code>, entonces:</p>
+<pre><code class="language-r">flights[.(&quot;JFK&quot;, &quot;LAX&quot;), on = c(&quot;origin&quot;, &quot;dest&quot;)][1:5]
+</code></pre>
+<pre><code>##     year month   day dep_delay arr_delay carrier origin   dest air_time distance  hour
+##    &lt;int&gt; &lt;int&gt; &lt;int&gt;     &lt;int&gt;     &lt;int&gt;  &lt;char&gt; &lt;char&gt; &lt;char&gt;    &lt;int&gt;    &lt;int&gt; &lt;int&gt;
+## 1:  2014     1     1        14        13      AA    JFK    LAX      359     2475     9
+## 2:  2014     1     1        -3        13      AA    JFK    LAX      363     2475    11
+## 3:  2014     1     1         2         9      AA    JFK    LAX      351     2475    19
+## 4:  2014     1     1         2         1      AA    JFK    LAX      350     2475    13
+## 5:  2014     1     1        -2       -18      AA    JFK    LAX      338     2475    21
+</code></pre>
+<ul>
+<li>
+<p>El argumento <code>on</code> acepta un vector de caracteres de nombres de columnas correspondientes al orden proporcionado a <code>i-argument</code>.</p>
+</li>
+<li>
+<p>Dado que el tiempo para calcular el índice secundario es bastante pequeño, no tenemos que usar <code>setindex()</code>, a menos que, una vez más, la tarea implique filtros repetidos en la misma columna.</p>
+</li>
+<li>
+<p>Para mayor claridad y legibilidad, podría ser útil nombrar las entradas en <code>i</code>, por ejemplo,</p>
+</li>
+</ul>
+<pre><code class="language-r">flights[.(origin = &quot;JFK&quot;, dest = &quot;LAX&quot;), on = c(&quot;origin&quot;, &quot;dest&quot;)]
+</code></pre>
+<pre><code>##         year month   day dep_delay arr_delay carrier origin   dest air_time distance  hour
+##        &lt;int&gt; &lt;int&gt; &lt;int&gt;     &lt;int&gt;     &lt;int&gt;  &lt;char&gt; &lt;char&gt; &lt;char&gt;    &lt;int&gt;    &lt;int&gt; &lt;int&gt;
+##     1:  2014     1     1        14        13      AA    JFK    LAX      359     2475     9
+##     2:  2014     1     1        -3        13      AA    JFK    LAX      363     2475    11
+##     3:  2014     1     1         2         9      AA    JFK    LAX      351     2475    19
+##     4:  2014     1     1         2         1      AA    JFK    LAX      350     2475    13
+##     5:  2014     1     1        -2       -18      AA    JFK    LAX      338     2475    21
+##    ---                                                                                    
+## 10204:  2014    10    31        -4        -9      VX    JFK    LAX      327     2475    20
+## 10205:  2014    10    31         0       -38      UA    JFK    LAX      320     2475     6
+## 10206:  2014    10    31        85        62      UA    JFK    LAX      323     2475     9
+## 10207:  2014    10    31         0       -33      UA    JFK    LAX      320     2475    17
+## 10208:  2014    10    31        -6       -38      UA    JFK    LAX      323     2475    11
+</code></pre>
+<p>Esto deja claro qué entradas en <code>j</code> corresponden a qué elemento de <code>on</code>.</p>
+<h3 id="sec:b-seleccionar-en-j">b) Seleccionar en <code>j</code></h3>
+<p>Todas las operaciones que analizaremos a continuación son idénticas a las que ya vimos en la viñeta <a href="datatable-keys-fast-subset.html"><code>vignette(&quot;datatable-keys-fast-subset&quot;, package=&quot;data.table&quot;)</code></a>. Excepto que usaremos el argumento <code>on</code> en lugar de establecer las claves.</p>
+<h4 id="sec:devuelve-la-columna-arr-delay-sola-como-una-tabla-de-datos-correspondiente-a-origin-quot-lga-quot-y-dest-quot-tpa-quot">– Devuelve la columna <code>arr_delay</code> sola como una tabla de datos correspondiente a <code>origin = &quot;LGA&quot;</code> y <code>dest = &quot;TPA&quot;</code></h4>
+<pre><code class="language-r">flights[.(&quot;LGA&quot;, &quot;TPA&quot;), .(arr_delay), on = c(&quot;origin&quot;, &quot;dest&quot;)]
+</code></pre>
+<pre><code>##       arr_delay
+##           &lt;int&gt;
+##    1:         1
+##    2:        14
+##    3:       -17
+##    4:        -4
+##    5:       -12
+##   ---          
+## 1848:        39
+## 1849:       -24
+## 1850:       -12
+## 1851:        21
+## 1852:       -11
+</code></pre>
+<h3 id="sec:c-encadenamiento">c) Encadenamiento</h3>
+<h4 id="sec:sobre-el-resultado-obtenido-anteriormente-utilice-el-encadenamiento-para-ordenar-la-columna-en-orden-decreciente">– Sobre el resultado obtenido anteriormente, utilice el encadenamiento para ordenar la columna en orden decreciente.</h4>
+<pre><code class="language-r">flights[.(&quot;LGA&quot;, &quot;TPA&quot;), .(arr_delay), on = c(&quot;origin&quot;, &quot;dest&quot;)][order(-arr_delay)]
+</code></pre>
+<pre><code>##       arr_delay
+##           &lt;int&gt;
+##    1:       486
+##    2:       380
+##    3:       351
+##    4:       318
+##    5:       300
+##   ---          
+## 1848:       -40
+## 1849:       -43
+## 1850:       -46
+## 1851:       -48
+## 1852:       -49
+</code></pre>
+<h3 id="sec:d-calcular-o-hacer-en-j">d) Calcular o <em>hacer</em> en <code>j</code></h3>
+<h4 id="sec:encuentra-el-retraso-m-ximo-de-llegada-correspondiente-a-origin-quot-lga-quot-y-dest-quot-tpa-quot">– Encuentra el retraso máximo de llegada correspondiente a <code>origin = &quot;LGA&quot;</code> y <code>dest = &quot;TPA&quot;</code>.</h4>
+<pre><code class="language-r">flights[.(&quot;LGA&quot;, &quot;TPA&quot;), max(arr_delay), on = c(&quot;origin&quot;, &quot;dest&quot;)]
+</code></pre>
+<pre><code>## [1] 486
+</code></pre>
+<h3 id="sec:e-sub-asignar-por-referencia-usando-en-j">e) <em>sub-asignar</em> por referencia usando <code>:=</code> en <code>j</code></h3>
+<p>Ya hemos visto este ejemplo en las viñetas <a href="datatable-reference-semantics.html"><code>vignette(&quot;datatable-reference-semantics&quot;, package=&quot;data.table&quot;)</code></a> y <a href="datatable-keys-fast-subset.html"><code>vignette(&quot;datatable-keys-fast-subset&quot;, package=&quot;data.table&quot;)</code></a>. Veamos todas las horas disponibles en la tabla de datos <code>flights</code>:</p>
+<pre><code class="language-r"># get all 'hours' in flights
+flights[, sort(unique(hour))]
+</code></pre>
+<pre><code>##  [1]  0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24
+</code></pre>
+<p>Observamos que hay un total de 25 valores únicos en los datos. Parece que hay tanto <em>0</em> como <em>24</em> horas. Reemplacemos <em>24</em> por <em>0</em>, pero esta vez usando <code>on</code> en lugar de las claves de configuración.</p>
+<pre><code class="language-r">flights[.(24L), hour := 0L, on = &quot;hour&quot;]
+</code></pre>
+<p>Ahora, verifiquemos si <code>24</code> se reemplaza con <code>0</code> en la columna <code>hora</code>.</p>
+<pre><code class="language-r">flights[, sort(unique(hour))]
+</code></pre>
+<pre><code>##  [1]  0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23
+</code></pre>
+<p>=====* Esta es una gran ventaja de los índices secundarios. Anteriormente, para actualizar solo algunas filas de <code>hour</code>, teníamos que ejecutar <code>setkey()</code>, lo que inevitablemente reordenaba toda la tabla data.table. Con <code>on</code>, el orden se conserva y la operación es mucho más rápida. Al observar el código, la tarea que queríamos realizar también está bastante clara.</p>
+<h3 id="sec:f-agregaci-n-utilizando-by">f) Agregación utilizando <code>by</code></h3>
+<h4 id="sec:obtener-el-retraso-m-ximo-de-salida-para-cada-mes-correspondiente-a-origen-jfk-ordenar-el-resultado-por-month">Obtener el retraso máximo de salida para cada mes correspondiente a «origen = “JFK”». Ordenar el resultado por <code>month</code>.</h4>
+<pre><code class="language-r">ans &lt;- flights[&quot;JFK&quot;, max(dep_delay), keyby = month, on = &quot;origin&quot;]
+head(ans)
+</code></pre>
+<pre><code>## Clave &lt;month&gt;
+##    month    V1
+##    &lt;int&gt; &lt;int&gt;
+## 1:     1   881
+## 2:     2  1014
+## 3:     3   920
+## 4:     4  1241
+## 5:     5   853
+## 6:     6   798
+</code></pre>
+<ul>
+<li>Tendríamos que haber establecido la <code>clave</code> nuevamente en <code>origin, dest</code>, si no hubiéramos usado <code>on</code> que construye internamente índices secundarios sobre la marcha.</li>
+</ul>
+<h3 id="sec:g-el-argumento-mult">g) El argumento <em>mult</em></h3>
+<p>Los demás argumentos, incluido <code>mult</code>, funcionan exactamente igual que en la viñeta <a href="datatable-keys-fast-subset.html"><code>vignette(&quot;datatable-keys-fast-subset&quot;, package=&quot;data.table&quot;)</code></a>. El valor predeterminado para <code>mult</code> es “all”. Podemos elegir; en su lugar, solo se devolverán las <em>primeras</em> (<code>mult = &quot;first&quot;</code>) o <em>últimas</em> (<code>mult = &quot;last&quot;</code>) filas coincidentes.</p>
+<h4 id="sec:subconjunto-solo-de-la-primera-fila-coincidente-donde-dest-coincide-con-bos-y-day">– Subconjunto solo de la primera fila coincidente donde <code>dest</code> coincide con <em>“BOS”</em> y <em>“DAY”</em></h4>
+<pre><code class="language-r">flights[c(&quot;BOS&quot;, &quot;DAY&quot;), on = &quot;dest&quot;, mult = &quot;first&quot;]
+</code></pre>
+<pre><code>##     year month   day dep_delay arr_delay carrier origin   dest air_time distance  hour
+##    &lt;int&gt; &lt;int&gt; &lt;int&gt;     &lt;int&gt;     &lt;int&gt;  &lt;char&gt; &lt;char&gt; &lt;char&gt;    &lt;int&gt;    &lt;int&gt; &lt;int&gt;
+## 1:  2014     1     1         3         1      AA    JFK    BOS       39      187    12
+## 2:  2014     1     1        25        35      EV    EWR    DAY      102      533    17
+</code></pre>
+<h4 id="sec:filtrar-solo-la-ltima-fila-coincidente-donde-origin-coincide-con-lga-jfk-ewr-y-dest-coincide-con-xna">– Filtrar solo la última fila coincidente donde <code>origin</code> coincide con <em>“LGA”, “JFK”, “EWR”</em> y <code>dest</code> coincide con <em>“XNA”</em></h4>
+<pre><code class="language-r">flights[.(c(&quot;LGA&quot;, &quot;JFK&quot;, &quot;EWR&quot;), &quot;XNA&quot;), on = c(&quot;origin&quot;, &quot;dest&quot;), mult = &quot;last&quot;]
+</code></pre>
+<pre><code>##     year month   day dep_delay arr_delay carrier origin   dest air_time distance  hour
+##    &lt;int&gt; &lt;int&gt; &lt;int&gt;     &lt;int&gt;     &lt;int&gt;  &lt;char&gt; &lt;char&gt; &lt;char&gt;    &lt;int&gt;    &lt;int&gt; &lt;int&gt;
+## 1:  2014    10    31        -5       -11      MQ    LGA    XNA      165     1147     6
+## 2:    NA    NA    NA        NA        NA    &lt;NA&gt;    JFK    XNA       NA       NA    NA
+## 3:  2014    10    31        -2       -25      EV    EWR    XNA      160     1131     6
+</code></pre>
+<h3 id="sec:h-el-argumento-nomatch">h) El argumento <em>nomatch</em></h3>
+<p>Podemos elegir si las consultas que no coinciden deben devolver “NA” o ignorarse por completo utilizando el argumento “nomatch”.</p>
+<h4 id="sec:del-ejemplo-anterior-filtre-todas-las-filas-solo-si-hay-una-coincidencia">– Del ejemplo anterior, filtre todas las filas solo si hay una coincidencia</h4>
+<pre><code class="language-r">flights[.(c(&quot;LGA&quot;, &quot;JFK&quot;, &quot;EWR&quot;), &quot;XNA&quot;), mult = &quot;last&quot;, on = c(&quot;origin&quot;, &quot;dest&quot;), nomatch = NULL]
+</code></pre>
+<pre><code>##     year month   day dep_delay arr_delay carrier origin   dest air_time distance  hour
+##    &lt;int&gt; &lt;int&gt; &lt;int&gt;     &lt;int&gt;     &lt;int&gt;  &lt;char&gt; &lt;char&gt; &lt;char&gt;    &lt;int&gt;    &lt;int&gt; &lt;int&gt;
+## 1:  2014    10    31        -5       -11      MQ    LGA    XNA      165     1147     6
+## 2:  2014    10    31        -2       -25      EV    EWR    XNA      160     1131     6
+</code></pre>
+<ul>
+<li>No hay vuelos que conecten “JFK” y “XNA”. Por lo tanto, esa fila se omite en el resultado.</li>
+</ul>
+<h2 id="sec:3-indexaci-n-autom-tica">3. Indexación automática</h2>
+<p>Primero, vimos cómo crear subconjuntos rápidos mediante búsqueda binaria con <em>claves</em>. Luego, descubrimos que podíamos mejorar aún más el rendimiento y lograr una sintaxis más clara usando índices secundarios.</p>
+<p>Eso es lo que hace la <em>autoindexación</em>. Actualmente, solo está implementada para los operadores binarios <code>==</code> y <code>%in%</code>. Se crea automáticamente un índice <em>y</em> se guarda como atributo. Es decir, a diferencia del argumento <code>on</code>, que calcula el índice sobre la marcha cada vez (a menos que ya exista uno), aquí se crea un índice secundario.</p>
+<p>Comencemos creando una tabla de datos lo suficientemente grande para resaltar la ventaja.</p>
+<pre><code class="language-r">set.seed(1L)
+dt = data.table(x = sample(1e5L, 1e7L, TRUE), y = runif(100L))
+print(object.size(dt), units = &quot;Mb&quot;)
+</code></pre>
+<pre><code>## 114.4 Mb
+</code></pre>
+<p>Cuando usamos <code>==</code> o <code>%in%</code> en una sola columna por primera vez, se crea automáticamente un índice secundario y se utiliza para filtrar.</p>
+<pre><code class="language-r">## have a look at all the attribute names
+names(attributes(dt))
+</code></pre>
+<pre><code>## [1] &quot;names&quot;             &quot;row.names&quot;         &quot;class&quot;             &quot;.internal.selfref&quot;
+</code></pre>
+<pre><code class="language-r">## run thefirst time
+(t1 &lt;- system.time(ans &lt;- dt[x == 989L]))
+</code></pre>
+<pre><code>##    user  system elapsed 
+##    0.97    0.05    1.02
+</code></pre>
+<pre><code class="language-r">head(ans)
+</code></pre>
+<pre><code>##        x         y
+##    &lt;int&gt;     &lt;num&gt;
+## 1:   989 0.7757157
+## 2:   989 0.6813302
+## 3:   989 0.2815894
+## 4:   989 0.4954259
+## 5:   989 0.7885886
+## 6:   989 0.5547504
+</code></pre>
+<pre><code class="language-r">## secondary index is created
+names(attributes(dt))
+</code></pre>
+<pre><code>## [1] &quot;names&quot;             &quot;row.names&quot;         &quot;class&quot;             &quot;.internal.selfref&quot;
+## [5] &quot;index&quot;
+</code></pre>
+<pre><code class="language-r">indices(dt)
+</code></pre>
+<pre><code>## [1] &quot;x&quot;
+</code></pre>
+<p>El tiempo para crear el subconjunto la primera vez equivale al tiempo para crear el índice + el tiempo para crear el subconjunto. Dado que crear un índice secundario solo implica crear el vector de orden, esta operación combinada es más rápida que los escaneos vectoriales en muchos casos. Pero la verdadera ventaja reside en los filtrados sucesivos, ya que son extremadamente rápidos.</p>
+<pre><code class="language-r">## successive subsets
+(t2 &lt;- system.time(dt[x == 989L]))
+</code></pre>
+<pre><code>##    user  system elapsed 
+##    0.04    0.00    0.03
+</code></pre>
+<pre><code class="language-r">system.time(dt[x %in% 1989:2012])
+</code></pre>
+<pre><code>##    user  system elapsed 
+##    0.03    0.00    0.03
+</code></pre>
+<ul>
+<li>
+<p>La primera ejecución tardó 1.020 segundos, mientras que la segunda vez tardó 0.030 segundos.</p>
+</li>
+<li>
+<p>La indexación automática se puede desactivar configurando el argumento global <code>options(datatable.auto.index = FALSE)</code>.</p>
+</li>
+<li>
+<p>Deshabilitar la indexación automática permite seguir usando índices creados explícitamente con <code>setindex</code> o <code>setindexv</code>. Puede deshabilitar los índices por completo configurando el argumento global <code>options(datatable.use.index = FALSE)</code>.</p>
+</li>
+</ul>
+<h1></h1>
+<p>En la versión reciente, ampliamos la indexación automática a expresiones que involucran más de una columna (combinadas con el operador <code>&amp;</code>). En el futuro, planeamos ampliar la búsqueda binaria para que funcione con más operadores binarios como <code>&lt;</code>, <code>&lt;=</code>, <code>&gt;</code> y <code>&gt;=</code>.</p>
+<p>Discutiremos <em>filtros</em> rápidos usando claves e índices secundarios para <em>uniones</em> (join) en la <a href="datatable-joins.html">siguiente viñeta (<code>vignette(&quot;datatable-joins&quot;, package=&quot;data.table&quot;)</code>)</a>.</p>
+<hr />
+</div>
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-core.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/autoloader/prism-autoloader.min.js" defer></script>
+</body>
+</html>
