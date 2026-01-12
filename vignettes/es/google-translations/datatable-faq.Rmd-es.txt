@@ -47,7 +47,7 @@ Esto se modificó en la versión 1.5.3 (febrero de 2011). Desde entonces, `X[Y]`
 ¿Algo más sobre `X[Y, sum(foo*bar)]`?
 Este comportamiento cambió en la v1.9.4 (septiembre de 2014). Ahora realiza la unión `X[Y]` y luego ejecuta `sum(foo*bar)` sobre todas las filas; es decir, `X[Y][ , sum(foo*bar)]`. Antes, ejecutaba `j` para cada *grupo* de `X` con el que coincidía cada fila de `Y`. Esto aún se puede hacer, ya que es muy útil, pero ahora es necesario especificar explícitamente `by = .EACHI`, es decir, `X[Y, sum(foo*bar), by = .EACHI]`. A esto lo llamamos *agrupación por cada `i`*.
 Por ejemplo, (para complicarlo aún más, también se utiliza *join legacy scope*):
-Qué bien. ¿Cómo lograste cambiarlo, dado que los usuarios dependían del comportamiento anterior?
+Qué bien. ¿Cómo lograste cambiarlo si los usuarios dependían del comportamiento anterior?
 La solicitud de cambio provino de los usuarios. Se creía que, si una consulta realiza agrupaciones, debería incluirse un `by=` explícito para facilitar la lectura del código. Se proporcionó una opción para restablecer el comportamiento anterior: `options(datatable.old.bywithoutby)`, con `FALSE` por defecto. Esto permitió la actualización para probar las demás nuevas funciones y correcciones de errores de la v1.9.4, y la posterior migración de cualquier consulta `by-without-by` cuando estuviera lista, añadiéndoles `by=.EACHI`. Conservamos 47 pruebas previas al cambio y las reintrodujimos como nuevas pruebas, con `options(datatable.old.bywithoutby=TRUE)`. Añadimos un mensaje de inicio sobre el cambio y cómo volver al comportamiento anterior. Tras un año, la opción quedó obsoleta con una advertencia al usarla. Tras dos años, se eliminó la opción para volver al comportamiento anterior.
 De los 66 paquetes en CRAN o Bioconductor que dependían de o importaban data.table al momento de la publicación de la v1.9.4 (ahora son más de 300), solo uno se vio afectado por el cambio. Esto podría deberse a que muchos paquetes no cuentan con pruebas exhaustivas, o simplemente a que la agrupación por cada fila en `i` no se usaba mucho en los paquetes posteriores. Siempre probamos la nueva versión con todos los paquetes dependientes antes del lanzamiento y coordinamos cualquier cambio con los responsables. Por lo tanto, esta versión fue bastante sencilla en ese sentido.
 Otra razón convincente para realizar el cambio fue que, anteriormente, no existía una forma eficiente de lograr lo que `X[Y, sum(foo*bar)]` hace ahora. Se debía escribir `X[Y][ , sum(foo*bar)]`. Esto no era óptimo porque `X[Y]` unía todas las columnas y las pasaba a la segunda consulta compuesta sin saber que solo se necesitaban `foo` y `bar`. Para solucionar este problema de eficiencia, se requería un esfuerzo de programación adicional: `X[Y, list(foo, bar)][ , sum(foo*bar)]`. El cambio a `by = .EACHI` ha simplificado esto al permitir que ambas consultas se expresen dentro de una única consulta `DT[...]` para mayor eficiencia.
@@ -65,7 +65,7 @@ Esta es una fuente común de confusión. En `data.frame` se suele usar, por ejem
 Que devuelve las dos columnas. En data.table, sabes que puedes usar los nombres de las columnas directamente y podrías intentar:
 Pero esto devuelve un vector. Recuerde que la expresión `j` se evalúa en el entorno de `DT` y `c()` devuelve un vector. Si se requieren dos o más columnas, utilice `list()` o `.()` en su lugar:
 `c()` también puede ser útil en una tabla de datos, pero su comportamiento es diferente al de `[.data.frame`.
-He creado una tabla compleja con muchas columnas. Quiero usarla como plantilla para una nueva tabla; es decir, crear una tabla sin filas, pero con los nombres y tipos de columna copiados de mi tabla. ¿Es fácil?
+He creado una tabla compleja con muchas columnas. Quiero usarla como plantilla para una nueva tabla; es decir, crear una tabla sin filas, pero con los nombres y tipos de columna copiados de mi tabla. ¿Es fácil hacerlo?
 Sí. Si su tabla compleja se llama `DT`, intente `NEWDT = DT[0]`.
 ¿Es un data.table nulo lo mismo que `DT[0]`?
 No. Por "data.table nulo" nos referimos al resultado de `data.table(NULL)` o `as.data.table(NULL)`; *es decir*,
@@ -174,7 +174,7 @@ Este error (y otros similares, por ejemplo, "`getCharCE` debe llamarse en un `CH
 Esto también ocurre antes de la v1.6.5, con `rbind(DT, DF)`. Actualice a la v1.6.7 o posterior.
 \"no se puede cambiar el valor del enlace bloqueado para `.SD`\"
 `.SD` está bloqueado por diseño. Consulte `?data.table`. Si desea manipular `.SD` antes de usarlo o devolverlo, y no desea modificar `DT` con `:=`, primero haga una copia (consulte `?copy`), por ejemplo:
-"No se puede cambiar el valor del enlace bloqueado para `.N`"
+\"no se puede cambiar el valor del enlace bloqueado para `.N`\"
 Actualice a la versión 1.8.1 o posterior. A partir de esta versión, si `.N` se devuelve mediante `j`, se renombra como `N` para evitar ambigüedades en cualquier agrupación posterior entre la variable especial `.N` y una columna llamada `\".N\"`.
 El comportamiento anterior se puede reproducir forzando a que `.N` se llame `.N`, de la siguiente manera:
 Si ya está ejecutando v1.8.1 o posterior, entonces el mensaje de error ahora es más útil que el error \"no se puede cambiar el valor del enlace bloqueado\", como puede ver arriba, ya que esta viñeta se produjo usando v1.8.1 o posterior.

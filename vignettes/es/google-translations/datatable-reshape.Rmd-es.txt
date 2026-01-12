@@ -25,7 +25,7 @@ b) `dcast` de `data.table` (de largo a ancho)
 En la sección anterior, vimos cómo pasar del formato ancho al formato largo. Veamos la operación inversa en esta sección.
 - ¿Cómo podemos volver a la tabla de datos original `DT` desde `DT.m1`?
 Es decir, queremos recopilar todas las observaciones de *child* correspondientes a cada `family_id, age_mother` en la misma fila. Podemos lograrlo usando `dcast` de la siguiente manera:
-=====* `dcast` usa la interfaz *formula*. Las variables del lado izquierdo de *formula* representan las variables *id* y del lado derecho las variables *measure*.=====
+=====* `dcast` usa la interfaz *formula*. Las variables del lado izquierdo de *formula* representan las variables *id* y del lado derecho, las variables *measure*.=====
 =====* `value.var` denota la columna que se debe completar al convertir a formato ancho.=====
 =====* `dcast` también intenta preservar los atributos en el resultado siempre que sea posible.=====
 - A partir de `DT.m1`, ¿cómo podemos obtener el número de hijos en cada familia?

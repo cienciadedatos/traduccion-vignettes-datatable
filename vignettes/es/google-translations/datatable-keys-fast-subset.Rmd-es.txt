@@ -1,15 +1,15 @@
 Esta viñeta está dirigida a quienes ya están familiarizados con la sintaxis de *data.table*, su forma general, cómo crear subconjuntos de filas en `i`, seleccionar y calcular columnas, agregar, modificar y eliminar columnas *por referencia* en `j` y agrupar mediante `by`. Si no está familiarizado con estos conceptos, lea primero las viñetas [`vignette(\"datatable-intro\", package=\"data.table\")`](datatable-intro.html) y [`vignette(\"datatable-reference-semantics\", package=\"data.table\")`](datatable-reference-semantics.html).
 Datos {#data}
-Utilizaremos los mismos datos de "vuelos" que en la viñeta [`vignette(\"datatable-intro\", package=\"data.table\")`](datatable-intro.html).
+Usaremos los mismos datos de «vuelos» que en la viñeta [`vignette(\"datatable-intro\", package=\"data.table\")`](datatable-intro.html).
 Introducción
-En esta viñeta, vamos a:
-=====* primero introduzca el concepto de `clave` en *data.table*, y establezca y use claves para realizar *búsquedas binarias rápidas* basadas en subconjuntos en `i`,=====
+En esta viñeta,
+=====* primero introduciremos el concepto de `clave` en *data.table*, y estableceremos y usaremos claves para realizar *búsquedas binarias rápidas* basadas en subconjuntos en `i`,=====
 =====* vea que podemos combinar subconjuntos basados ​​en clave junto con `j` y `by` exactamente de la misma manera que antes,=====
 =====* mira otros argumentos útiles adicionales: `mult` y `nomatch`,=====
 =====* y finalmente concluimos mirando la ventaja de configurar claves: realizar *subconjuntos basados ​​en búsquedas binarias rápidas* y comparar con el enfoque de escaneo vectorial tradicional.=====
-1. Llaves
+1. Claves
 a) ¿Qué es una *clave*?
-En la viñeta [`vignette(\"datatable-intro\", package=\"data.table\")`](datatable-intro.html), vimos cómo crear subconjuntos de filas en `i` mediante expresiones lógicas, números de fila y `order()`. En esta sección, veremos otra forma de crear subconjuntos increíblemente rápido: usando *claves*.
+En la viñeta [`vignette(\"datatable-intro\", package=\"data.table\")`](datatable-intro.html), vimos cómo crear subconjuntos de filas en `i` usando expresiones lógicas, números de fila y el uso de `order()`. En esta sección, veremos otra forma de crear subconjuntos increíblemente rápido: usando *claves*
 Pero primero, veamos los *data.frames*. Todos los *data.frames* tienen un atributo de nombre de fila. Considere el *data.frame* `DF` a continuación.
 Podemos crear un *subconjunto* de una fila particular usando su nombre de fila como se muestra a continuación:
 Es decir, los nombres de fila son más o menos *un índice* de las filas de un *data.frame*. Sin embargo,
@@ -31,8 +31,8 @@ b) Establecer, obtener y usar claves en una *data.table*
 =====* Tenga en cuenta que no tuvimos que asignar el resultado a una variable. Esto se debe a que, al igual que la función `:=` que vimos en la viñeta [`vignette(\"datatable-reference-semantics\", package=\"data.table\")`](datatable-reference-semantics.html), `setkey()` y `setkeyv()` modifican la entrada *data.table* *por referencia*. Devuelven el resultado de forma invisible.=====
 =====* La *data.table* ahora se reordena (u ordena) según la columna proporcionada: `origin`. Al reordenar por referencia, solo necesitamos memoria adicional de una columna con una longitud igual al número de filas de la *data.table*, lo que la hace muy eficiente en el uso de memoria.=====
 =====* También puede establecer claves directamente al crear *data.tables* mediante la función `data.table()` con el argumento `key`. Esta función acepta un vector de caracteres de nombres de columna.=====
-establecer* y `:=`:
-En *data.table*, el operador `:=` y todas las funciones `set*` (por ejemplo, `setkey`, `setorder`, `setnames`, etc.) son las únicas que modifican el objeto de entrada *por referencia*.
+set* y `:=`:
+En *data.table*, el operador `:=` y todas las funciones `set*` (por ejemplo, `setkey`, `setorder`, `setnames`, etc.) son las únicas que modifican el objeto de entrada *por referencia*
 Una vez que se *clasifica* una *data.table* por ciertas columnas, se puede crear un subconjunto consultando esas columnas clave usando la notación `.()` en `i`. Recuerde que `.()` es un *alias* de `list()`.
 -- Utilice la columna clave `origen` para crear un subconjunto de todas las filas donde el aeropuerto de origen coincida con *\"JFK\"*
 =====* La columna *key* ya está configurada como `origin`. Por lo tanto, basta con proporcionar el valor, en este caso *\"JFK\"*, directamente. La sintaxis `.()` ayuda a identificar que la tarea requiere buscar el valor *\"JFK\"* en la columna key de *data.table* (en este caso, la columna `origin` de `flights` *data.table*).=====
@@ -54,8 +54,8 @@ Para refrescar, las *claves* son como nombres de fila *sobrecargados*. Podemos e
 -- Subconjunto de todas las filas donde solo la primera columna de clave `origen` coincide con *\"JFK\"*
 =====* Dado que no proporcionamos ningún valor para la segunda columna de clave `dest`, simplemente compara *\"JFK\"* con la primera columna de clave `origin` y devuelve todas las filas coincidentes.=====
 -- Subconjunto de todas las filas donde sólo la segunda columna clave `dest` coincide con *\"MIA\"*
-¿Que está pasando aquí?
-=====* Lea [esto](#multiple-key-point) de nuevo. El valor proporcionado para la segunda columna clave *\"MIA\"* debe encontrar los valores coincidentes en la columna clave `dest` *en las filas coincidentes proporcionadas por la primera columna clave `origin`*. No podemos omitir los valores de las columnas clave *anteriores*. Por lo tanto, proporcionamos *todos* los valores únicos de la columna clave `origin`.=====
+¿Qué está pasando aquí?
+=====* Lea [esto](#multiple-key-point) de nuevo. El valor proporcionado para la segunda columna de clave *\"MIA\"* tiene que encontrar los valores coincidentes en la columna de clave `dest` *en las filas coincidentes proporcionadas por la primera columna de clave `origin`*. No podemos omitir los valores de las columnas de clave *anteriores*. Por lo tanto, proporcionamos *todos* los valores únicos de la columna de clave `origin`.=====
 =====* *\"MIA\"* se recicla automáticamente para ajustarse a la longitud de `unique(origin)` que es *3*.=====
 2. Combinando teclas con `j` y `by`
 Hasta ahora, todo lo que hemos visto es el mismo concepto: obtener *índices de fila* en `i`, pero con un método diferente: usar `keys`. No debería sorprender que podamos hacer exactamente lo mismo en `j` y `by`, como se vio en los ejemplos anteriores. Lo ilustraremos con algunos ejemplos.
@@ -65,7 +65,7 @@ a) Seleccionar en `j`
 =====* Una vez que tenemos los índices de fila, revisamos `j`, que solo requiere la columna `arr_delay`. Así que simplemente seleccionamos la columna `arr_delay` para esos *índices de fila* de la misma manera que vimos en la viñeta [`vignette(\"datatable-intro\", package=\"data.table\")`](datatable-intro.html).=====
 =====* Podríamos haber devuelto el resultado usando `with = FALSE` también.=====
 b) Encadenamiento
--- Sobre el resultado obtenido anteriormente, utilice el encadenamiento para ordenar la columna en orden decreciente.
+-- Con el resultado obtenido anteriormente, utilice el encadenamiento para ordenar la columna en orden decreciente
 c) Calcular o *hacer* en `j`
 -- Encuentra el retraso máximo de llegada correspondiente a `origin = \"LGA\"` y `dest = \"TPA\"`.
 =====*Podemos verificar que el resultado es idéntico al primer valor (486) del ejemplo anterior.=====
@@ -75,7 +75,7 @@ Observamos que hay un total de 25 valores únicos en los datos. Parece que hay t
 =====* Primero configuramos `key` como `hour`. Esto reordena los `flights` según la columna `hour` y marca esa columna como `key`.=====
 =====* Ahora podemos subconjuntor la hora usando la notación `.()`. Subconjunto para el valor *24* y obtenemos los *índices de fila* correspondientes.=====
 =====* Y en esos índices de fila, reemplazamos la columna `key` con el valor `0`.=====
-=====* Dado que reemplazamos los valores en la columna *key*, la tabla de datos *flights* ya no se ordena por *hour*. Por lo tanto, la clave se ha eliminado automáticamente al establecerla en NULL.=====
+=====* Dado que reemplazamos los valores en la columna *key*, la tabla de datos `flights` ya no se ordena por `hour`. Por lo tanto, la clave se ha eliminado automáticamente al establecerla en NULL.=====
 Ahora, no debería haber ningún *24* en la columna "hora".
 e) Agregación utilizando `por`
 Primero, establezcamos nuevamente la clave en `origin, dest`.
@@ -104,17 +104,17 @@ Con el tiempo, `data.table` se optimiza y actualmente la última llamada se opti
 a) Rendimiento del enfoque de búsqueda binaria
 Para ilustrarlo, creemos una tabla de datos de muestra con 20 millones de filas y tres columnas y clasifiquémosla por las columnas `x` e `y`.
 De lo que hemos visto en la sección Introducción a data.table, podemos subconjuntar aquellas filas donde las columnas `x = \"g\"` e `y = 877` de la siguiente manera:
-Ahora intentemos crear subconjuntos usando claves.
+Ahora vamos a intentar crear subconjuntos usando claves.
 b) ¿Por qué al introducir una clave en una *data.table* se obtienen subconjuntos increíblemente rápidos?
 Para entender esto, veamos primero qué hace el *enfoque de escaneo vectorial* (método 1).
 Enfoque de escaneo vectorial
-=====* Se busca el valor *\"g\"* en la columna `x` fila por fila, en los 20 millones de filas. Esto genera un *vector lógico* de 20 millones de tamaño, con valores `TRUE, FALSE o NA` correspondientes al valor de `x`.=====
+=====* Se busca en la columna `x` el valor *\"g\"* fila por fila, en los 20 millones de ellas. Esto da como resultado un *vector lógico* de tamaño 20 millones, con valores `VERDADERO, FALSO o NA` correspondientes al valor de `x`.=====
 =====* De manera similar, se busca `877` en la columna `y` en las 20 millones de filas una por una, y se almacena en otro vector lógico.=====
 =====* Las operaciones `&` elemento por elemento se realizan en los vectores lógicos intermedios y se devuelven todas las filas donde la expresión se evalúa como `VERDADERO`.=====
 Esto es lo que llamamos un enfoque de escaneo vectorial. Es bastante ineficiente, especialmente en tablas grandes y cuando se necesita crear subconjuntos repetidamente, ya que tiene que escanear todas las filas cada vez.
 Ahora veamos el método de búsqueda binaria (método 2). Recordemos de [Propiedades de la clave](#key-properties): *establecer claves reordena la tabla data.table por columnas clave*. Como los datos están ordenados, ¡no tenemos que *explorar toda la longitud de la columna*! En su lugar, podemos usar la *búsqueda binaria* para buscar un valor en `O(log n)`, en lugar de `O(n)`, como en el caso del *enfoque de escaneo vectorial*, donde `n` es el número de filas en la tabla data.table*.
 Enfoque de búsqueda binaria
-He aquí una ilustración muy sencilla. Consideremos los números (ordenados) que se muestran a continuación:
+Aquí hay una ilustración muy simple. Consideremos los números (ordenados) que se muestran a continuación:
 Supongamos que queremos encontrar la posición coincidente del valor *1*, usando la búsqueda binaria, así es como procederíamos, porque sabemos que los datos están *ordenados*.
 =====* Comienza con el valor del medio = 19. ¿Es 1 == 19? N.° 1 < 19.=====
 =====* Dado que el valor que buscamos es menor que 19, debería estar en algún lugar antes de 19. Por lo tanto, podemos descartar el resto de la mitad que sea >= 19.=====
@@ -124,7 +124,7 @@ Por otro lado, un enfoque de escaneo vectorial tendría que escanear todos los v
 Se puede observar que con cada búsqueda reducimos el número de búsquedas a la mitad. Por eso, los subconjuntos basados ​​en *búsquedas binarias* son **increíblemente rápidos**. Dado que las filas de cada columna de *data.tables* tienen ubicaciones contiguas en memoria, las operaciones se realizan con gran eficiencia de caché (lo que también contribuye a la *velocidad*).
 Además, dado que obtenemos los índices de fila coincidentes directamente sin tener que crear esos enormes vectores lógicos (iguales al número de filas en una *data.table*), también es bastante **eficiente en términos de memoria**.
 Resumen
-En esta viñeta, hemos aprendido otro método para crear subconjuntos de filas en `i` mediante la introducción de claves en una tabla de datos. Estableciendo claves, podemos realizar subconjuntos increíblemente rápidos mediante la búsqueda binaria. En particular, hemos visto cómo
+En esta viñeta, hemos aprendido otro método para crear subconjuntos de filas en `i` mediante la introducción de claves en una tabla de datos. La introducción de claves nos permite realizar subconjuntos increíblemente rápidos mediante la búsqueda binaria. En particular, hemos visto cómo
 =====* establecer clave y subconjunto usando la clave en una *data.table*.=====
 =====* subconjunto que utiliza claves que obtienen *índices de fila* en `i`, pero mucho más rápido.=====
 =====* Combina subconjuntos basados ​​en claves con `j` y `by`. Ten en cuenta que las operaciones `j` y `by` son exactamente las mismas que antes.=====

@@ -3,7 +3,7 @@ Análisis de datos utilizando `data.table`
 Las operaciones de manipulación de datos como *subconjunto*, *agrupación*, *actualización*, *unión*, etc., están intrínsecamente relacionadas. Mantener estas *operaciones relacionadas* permite:
 =====* Sintaxis *concisa* y *consistente* independientemente del conjunto de operaciones que desee realizar para lograr su objetivo final.=====
 =====* realizar análisis *de manera fluida* sin la carga cognitiva de tener que asignar cada operación a una función particular de un conjunto potencialmente enorme de funciones disponibles antes de realizar el análisis.=====
-=====* Optimizar *automáticamente* las operaciones de forma interna y muy efectiva al conocer con precisión los datos necesarios para cada operación, lo que genera un código muy rápido y con un uso eficiente de la memoria.=====
+=====* *optimizando automáticamente* las operaciones de manera interna y muy efectiva al conocer con precisión los datos necesarios para cada operación, lo que genera un código muy rápido y con uso eficiente de la memoria.=====
 En resumen, si le interesa reducir drásticamente el tiempo de *programación* y *computación*, este paquete es para usted. La filosofía de `data.table` lo hace posible. Nuestro objetivo es ilustrarlo mediante esta serie de viñetas.
 Datos {#data}
 En esta viñeta, utilizaremos datos de [NYC-flights14](https://raw.githubusercontent.com/Rdatatable/data.table/master/vignettes/flights14.csv) obtenidos del paquete [flights](https://github.com/arunsrinivasan/flights) (disponible solo en GitHub). Este paquete contiene datos de vuelos puntuales de la Oficina de Estadísticas de Transporte para todos los vuelos que salieron de los aeropuertos de la ciudad de Nueva York en 2014 (inspirado en [nycflights13](https://github.com/tidyverse/nycflights13)). Los datos solo están disponibles para el período de enero a octubre de 2014.
@@ -39,7 +39,7 @@ Podemos utilizar la función R `order()` para lograr esto.
 `order()` está optimizado internamente
 =====* Podemos usar \"-\" en columnas de `carácter` dentro del marco de una `data.table` para ordenar en orden decreciente.=====
 =====* Además, `order(...)` dentro del marco de `data.table` utiliza el ordenamiento radix rápido interno de `data.table`, `forder()`. Este ordenamiento proporcionó una mejora tan convincente respecto a `base::order` de R que el proyecto R adoptó el algoritmo `data.table` como su ordenamiento predeterminado en 2016 para R 3.3.0 (para referencia, consulte `?sort` y las [NOTICIAS de la versión de R](https://cran.r-project.org/doc/manuals/r-release/NEWS.pdf)).=====
-Discutiremos el orden rápido de `data.table` con más detalle en la viñeta *Aspectos internos de `data.table`*.
+Discutiremos el orden rápido de `data.table` con más detalle en la viñeta *internos de `data.table`*.
 d) Seleccione la(s) columna(s) en `j` {#select-j-1d}
 -- Seleccione la columna `arr_delay`, pero devuélvala como un *vector*.
 =====* Dado que las columnas se pueden referenciar como variables dentro de una tabla `data.table`, nos referimos directamente a la *variable* que queremos subconjunto. Como queremos *todas las filas*, simplemente omitimos `i`.=====
@@ -50,7 +50,7 @@ d) Seleccione la(s) columna(s) en `j` {#select-j-1d}
 Un `data.table` (y también un `data.frame`) es internamente una `lista`, con la condición de que cada elemento tenga la misma longitud y que la `lista` tenga un atributo `class`. Permitir que `j` devuelva una `lista` permite convertir y devolver `data.table` de forma muy eficiente.
 Consejo: {#tip-1}
 Mientras `j-expression` devuelva una `list`, cada elemento de la lista se convertirá en una columna en la `data.table` resultante. Esto hace que `j` sea bastante potente, como veremos en breve. También es muy importante comprender esto para cuando se deseen realizar consultas más complejas.
--- Seleccione las columnas `arr_delay` y `dep_delay`.
+- Seleccione las columnas `arr_delay` y `dep_delay`.
 =====* Envuelve ambas columnas dentro de `.()` o `list()`. Listo.=====
 -- Seleccione las columnas `arr_delay` y `dep_delay` *y* cámbieles el nombre a `delay_arr` y `delay_dep`.
 Dado que `.()` es solo un alias de `list()`, podemos nombrar las columnas como lo haríamos al crear una `lista`.
@@ -145,7 +145,7 @@ Recuerde que una `data.table` es internamente también una `lista` con todas sus
 Utilicemos la [`data.table` `DT` de antes](#what-is-datatable-1a) para tener una idea de cómo se ve `.SD`.
 =====* `.SD` contiene todas las columnas *excepto las columnas de agrupación* de forma predeterminada.=====
 =====* También se genera conservando el orden original: datos correspondientes a `ID = \"b\"`, luego `ID = \"a\"`, y luego `ID = \"c\"`.=====
-Para realizar cálculos en (múltiples) columnas, podemos simplemente utilizar la función base R `lapply()`.
+Para calcular en (múltiples) columnas, podemos simplemente usar la función base R `lapply()`.
 =====* `.SD` contiene las filas correspondientes a las columnas `a`, `b` y `c` de ese grupo. Calculamos la `mean()` de cada una de estas columnas utilizando la función base `lapply()`, ya conocida.=====
 =====* Cada grupo devuelve una lista de tres elementos que contienen el valor medio que se convertirá en las columnas de la tabla `data.table` resultante.=====
 =====* Dado que `lapply()` devuelve una `lista`, no es necesario envolverla con un `.()` adicional (si es necesario, consulte [este consejo](#tip-1)).=====
@@ -162,13 +162,13 @@ f) Subconjunto `.SD` para cada grupo:
 g) ¿Por qué mantener `j` tan flexible?
 Para mantener una sintaxis consistente y seguir usando funciones base ya existentes (y conocidas), en lugar de aprender nuevas funciones, utilicemos el `data.table` `DT` que creamos al principio, en la sección [¿Qué es un data.table?](#what-is-datatable-1a).
 -- ¿Cómo podemos concatenar las columnas `a` y `b` para cada grupo en `ID`?
-=====* Eso es todo. No se requiere sintaxis especial. Solo necesitamos saber la función base `c()`, que concatena vectores, y [el consejo anterior](#tip-1).=====
+=====* Eso es todo. No se requiere sintaxis especial. Solo necesitamos saber la función base `c()`, que concatena vectores, y [la sugerencia anterior](#tip-1).=====
 --¿Qué sucede si queremos tener todos los valores de las columnas `a` y `b` concatenados, pero devueltos como una columna de lista?
 =====* Aquí, primero concatenamos los valores con `c(a,b)` para cada grupo y los envolvemos con `list()`. Por lo tanto, para cada grupo, devolvemos una lista de todos los valores concatenados.=====
 =====* Tenga en cuenta que estas comas son solo para visualización. Una columna de lista puede contener cualquier objeto en cada celda; en este ejemplo, cada celda es un vector, y algunas celdas contienen vectores más largos que otras.=====
 Una vez que empieces a internalizar el uso de `j`, te darás cuenta de lo poderosa que puede ser la sintaxis. Una forma muy útil de comprenderla es experimentando con la ayuda de `print()`.
 Por ejemplo:
-La flexibilidad de j nos permite almacenar cualquier objeto de lista como elemento de data.table. Por ejemplo, cuando los modelos estadísticos se ajustan a grupos, estos modelos pueden almacenarse en un data.table. El código es conciso y fácil de entender.
+La flexibilidad de j nos permite almacenar cualquier objeto de lista como elemento de data.table. Por ejemplo, cuando los modelos estadísticos se ajustan a grupos, estos modelos pueden almacenarse en una tabla data.table. El código es conciso y fácil de entender.
 Usando data.frames, necesitamos un código más complicado para obtener el mismo resultado.
 Resumen
 La forma general de la sintaxis de `data.table` es:

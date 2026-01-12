@@ -56,7 +56,7 @@ El argumento integer64 (y la opción correspondiente) acepta los siguientes valo
 Para comprobar o establecer el valor predeterminado global, utilice:
 1.6 Eliminar o seleccionar columnas por nombre o posición
 Para ahorrar memoria y mejorar el rendimiento, utilice los argumentos `select` o `drop` de `fread()` para leer solo las columnas que necesita.
-=====- Si solo necesita unas pocas columnas, utilice `select`.===== =====- Si desea excluir solo unas pocas, utilice `drop`—esto evita tener que listar todo lo que desea conservar.=====
+=====- Si solo necesita unas pocas columnas, utilice `select`.===== =====- Si desea excluir solo algunas, utilice `drop`—esto evita tener que listar todo lo que desea conservar.=====
 Puntos clave: =====- `select`: Vector de nombres/posiciones de columnas a conservar (descarta las demás).===== =====- `drop`: Vector de nombres/posiciones de columnas a descartar (descarta las demás).===== =====- No utilice `select` y `drop` juntos, son mutuamente excluyentes.===== =====- `fread()` le avisará si falta alguna columna especificada en el archivo.=====
 Para obtener más detalles, consulte la página del manual ejecutando `?fread` en R.
 1.7 Detección automática de escape de comillas (incluida la ausencia de escape)
