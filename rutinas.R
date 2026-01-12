@@ -731,10 +731,10 @@ combinar_plain_txt_en_po <- function(po_txt_file, po_file, overwrite = FALSE) {
           c("msgstr \"\"", s)
         }
       })
-
+      
       no_empty <- nzchar(msgs$msgstr)
       if (overwrite && any(no_empty[-1])) {
-        warning("AVISO: algunos mensajes ya traducidos se reemplazan por nueva versión de google")
+        message("AVISO: algunos mensajes ya traducidos se reemplazan por nueva versión de google")
       } else {
         # restaurar originales
         msgstr_new[no_empty][-1] <-
@@ -769,7 +769,6 @@ combinar_plain_txt_en_po <- function(po_txt_file, po_file, overwrite = FALSE) {
       # comments al final?
       trail <- seq(o_from[i + 1], length.out = po_nl - o_from[i + 1] + 1)
       po[[2L * i + 1L]] <- lines_po[trail]
-      browser()
 
       writeLines(unlist(po, FALSE, FALSE), po_file)
     },
@@ -798,60 +797,6 @@ actualizar_po_metadata <- function(po_files, name, email, lang_code) {
 }
 
 
-# TODO: Script provisorio para traducir los títulos
-traducir_titulos_rmd <- function(lang_code = "es") {
-  # títulos en inglés
-  #   datatable-benchmarking.Rmd: "Benchmarking data.table",
-  #   datatable-faq.Rmd: "Frequently Asked Questions about data.table",
-  #   datatable-importing.Rmd: "Importing data.table",
-  #   datatable-intro.Rmd: "Introduction to data.table",
-  #   datatable-keys-fast-subset.Rmd: "Keys and fast binary search based subset",
-  #   datatable-programming.Rmd: "Programming on data.table",
-  #   datatable-reference-semantics.Rmd: "Reference semantics",
-  #   datatable-reshape.Rmd: "Efficient reshaping using data.tables",
-  #   datatable-sd-usage.Rmd: "Using .SD for Data Analysis",
-  #   datatable-fread-and-fwrite.Rmd: "Fast Read and Fast Write",
-  #   datatable-secondary-indices-and-auto-indexing.Rmd: "Secondary indices and auto indexing",
-  #   datatable-joins.Rmd: "Joins in data.table"
-  # titles missing: "joins and rolling joins", "data.table internals"
-
-  titles_es <- c(
-    `datatable-benchmarking.Rmd` = "Benchmarking con data.table",
-    `datatable-faq.Rmd` = "Preguntas frecuentes sobre data.table",
-    `datatable-importing.Rmd` = "Importar data.table",
-    `datatable-intro.Rmd` = "Introducción a data.table",
-    `datatable-keys-fast-subset.Rmd` = "Claves y filtrado rápido con búsqueda binaria",
-    `datatable-programming.Rmd` = "Programación en data.table",
-    `datatable-reference-semantics.Rmd` = "Semántica de referencia",
-    `datatable-reshape.Rmd` = "Remodelado eficiente con data.table",
-    `datatable-sd-usage.Rmd` = "Uso de .SD para Análisis de datos",
-    `datatable-fread-and-fwrite.Rmd` = "Lectura y escritura rápida: fread()/fwrite()",
-    `datatable-secondary-indices-and-auto-indexing.Rmd` = "Índices secundarios y auto indexación",
-    `datatable-joins.Rmd` = "Uniones «join» en data.table"
-  )
-  rmd_files <- dir(lang_code, pattern = ".Rmd$", full.names = TRUE)
-  lapply(rmd_files, function(f, i = basename(f)) {
-    if (i %in% names(titles_es)) {
-      lines <- readLines(f)
-      if ((length(n <- grep("title: \"(.*)\"", lines))) == 1) {
-        prev <- sub(".*title: \"(.*)\".*", "\\1", lines[n])
-        if (prev == titles_es[i]) {
-          message("Título no se cambia: ", prev)
-        } else {
-          writeLines(
-            regex_sub(lines, "title: \"(.*)\"", titles_es[i]), f
-          )
-          message("Título cambiado: ", prev, "-->", titles_es[i])
-        }
-      } else {
-        warning("no se puede individualizar \"title\"")
-      }
-    } else {
-      warning(gettext("título para %s no en titles_es (lista de traducidos)", i))
-    }
-  })
-  invisible()
-}
 
 # usa SELENIUM para traducir con google desde github
 extraer_traducciones_con_selenium <- function(
@@ -1043,7 +988,7 @@ update_PO <- function(lang_code = "es") {
 }
 
 # ---- Inicio ----
-start_translation <- function(lang_code = "es") {
+start_translation <- function(lang_code = "es", overwrite = FALSE) {
   # En Windows necesito python 3.8esto porque la librería rmpo sólo tiene
   # paquetes pre-compilados hasta esta versión
   #  py_available(TRUE)  # check for Python
@@ -1185,61 +1130,138 @@ start_translation <- function(lang_code = "es") {
 
 
   ## ---- paso (6) combinar traducción en el PO ----
-  cat("combinar traducciones en PO...\n")
-  cat("Las traducciones existentes no se modifican\n")
-  {
-    # función hace el trabajo de msgcat, etc.
-    # analizar si potools tiene algo similar...
-
-    for (i in seq_along(files.txt.es)) {
-      combinar_plain_txt_en_po(files.txt.es[i], files.po[i], overwrite = FALSE)
-    }
+  if (overwrite) {
+    cat("reemplazar PO con nuevas traducciones...\n")
+  } else {
+    cat("combinar traducciones en PO...\n")
+  }
+  # función hace el trabajo de msgcat, etc.
+  for (i in seq_along(files.txt.es)) {
+    combinar_plain_txt_en_po(files.txt.es[i], files.po[i], overwrite = TRUE)
+  }
     # TODO: después de este paso es posible correr "update_PO()" ya que rmd2po
     # altera un poco la disposición de las traducciones (no se borra nada).
-
     # Actualiza metadata ej: name = "Ricardo Villalba", mail = "rikivillalba@gmail.com"
-  }
 
+  ## ---- paso (10) subir a repo. ----
+  
+  ## ---- paso (7) generar .Rmd traducidos ----
+
+  msg <- R"--{
+Por último:
+- verifique las traducciones.
+- actualice las rutas en el código para que apunten al directorio raíz:
+  p.ej  "flights14.csv"  debería ser "../flights14.csv", ya que el .Rmd
+  del idioma se encuentra dentro de un subdirectorio.
+  
+- generar rmd's ejecutando `generar_rmds()` 
+  
+- actualizar el repo.
+
+> git add "."
+> git commit -m "rmd actualizados"
+> git push
+}--"
+
+  invisible()
+}
+
+generar_rmds <- function(lang_code = "es") {
+  
+  rmd_files <- dir(, ".Rmd$")
+  # modificar rutas y generar vignettes   
   ## ---- paso (7) generar .Rmd traducidos ----
   cat("Generar .Rmd traducidos...")
   for (f in rmd_files) {
     po2rmd(f, lang = lang_code, verbose = TRUE)
   }
-
-  ## ---- here ----
-  ## ---- paso (8) cambiar rutas en código R de subcarpeta del idioma ----
-  cat("Pendiente: corregir rutas en código R de subcarpeta del idioma...")
-
+  
   cat("Traducir títulos de Rmd")
   # TODO: este paso está HARCODEADO. rmd2po no tiene en cuenta los títulos
   # habríoa que generar un PO con los títulos y usar ese.
-  traducir_titulos_rmd()
+  titles_es <- c(
+    `datatable-benchmarking.Rmd` = "Benchmarking con data.table",
+    `datatable-faq.Rmd` = "Preguntas frecuentes sobre data.table",
+    `datatable-importing.Rmd` = "Importar data.table",
+    `datatable-intro.Rmd` = "Introducción a data.table",
+    `datatable-keys-fast-subset.Rmd` = "Claves y filtrado rápido con búsqueda binaria",
+    `datatable-programming.Rmd` = "Programación en data.table",
+    `datatable-reference-semantics.Rmd` = "Semántica de referencia",
+    `datatable-reshape.Rmd` = "Remodelado eficiente con data.table",
+    `datatable-sd-usage.Rmd` = "Uso de .SD para Análisis de datos",
+    `datatable-fread-and-fwrite.Rmd` = "Lectura y escritura rápida: fread()/fwrite()",
+    `datatable-secondary-indices-and-auto-indexing.Rmd` = "Índices secundarios y auto indexación",
+    `datatable-joins.Rmd` = "Uniones «join» en data.table"
+  )
+  rmd_files_tr <- dir(lang_code, pattern = ".Rmd$", full.names = TRUE)
+  for (f in rmd_files_tr) {
+    i = basename(f)
+    if (i %in% names(titles_es)) {
+      lines <- readLines(f)
+      if ((length(n <- grep("title: \"(.*)\"", lines))) == 1) {
+        prev <- sub(".*title: \"(.*)\".*", "\\1", lines[n])
+        if (prev == titles_es[i]) {
+          message("Título no se cambia: ", prev)
+        } else {
+          writeLines(regex_sub(lines, "title: \"(.*)\"", titles_es[i]), f)
+          message("Título cambiado: ", prev, "-->", titles_es[i])
+        }
+      } else {
+        warning("no se puede individualizar \"title\"")
+      }
+    } else {
+      warning(gettext("título para %s no fue cambiado (desconocido)", i))
+    }
+  }
+  
+  # cambiar rutas
+  rmd_files.transl <- dir(file.path(lang_code), ".Rmd$", full.names = TRUE)
+  tl <- "_translation_links.R"
+  dir.. <- \(i) file.path("..", i)
+  aux_files <- dir(recursive = TRUE)
+  is_rmd <- grepl("(?i)[.](Rmd|po|rmd-..[.]txt)$", aux_files)
+  rmd_dirs <- setdiff(dirname(aux_files[is_rmd]), ".")
+  aux_files <- aux_files[!is_rmd & !(dirname(aux_files) %in% rmd_dirs)]  
+  for (i in seq_along(rmd_files.transl)) {
+    lines <- readLines(rmd_files.transl[i]) 
+    m <- length(grep(sQuote(tl, FALSE), lines, fixed = TRUE))
+    lines <- sub(sQuote(tl, FALSE), sQuote(dir..(tl), FALSE), lines, fixed = TRUE) 
+    for (f in aux_files) {
+      m <- m + length(grep(dQuote(f, FALSE), lines, fixed = TRUE))
+      lines <- sub(dQuote(f, FALSE), dQuote(dir..(f), FALSE), lines, fixed = TRUE) 
+      # [text](link)
+      re <- sprintf("(\\[[^]]*\\])\\((\\Q%s\\E)\\)", f)
+      m <- m + length(grep(re, lines))
+      stopifnot((!grepl("\\\\", f)))
+      lines <- sub(re, sprintf("\\1(%s)", dir..(f)), lines) 
+    }
+    cat(rmd_files.transl[i],":", m," substituciones.\n")
+    writeLines(lines, rmd_files.transl[i])
+  }
+  # knit
+  local({
+    cd <- setwd(lang_code)
+    on.exit(setwd(cd))
+    for (i in dir(,"[.]Rmd$")) {
+      knitr::knit2html(i)
+      unlink(sub("[.]Rmd$", "[.]md$", i))
+    }
+  })
 
-  ## ---- paso (10) subir a repo. ----
-  msg <- R"--{
-  Por último:
-  - verifique las traducciones.
-  - actualice las rutas en el código para que apunten al directorio raíz:
-    p.ej  "flights14.csv"  debería ser "../flights14.csv", ya que el .Rmd
-    del idioma se encuentra dentro de un subdirectorio.
-  - actualizar el remo.
-
-  > git add "."
-  > git commit -m "rmd actualizados"
-  > git push
-
-  }--"
-
-  branch_name <- "main"
 }
-
+  
 library(reticulate)
 
+msg <- R"--{
+Script para tradución automática de viñetas .Rmd\n")Utiliza partes del proyecto 
+rmdpo - https://github.com/SciViews/rmdpo
+*** Ejecute `start_translation()` para iniciar traducción automática
+*** Ejecute `update_PO()` para solamente actualizar el catálogo .PO con 
+los cambios en los .Rmd en inglés más recientes.
+*** Ejecute generar_rmds() para volver a construir los Rmd traducidos.
+*** Ejecute `q()` para salir de R\n
+}--"
+cat(msg)
 local({
   #  rlang::global_entrace()
-  cat("Script para tradución automática de viñetas .Rmd\n")
-  cat("Utiliza partes del proyecto rmdpo - https://github.com/SciViews/rmdpo\n")
-  cat("*** Ejecute `start_translation()` para iniciar traducción automática\n")
-  cat("*** Ejecute `update_PO()` para solamente actualizar el catálogo .PO con los cambios en los .Rmd en inglés más recientes\n")
-  cat("*** Ejecute `q()` para salir de R\n")
 })
